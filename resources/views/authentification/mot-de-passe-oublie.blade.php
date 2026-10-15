@@ -1,0 +1,15 @@
+<x-layouts.invite titre="Mot de passe oublié">
+    <p class="text-sm">Indiquez votre adresse e-mail : vous recevrez un lien pour choisir un nouveau mot de passe.</p>
+
+    <form method="POST" action="{{ route('password.email') }}" class="mt-4 space-y-4">
+        @csrf
+        <div>
+            <label for="email" class="block text-sm font-medium">Adresse e-mail</label>
+            <input id="email" name="email" type="email" value="{{ old('email') }}" required autofocus autocomplete="email"
+                   class="mt-1 w-full rounded border border-slate-400 px-3 py-2">
+        </div>
+        <button type="submit" class="w-full rounded bg-slate-900 px-4 py-2 font-medium text-white">Recevoir le lien</button>
+    </form>
+
+    <p class="mt-6 text-sm"><a class="underline" href="{{ route('login') }}">Retour à la connexion</a></p>
+</x-layouts.invite>

@@ -3,12 +3,14 @@
 namespace App\Models\App;
 
 use App\Models\Fourrage\Elevage;
+use App\Notifications\Authentification\ReinitialisationMotDePasseNotification;
 use Database\Factories\App\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * Compte applicatif (chapitre 5.2) : éleveur, vétérinaire d'élevage (compte propre),
@@ -34,7 +36,7 @@ use Illuminate\Support\Carbon;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasRoles, Notifiable;
 
     public const CREATED_AT = 'cree_le';
 
@@ -83,6 +85,26 @@ class User extends Authenticatable
             ->using(ElevageAcces::class)
             ->as('acces')
             ->withPivot('role', 'consentement_id');
+    }
+
+    /**
+     * Compte d'agent GDS : authentifié par Entra ID, sans mot de passe local (EF-M0-04).
+     */
+    public function estCompteEntra(): bool
+    {
+        return $this->entra_oid !== null;
+    }
+
+    /**
+     * Réinitialisation du mot de passe : jamais pour un compte Entra ID, qui n'a pas de mot de passe local.
+     *
+     * @param  string  $token
+     */
+    public function sendPasswordResetNotification($token): void
+    {
+        if (! $this->estCompteEntra()) {
+            $this->notify(new ReinitialisationMotDePasseNotification($token));
+        }
     }
 
     public function nomComplet(): string

@@ -23,4 +23,6 @@ COPY docker/php/php.ini /usr/local/etc/php/conf.d/zz-focustroupeau.ini
 RUN groupmod -o -g "${GID}" www-data && usermod -o -u "${UID}" -g "${GID}" www-data
 
 WORKDIR /var/www/html
+# Configuration des outils CLI (tinker / psysh, composer) hors du dossier personnel non inscriptible
+ENV XDG_CONFIG_HOME=/tmp/.config COMPOSER_HOME=/tmp/.composer
 USER www-data

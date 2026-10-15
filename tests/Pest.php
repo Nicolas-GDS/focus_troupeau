@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /*
@@ -15,3 +16,12 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->in('Feature');
+
+/**
+ * Have I Been Pwned (k-anonymat, ENF-SEC-02) : simule la réponse de l'API ; sans argument, aucune fuite connue.
+ */
+function hibp(?string $motDePasseFuite = null): void
+{
+    $suffixe = $motDePasseFuite === null ? '' : substr(strtoupper(sha1($motDePasseFuite)), 5).':42';
+    Http::fake(['api.pwnedpasswords.com/*' => Http::response($suffixe)]);
+}
