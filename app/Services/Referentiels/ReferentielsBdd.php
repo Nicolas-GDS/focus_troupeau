@@ -73,7 +73,9 @@ class ReferentielsBdd implements Referentiels
 
     public function versionGrilleCourante(): string
     {
+        // Plus grand numéro (E24 numérote les versions successivement ; deux versions peuvent partager date et seconde).
         return (string) $this->cache->remember(self::CLE_CACHE.'version', self::DUREE_CACHE, fn () => DB::table('ref.version_referentiel')
+            ->orderByRaw("CASE WHEN numero ~ '^[0-9]+$' THEN numero::int END DESC NULLS LAST")
             ->orderByDesc('date_version')
             ->orderByDesc('cree_le')
             ->value('numero'));
