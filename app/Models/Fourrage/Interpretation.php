@@ -22,12 +22,15 @@ use Illuminate\Support\Carbon;
  * @property int|null $niveau_propose
  * @property string|null $synthese
  * @property string|null $lecture_nutritionnelle
- * @property string|null $lecture_sanitaire
+ * @property string|null $lecture_sanitaire lecture « propreté et conservation » (EF-M2-03)
+ * @property string|null $lecture_mineraux lecture « minéraux » (EF-M2-03, ajout)
  * @property string|null $recommandations
  * @property bool $orientation_veterinaire
  * @property string $statut
  * @property string|null $version_grille
  * @property string|null $utilisation_conseillee
+ * @property string|null $utilisation_deconseillee tableau PostgreSQL de codes de ref.categorie_animale
+ * @property string|null $motifs_rehaussement tableau PostgreSQL des motifs du niveau proposé (RC-1.4, ajout)
  * @property int|null $vise_par
  * @property Carbon|null $vise_le
  */
@@ -57,9 +60,9 @@ class Interpretation extends Model
 
     protected $fillable = [
         'analyse_id', 'version', 'date_interpretation', 'technicien_id', 'categorie_cible_code', 'niveau_global',
-        'niveau_propose', 'synthese', 'lecture_nutritionnelle', 'lecture_sanitaire', 'recommandations',
+        'niveau_propose', 'synthese', 'lecture_nutritionnelle', 'lecture_sanitaire', 'lecture_mineraux', 'recommandations',
         'orientation_veterinaire', 'statut', 'version_grille', 'utilisation_conseillee', 'utilisation_deconseillee',
-        'vise_par', 'vise_le',
+        'vise_par', 'vise_le', 'motifs_rehaussement',
     ];
 
     protected $attributes = ['version' => 1, 'statut' => self::STATUT_BROUILLON, 'orientation_veterinaire' => false];
@@ -70,6 +73,8 @@ class Interpretation extends Model
             'date_interpretation' => 'date',
             'vise_le' => 'datetime',
             'orientation_veterinaire' => 'boolean',
+            'niveau_global' => 'integer',
+            'niveau_propose' => 'integer',
         ];
     }
 
