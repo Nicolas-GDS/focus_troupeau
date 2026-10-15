@@ -84,6 +84,7 @@ CREATE TABLE app.convention (
   statut     text NOT NULL DEFAULT 'active' CHECK (statut IN ('active','echue','resiliee')),
   reference_externe text,                             -- n° de contrat (SignClic / gestion)
   commentaire text,
+  cree_par bigint REFERENCES app."user"(id), maj_par bigint REFERENCES app."user"(id),   -- auteur (EF-GEN-06)
   cree_le timestamptz NOT NULL DEFAULT now(), maj_le timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX ON app.convention (elevage_id, statut);

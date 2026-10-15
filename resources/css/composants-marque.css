@@ -1,0 +1,51 @@
+/* Focus Troupeau — composants graphiques de la marque (kit graphique v1, 06_jetons/components.css).
+   Ne couvre que la grammaire propre à la marque : cadres d'icônes, listes, pastilles d'état et de position. */
+
+/* Cadre de mise au point autour d'une icône (grammaire du signe) */
+.ft-icone{position:relative;width:54px;height:54px;display:grid;place-items:center;
+  color:var(--ft-bleu-gds)}
+.ft-icone::before,.ft-icone::after{content:"";position:absolute;width:15px;height:15px;
+  border-color:currentColor}
+.ft-icone::before{top:0;left:0;border-top:2px solid;border-left:2px solid;border-radius:5px 0 0 0}
+.ft-icone::after{bottom:0;right:0;border-bottom:2px solid;border-right:2px solid;border-radius:0 0 5px 0}
+.ft-icone svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.55;
+  stroke-linecap:round;stroke-linejoin:round}
+.ft-icone--actif::before,.ft-icone--actif::after{width:15px;height:15px}
+/* étape en cours : les quatre équerres */
+.ft-icone--actif{box-shadow:none}
+.ft-icone--pilier-hydratation{color:var(--ft-pilier-hydratation)}
+.ft-icone--pilier-nutrition{color:var(--ft-pilier-nutrition)}
+.ft-icone--pilier-physique{color:var(--ft-pilier-physique)}
+.ft-icone--pilier-environnement{color:var(--ft-pilier-environnement)}
+.ft-icone--pilier-bien-etre{color:var(--ft-pilier-bien-etre)}
+
+/* Listes — trois niveaux + vigilance */
+.ft-liste{list-style:none;padding:0;margin:0;display:grid;gap:.6rem}
+.ft-liste li{position:relative;padding-left:1.6rem;line-height:1.5}
+.ft-liste li::before{content:"";position:absolute;left:1px;top:.58em;transform:translateY(-50%);
+  width:9px;height:9px;border-top:2.4px solid var(--ft-bleu-gds);
+  border-left:2.4px solid var(--ft-bleu-gds);border-radius:3px 0 0 0}
+.ft-liste .n2{padding-left:2.75rem}
+.ft-liste .n2::before{left:1.3rem;width:7px;height:7px;border:0;border-radius:50%;
+  background:var(--ft-gris-territoire)}
+.ft-liste .n3{padding-left:3.9rem}
+.ft-liste .n3::before{left:2.5rem;width:9px;height:1.5px;border:0;border-radius:0;
+  background:var(--ft-gris-territoire)}
+.ft-liste .vigilance{font-weight:600}
+.ft-liste .vigilance::before{border-top-color:var(--ft-violet-sante);
+  border-left-color:var(--ft-violet-sante)}
+
+/* Pastilles d'état — la forme porte le sens autant que la couleur (WCAG) */
+.ft-etat{display:inline-flex;align-items:center;gap:.4rem;padding:.15rem .55rem;border-radius:999px;
+  font-family:var(--ft-police-titre);font-size:.78rem;font-weight:600}
+.ft-etat--critique{color:var(--ft-etat-critique);background:var(--ft-etat-critique-fond)}
+.ft-etat--alerte{color:var(--ft-etat-alerte);background:var(--ft-etat-alerte-fond)}
+.ft-etat--vigilance{color:var(--ft-etat-vigilance);background:var(--ft-etat-vigilance-fond)}
+.ft-etat--couvert{color:var(--ft-etat-couvert);background:var(--ft-etat-couvert-fond)}
+.ft-etat--information{color:var(--ft-etat-information);background:var(--ft-etat-information-fond)}
+.ft-etat svg{width:12px;height:12px}
+
+/* Position dans la campagne — forme distincte par niveau */
+.ft-position{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--ft-police-titre);
+  font-size:.78rem;font-weight:600;color:var(--ft-texte-doux)}
+.ft-position svg{width:14px;height:14px}
