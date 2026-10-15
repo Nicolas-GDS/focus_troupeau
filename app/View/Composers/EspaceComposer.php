@@ -48,7 +48,9 @@ class EspaceComposer
     }
 
     /**
-     * @return list<array{libelle: string, route: string}>
+     * Liens de navigation ; « parametres » : paramètres de route éventuels (E24 : table éditée).
+     *
+     * @return list<array{libelle: string, route: string, parametres?: array<string, string>}>
      */
     private function navigation(User $user): array
     {
@@ -70,6 +72,7 @@ class EspaceComposer
             $liens[] = ['libelle' => 'Utilisateurs', 'route' => 'admin.utilisateurs'];
             $liens[] = ['libelle' => 'Conventions', 'route' => 'admin.conventions'];
             $liens[] = ['libelle' => 'GDS', 'route' => 'admin.gds'];
+            $liens[] = ['libelle' => 'Référentiels', 'route' => 'admin.referentiels', 'parametres' => ['table' => 'seuils']];
         }
 
         return $liens;

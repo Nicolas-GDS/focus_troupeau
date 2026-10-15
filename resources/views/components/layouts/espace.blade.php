@@ -29,7 +29,7 @@
             <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-2 sm:flex-row sm:items-center sm:justify-between">
                 <nav aria-label="Navigation principale" class="flex flex-col gap-1 sm:flex-row sm:items-center">
                     @foreach ($navigation as $lien)
-                        <a href="{{ route($lien['route']) }}" class="lien-navigation"
+                        <a href="{{ route($lien['route'], $lien['parametres'] ?? []) }}" class="lien-navigation"
                            @if (request()->routeIs($lien['route'])) aria-current="page" @endif>{{ $lien['libelle'] }}</a>
                     @endforeach
                 </nav>

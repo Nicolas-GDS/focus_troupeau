@@ -50,6 +50,10 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
             Route::view('/gds', 'espace.admin.gds')->name('gds');
             Route::view('/utilisateurs', 'espace.admin.utilisateurs')->name('utilisateurs');
             Route::view('/conventions', 'espace.admin.conventions')->name('conventions');
+
+            // E24 — Référentiels versionnés (EF-M10-02) : {table} ∈ seuils, plages (404 sinon) ; l'écriture
+            // (permission referentiel.ecrire) est autorisée côté serveur dans chaque action du composant (ENF-SEC-04)
+            Route::view('/referentiels/{table}', 'espace.admin.referentiels')->middleware('permission:referentiel.lire')->name('referentiels');
         });
     });
 });

@@ -70,6 +70,11 @@ const REGISTRE_ROUTES = [
     'GET import/bulletins' => ['acces' => 'roles', 'roles' => ['technicien']],
     'GET import/bulletins/{import}/pdf' => ['acces' => 'objet'],
     'GET bulletins/{analyse}/pdf' => ['acces' => 'objet'],
+
+    // Lot L2 — E24 (référentiels versionnés) : appelée ici avec une table fictive, la route répond 404 aux
+    // administrateurs et 403 aux autres rôles ; accès réel (seuils, plages) testé dans
+    // tests/Feature/Referentiels/EcranReferentielsTest.php
+    'GET admin/referentiels/{table}' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global'], 'statut' => 404],
 ];
 
 /**
