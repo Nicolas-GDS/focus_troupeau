@@ -2,6 +2,8 @@
 
 namespace App\Models\App;
 
+use App\Models\Concerns\CloisonneParElevage;
+use App\Models\Concerns\CloisonneParGds;
 use App\Models\Concerns\TraceAuteur;
 use App\Models\Fourrage\Elevage;
 use Database\Factories\App\ConventionFactory;
@@ -30,7 +32,7 @@ use Illuminate\Support\Carbon;
 class Convention extends Model
 {
     /** @use HasFactory<ConventionFactory> */
-    use HasFactory, TraceAuteur;
+    use CloisonneParElevage, CloisonneParGds, HasFactory, TraceAuteur;
 
     public const CREATED_AT = 'cree_le';
 
@@ -43,6 +45,12 @@ class Convention extends Model
     public const STATUT_RESILIEE = 'resiliee';
 
     protected $table = 'app.convention';
+
+    /** Valeurs par défaut de la table, connues dès la création en mémoire. */
+    protected $attributes = [
+        'type' => 'approche_globale',
+        'statut' => self::STATUT_ACTIVE,
+    ];
 
     protected $fillable = [
         'elevage_id', 'gds_id', 'type', 'date_debut', 'date_fin', 'statut', 'reference_externe', 'commentaire',

@@ -2,6 +2,7 @@
 
 namespace App\Models\App;
 
+use App\Models\Concerns\CloisonneParElevage;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
@@ -16,6 +17,8 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  */
 class ElevageAcces extends Pivot
 {
+    use CloisonneParElevage;
+
     public const ROLE_ELEVEUR = 'eleveur';
 
     public const ROLE_VETERINAIRE = 'veterinaire';

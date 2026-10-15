@@ -7,6 +7,8 @@ use App\Models\App\Convention;
 use App\Models\App\ElevageAcces;
 use App\Models\App\Gds;
 use App\Models\App\User;
+use App\Models\Concerns\CloisonneParElevage;
+use App\Models\Concerns\CloisonneParGds;
 use Database\Factories\Fourrage\ElevageFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -40,7 +42,10 @@ use Illuminate\Support\Carbon;
 class Elevage extends Model
 {
     /** @use HasFactory<ElevageFactory> */
-    use HasFactory, HasUuids;
+    use CloisonneParElevage, CloisonneParGds, HasFactory, HasUuids;
+
+    /** Cloisonnement : l'élevage est identifié par sa propre clé. */
+    public const COLONNE_ELEVAGE = 'id';
 
     public const CREATED_AT = 'cree_le';
 

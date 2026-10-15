@@ -51,6 +51,14 @@ class User extends Authenticatable
 
     protected $hidden = ['password', 'remember_token'];
 
+    /** Valeurs par défaut de la table, connues dès la création en mémoire. */
+    protected $attributes = [
+        'actif' => true,
+        'pref_email' => true,
+        'pref_sms' => true,
+        'deux_facteurs_email' => false,
+    ];
+
     protected function casts(): array
     {
         return [

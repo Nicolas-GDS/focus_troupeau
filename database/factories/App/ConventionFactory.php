@@ -20,7 +20,7 @@ class ConventionFactory extends Factory
     {
         return [
             'elevage_id' => Elevage::factory(),
-            'gds_id' => fn (array $attributs) => Elevage::query()->findOrFail($attributs['elevage_id'])->gds_id,
+            'gds_id' => fn (array $attributs) => Elevage::query()->withoutGlobalScopes()->findOrFail($attributs['elevage_id'])->gds_id,
             'date_debut' => now()->subMonths(6)->toDateString(),
             'date_fin' => now()->addMonths(6)->toDateString(),
             'statut' => Convention::STATUT_ACTIVE,

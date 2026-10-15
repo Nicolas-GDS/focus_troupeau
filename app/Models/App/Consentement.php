@@ -2,6 +2,7 @@
 
 namespace App\Models\App;
 
+use App\Models\Concerns\CloisonneParElevage;
 use App\Models\Fourrage\Elevage;
 use Database\Factories\App\ConsentementFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -26,7 +27,7 @@ use Illuminate\Support\Carbon;
 class Consentement extends Model
 {
     /** @use HasFactory<ConsentementFactory> */
-    use HasFactory;
+    use CloisonneParElevage, HasFactory;
 
     public const TYPE_REFERENCES = 'references';
 

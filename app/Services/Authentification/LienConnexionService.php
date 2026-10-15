@@ -5,6 +5,7 @@ namespace App\Services\Authentification;
 use App\Models\App\User;
 use App\Notifications\Authentification\InvitationNotification;
 use App\Notifications\Authentification\LienConnexionNotification;
+use App\Services\Cloisonnement\AccesCompte;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -24,6 +25,8 @@ class LienConnexionService
 
     public const TYPE_ACTIVATION = 'activation';
 
+    public function __construct(private readonly AccesCompte $acces) {}
+
     /**
      * Envoie un lien de connexion si le compte peut en recevoir un. Ne révèle jamais si le compte existe.
      */
@@ -35,7 +38,7 @@ class LienConnexionService
             ->whereNull('entra_oid')
             ->first();
 
-        if ($user === null) {
+        if ($user === null || ! $this->acces->peutSeConnecter($user)) {
             return;
         }
 
@@ -89,7 +92,9 @@ class LienConnexionService
             return null;
         }
 
-        return User::query()->where('id', $ligne->user_id)->where('actif', true)->first();
+        $user = User::query()->find($ligne->user_id);
+
+        return $user !== null && $this->acces->peutSeConnecter($user) ? $user : null;
     }
 
     private function creer(User $user, string $type, Carbon $expiration, ?string $ip, ?User $auteur = null): string
