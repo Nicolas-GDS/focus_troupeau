@@ -53,3 +53,13 @@ jobs:
 
       - name: Tests (Pest)
         run: php artisan test
+
+  reference-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Implémentation de référence RC-5 à RC-14 (60 vérifications, T-10 à T-16)
+        run: python3 calculs/test_calculs.py
