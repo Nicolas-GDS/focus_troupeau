@@ -99,6 +99,10 @@
                                         </div>
                                     @elseif ($import->analyse)
                                         <span class="text-xs text-texte-doux">Analyse n° {{ $import->analyse->id }} — {{ $import->analyse->statut }}</span>
+                                        {{-- E20 — Interprétation d'un bulletin contrôlé (EF-M2-02) --}}
+                                        @if (in_array($import->analyse->statut, ['controle', 'valide'], true))
+                                            <a class="lien block text-sm" href="{{ route('analyses.interpretation', $import->analyse->id) }}">{{ $import->analyse->statut === 'controle' ? 'Interpréter' : 'Voir l\'interprétation' }}</a>
+                                        @endif
                                     @endif
                                 </td>
                             </tr>

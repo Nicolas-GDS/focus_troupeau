@@ -70,6 +70,9 @@ const REGISTRE_ROUTES = [
     'GET import/bulletins' => ['acces' => 'roles', 'roles' => ['technicien']],
     'GET import/bulletins/{import}/pdf' => ['acces' => 'objet'],
     'GET bulletins/{analyse}/pdf' => ['acces' => 'objet'],
+
+    // Lot L2 — E20 (objet testé dans tests/Feature/Interpretation/EcranInterpretationTest.php)
+    'GET analyses/{analyse}/interpretation' => ['acces' => 'objet'],
 ];
 
 /**
