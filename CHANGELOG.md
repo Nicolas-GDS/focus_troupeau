@@ -3,6 +3,19 @@
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; versions sémantiques (chapitre 6.5).
 Le numéro de version est affiché dans le pied de page de l'application et dans les PDF (ENF-EXP-03).
 
+## [Non publié] — lot L2 (import et interprétation)
+
+### Ajouté
+- Extension du schéma (§ 5.3) : versions des référentiels, plages de plausibilité, référentiel minéraux × troubles
+  (chapitre 11), suivi des dépôts de bulletins, visa et refus de visa.
+- Domaine d'interprétation : classement par la grille (RC-1), ratios, plausibilité (RC-2), niveau proposé et
+  compatibilité avec les troubles sanitaires (RC-1.4).
+- Import des bulletins LANO (EF-M9-01) : extraction par `scripts/parse_lano.py`, rapprochement, contrôle, écran E19.
+- Interprétation d'un bulletin et circuit de visa (EF-M2-02 à EF-M2-04) : écran E20.
+- Référentiels versionnés (EF-M10-02) : écran E24 (seuils, plages de plausibilité).
+- Files de travail du technicien et du vétérinaire conseil (EF-M2-08) : écran E18.
+- Outillage de recette J0 : `bulletins:importer`, `bulletins:controler-charges`, `bulletins:bilan`.
+
 ## [Non publié] — lot L1 (socle)
 
 ### Ajouté

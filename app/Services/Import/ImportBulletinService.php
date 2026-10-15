@@ -209,6 +209,53 @@ class ImportBulletinService
         $this->journal->ecrire('annulation_bulletin', $technicien->id, 'fourrage.analyse:'.$analyse->id, ['motif' => $motif]);
     }
 
+    /**
+     * Contrôle d'une analyse dont les résultats sont déjà en base (chargement du script 03 en recette, saisie) :
+     * ratios manquants (RC-1), plausibilité (RC-2), statut « controle » ou « anomalie », exclusion des références.
+     * Seule une analyse au statut « recu » est traitée ; renvoie le statut obtenu.
+     */
+    public function controlerAnalyseChargee(Analyse $analyse): string
+    {
+        if ($analyse->statut !== Analyse::STATUT_RECU) {
+            return $analyse->statut;
+        }
+
+        return DB::transaction(function () use ($analyse) {
+            $lignes = DB::table('fourrage.resultat')->where('analyse_id', $analyse->id)->whereNotNull('valeur')->get();
+            $valeurs = $lignes->map(fn ($l) => new ValeurAnalysee((string) $l->parametre_code, (float) $l->valeur, $l->censure))->values()->all();
+            $presents = $lignes->pluck('parametre_code')->all();
+            $ratios = array_values(array_filter((new Ratios)->calculer($valeurs), fn ($r) => ! in_array($r->parametreCode, $presents, true)));
+
+            $type = (string) DB::table('fourrage.prelevement')->where('id', $analyse->prelevement_id)->value('type_fourrage_code');
+            $anomalies = (new Plausibilite)->controler(array_merge($valeurs, $ratios), $this->referentiels->familleDuType($type), $this->referentiels->plagesPlausibiliteActives());
+            $horsPlage = array_map(fn ($a) => $a['valeur']->parametreCode, $anomalies);
+
+            foreach ($ratios as $r) {
+                DB::table('fourrage.resultat')->insert([
+                    'analyse_id' => $analyse->id, 'parametre_code' => $r->parametreCode, 'valeur' => $r->valeur,
+                    'unite' => (string) DB::table('ref.parametre')->where('code', $r->parametreCode)->value('unite'),
+                    'origine' => 'calcul_gds',
+                ]);
+            }
+            DB::table('fourrage.resultat')->where('analyse_id', $analyse->id)->update(['flag_anomalie' => false]);
+            DB::table('fourrage.resultat')->where('analyse_id', $analyse->id)->whereIn('parametre_code', $horsPlage)->update(['flag_anomalie' => true]);
+
+            $enAnomalie = $anomalies !== [];
+            $analyse->update([
+                'statut' => $enAnomalie ? Analyse::STATUT_ANOMALIE : Analyse::STATUT_CONTROLE,
+                'anomalie_detail' => $enAnomalie ? self::detailAnomalies($anomalies) : null,
+                'exclu_references' => $enAnomalie,
+                'motif_exclusion' => $enAnomalie ? 'Bulletin en anomalie (RC-2)' : null,
+            ]);
+
+            $this->journal->ecrire('controle_analyse_chargee', null, 'fourrage.analyse:'.$analyse->id, [
+                'statut' => $analyse->statut, 'ratios' => count($ratios), 'hors_plage' => $horsPlage,
+            ]);
+
+            return $analyse->statut;
+        });
+    }
+
     private function enregistrer(ImportBulletin $import, Prelevement $prelevement, ?Analyse $analyse): ImportBulletin
     {
         $donnees = (array) $import->donnees_extraites;

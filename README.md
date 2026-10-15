@@ -70,6 +70,7 @@ en recette uniquement.
   (`docker compose --profile front up node`).
 - **Bulletins** : `scripts/parse_lano.py` extrait les PDF LANO (`--json fichier.pdf`) ; bulletins anonymisés
   d'exemple dans `tests/Fixtures/lano/`.
+- **Recette** : procédures par lot dans `docs/recette/` (lot L2 : `L2_recette_J0.md`, commandes `bulletins:*`).
 
 ## Qualité
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\AiguillageController;
 use App\Http\Controllers\BulletinPdfController;
 use App\Http\Controllers\ElevageCourantController;
 use App\Http\Controllers\NoticeRgpdController;
+use App\Http\Controllers\TravailController;
 use App\Livewire\Interpretation\InterpretationBulletin;
 use Illuminate\Support\Facades\Route;
 
@@ -39,7 +40,7 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
         });
 
         // E18 — Travail du technicien (le vétérinaire conseil y trouve ses visas, E21)
-        Route::view('/travail', 'espace.travail')->middleware('role:technicien|veterinaire_gds')->name('travail');
+        Route::get('/travail', TravailController::class)->middleware('role:technicien|veterinaire_gds')->name('travail');
 
         // E19 — Import des bulletins (EF-M9-01) ; PDF servis par route signée et policy (ENF-SEC-05)
         Route::view('/import/bulletins', 'espace.import.bulletins')->middleware('permission:bulletin.importer')->name('import.bulletins');
