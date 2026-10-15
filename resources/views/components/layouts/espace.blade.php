@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $titre }} — {{ config('brand.nom') }}</title>
+    <x-tete-commune />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="flex min-h-screen flex-col">
@@ -20,7 +21,7 @@
                 @endif
             </div>
             <a href="{{ route('tableau-de-bord') }}" class="rounded-md">
-                <x-marque />
+                <x-marque :gds="$gds" />
             </a>
         </div>
 

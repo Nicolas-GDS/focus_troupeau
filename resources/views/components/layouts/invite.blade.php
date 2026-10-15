@@ -6,12 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $titre }} — {{ config('brand.nom') }}</title>
+    <x-tete-commune />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="flex min-h-screen flex-col">
     {{-- Pages publiques (E01) : avant la connexion, le GDS n'est pas connu — couleurs nationales --}}
     <main class="mx-auto w-full max-w-md flex-1 px-4 py-12">
-        <x-marque />
+        <x-marque :grand="true" />
         {{-- Première mention dans l'application (§ 8.1) --}}
         <p class="mt-2 text-sm text-slate-600">{{ config('brand.nom') }}, {{ config('brand.baseline') }}</p>
 

@@ -1,10 +1,10 @@
 @props(['gds'])
 {{--
     Logo du GDS de l'élevage (co-branding, § 8.1), en haut à gauche.
-    Fichier attendu : public/images/logos/gds-{id}.jpg ; le logo contient déjà le nom du GDS (texte alternatif pour
+    Fichier attendu : public/img/logos/gds-{id}.jpg ; le logo contient déjà le nom du GDS (texte alternatif pour
     les lecteurs d'écran). Sans fichier (nouveau GDS), un cartouche texte aux couleurs de l'entité le remplace.
 --}}
-@php($fichier = 'images/logos/gds-'.$gds->id.'.jpg')
+@php($fichier = 'img/logos/gds-'.$gds->id.'.jpg')
 @if (file_exists(public_path($fichier)))
     <img src="{{ asset($fichier) }}" alt="{{ $gds->nom }}" {{ $attributes->merge(['class' => 'h-10 w-auto']) }}>
 @else

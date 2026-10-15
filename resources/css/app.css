@@ -1,15 +1,11 @@
 /*
  * Focus Troupeau — système de design (§ 8.2).
+ * Jetons et composants de marque : kit graphique Focus Troupeau v1 (jetons.css, composants-marque.css).
  * Bases graphiques reprises de SAGEMA (neutres ardoise, rayons, menus déroulants) ; palette de la charte GDS v2.0.
- * Polices chargées localement (pas de police externe en production).
+ * Polices auto-hébergées dans public/fonts (aucune requête externe en production).
  */
-@import '@fontsource/outfit/400.css';
-@import '@fontsource/outfit/500.css';
-@import '@fontsource/outfit/600.css';
-@import '@fontsource/outfit/700.css';
-@import '@fontsource/source-serif-4/400.css';
-@import '@fontsource/source-serif-4/400-italic.css';
-@import '@fontsource/source-serif-4/600.css';
+@import './jetons.css';
+@import './composants-marque.css';
 
 @import 'tailwindcss';
 
@@ -18,76 +14,97 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/* Polices variables du kit (licences OFL dans public/fonts) */
+@font-face {
+    font-family: 'Outfit';
+    src: url('/fonts/Outfit.woff2') format('woff2-variations');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Source Serif 4';
+    src: url('/fonts/SourceSerif4.woff2') format('woff2-variations');
+    font-weight: 200 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Source Serif 4';
+    src: url('/fonts/SourceSerif4-Italic.woff2') format('woff2-variations');
+    font-weight: 200 900;
+    font-style: italic;
+    font-display: swap;
+}
+
 /*
- * Couleur d'entité : déterminée par le GDS de l'élevage courant (attribut data-gds sur <html>).
- * Les deux couleurs locales ne sont jamais mélangées dans un même bloc (§ 8.1).
- * « action » : couleur des boutons et liens actifs, contrastée AA avec le blanc (ENF-ACC-01) ;
- * l'Or Agenais #D4820A est réservé aux grands titres et aux filets, le texte courant du GDS 47 est en #7A5200.
+ * Utilitaires Tailwind adossés aux jetons du kit. La couleur d'entité suit l'attribut data-gds de <html>
+ * (GDS de l'élevage courant ; GDS 24 par défaut, comme dans le kit). Les deux couleurs locales ne sont
+ * jamais mélangées dans un même bloc (§ 8.1). « entite-action » (boutons, liens actifs) est la couleur de
+ * texte sur fond clair de l'entité, contrastée AA avec le blanc : l'Or Agenais #D4820A est réservé aux grands
+ * titres et aux filets, le texte courant du GDS 47 est en #7A5200 (ENF-ACC-01).
  */
-:root {
-    --entite: #0083ca;          /* sans GDS : Bleu GDS (couleur nationale) */
-    --entite-clair: #e6f4fb;
-    --entite-texte: #005f93;
-    --entite-action: #006ba0;
-}
-
-[data-gds='24'] {
-    --entite: #006ba0;          /* Bleu Périgord */
-    --entite-clair: #e6f4fb;    /* Ciel Dordogne */
-    --entite-texte: #006ba0;
-    --entite-action: #006ba0;
-}
-
-[data-gds='47'] {
-    --entite: #d4820a;          /* Or Agenais */
-    --entite-clair: #fdf3e3;    /* Crème Agenais */
-    --entite-texte: #7a5200;
-    --entite-action: #7a5200;
-}
-
 @theme {
-    --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
-    --font-titre: 'Outfit', ui-sans-serif, system-ui, sans-serif;
-    --font-serif: 'Source Serif 4', ui-serif, Georgia, serif;
+    --font-sans: 'Outfit', 'Aptos Display', Calibri, ui-sans-serif, system-ui, sans-serif;
+    --font-titre: var(--ft-police-titre);
+    --font-serif: var(--ft-police-corps);
 
     /* Couleurs nationales de la charte GDS v2.0 */
-    --color-bleu-gds: #0083ca;
-    --color-violet-sante: #9d3293;
-    --color-vert-prairie: #54b948;
-    --color-gris-territoire: #939598;
-    --color-quasi-noir: #231f20;
+    --color-bleu-gds: var(--ft-bleu-gds);
+    --color-violet-sante: var(--ft-violet-sante);
+    --color-vert-prairie: var(--ft-vert-prairie);
+    --color-gris-territoire: var(--ft-gris-territoire);
+    --color-quasi-noir: var(--ft-quasi-noir);
 
-    /* Couleurs locales (usage direct : logos, filets) */
-    --color-bleu-perigord: #006ba0;
-    --color-ciel-dordogne: #e6f4fb;
-    --color-or-agenais: #d4820a;
-    --color-creme-agenais: #fdf3e3;
-    --color-texte-agenais: #7a5200;
+    /* Entité courante */
+    --color-entite: var(--ft-entite-primaire);
+    --color-entite-clair: var(--ft-entite-fond-clair);
+    --color-entite-texte: var(--ft-entite-texte-sur-clair);
+    --color-entite-action: var(--ft-entite-texte-sur-clair);
 
-    /* Couleur de l'entité courante */
-    --color-entite: var(--entite);
-    --color-entite-clair: var(--entite-clair);
-    --color-entite-texte: var(--entite-texte);
-    --color-entite-action: var(--entite-action);
+    /* Surfaces et texte */
+    --color-surface: var(--ft-surface);
+    --color-fond: var(--ft-fond);
+    --color-texte: var(--ft-texte);
+    --color-texte-doux: var(--ft-texte-doux);
+    --color-filet: var(--ft-filet);
 
-    /* Couleurs d'état : toujours doublées d'un libellé et de la valeur (EF-GEN-03) */
-    --color-etat-critique: #b91c1c;
-    --color-etat-critique-fond: #fef2f2;
-    --color-etat-alerte: #b45309;
-    --color-etat-alerte-fond: #fffbeb;
-    --color-etat-vigilance: #0369a1;
-    --color-etat-vigilance-fond: #e0f2fe;
-    --color-etat-couvert: #2e7d32;
-    --color-etat-couvert-fond: #f0fdf4;
-    --color-etat-information: #4a5568;
+    /* États : toujours doublés d'un libellé, d'une forme et de la valeur (EF-GEN-03) */
+    --color-etat-critique: var(--ft-etat-critique);
+    --color-etat-critique-fond: var(--ft-etat-critique-fond);
+    --color-etat-alerte: var(--ft-etat-alerte);
+    --color-etat-alerte-fond: var(--ft-etat-alerte-fond);
+    --color-etat-vigilance: var(--ft-etat-vigilance);
+    --color-etat-vigilance-fond: var(--ft-etat-vigilance-fond);
+    --color-etat-couvert: var(--ft-etat-couvert);
+    --color-etat-couvert-fond: var(--ft-etat-couvert-fond);
+    --color-etat-information: var(--ft-etat-information);
+    --color-etat-information-fond: var(--ft-etat-information-fond);
+
+    /* Piliers et position dans la campagne (teintes de position : proposition du kit, à valider) */
+    --color-pilier-hydratation: var(--ft-pilier-hydratation);
+    --color-pilier-nutrition: var(--ft-pilier-nutrition);
+    --color-pilier-physique: var(--ft-pilier-physique);
+    --color-pilier-environnement: var(--ft-pilier-environnement);
+    --color-pilier-bien-etre: var(--ft-pilier-bien-etre);
+    --color-position-faible: var(--ft-position-faible);
+    --color-position-normal: var(--ft-position-normal);
+    --color-position-eleve: var(--ft-position-eleve);
 }
 
 @layer base {
-    body {
-        @apply bg-slate-50 font-sans text-quasi-noir antialiased;
+    html {
+        font-optical-sizing: auto;
     }
 
-    h1, h2, h3 {
+    /* Corps en Source Serif 4, titres et éléments d'interface en Outfit (§ 8.2) */
+    body {
+        @apply bg-fond font-serif text-texte antialiased;
+    }
+
+    h1, h2, h3, h4, nav, button, label, summary, .font-sans {
         @apply font-titre;
     }
 
@@ -98,19 +115,19 @@
 
 @layer components {
     .bouton-principal {
-        @apply inline-flex items-center justify-center rounded-md bg-entite-action px-4 py-2 font-medium text-white hover:opacity-90;
+        @apply inline-flex items-center justify-center rounded-md bg-entite-action px-4 py-2 font-titre font-medium text-white hover:opacity-90;
     }
 
     .bouton-secondaire {
-        @apply inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 font-medium text-slate-800 hover:bg-slate-50;
+        @apply inline-flex items-center justify-center rounded-md border border-slate-300 bg-surface px-4 py-2 font-titre font-medium text-slate-800 hover:bg-slate-50;
     }
 
     .champ {
-        @apply mt-1 w-full rounded-md border border-slate-400 bg-white px-3 py-2 text-base;
+        @apply mt-1 w-full rounded-md border border-slate-400 bg-surface px-3 py-2 font-titre text-base;
     }
 
     .etiquette {
-        @apply block text-sm font-medium text-slate-800;
+        @apply block font-titre text-sm font-medium text-slate-800;
     }
 
     .lien {
@@ -118,7 +135,7 @@
     }
 
     .carte {
-        @apply rounded-lg border border-slate-200 bg-white p-6 shadow-sm;
+        @apply rounded-lg border border-filet bg-surface p-6 shadow-sm;
     }
 
     /* Menus déroulants (repris des menus de SAGEMA), sans JavaScript : <details> natif, accessible au clavier */
@@ -140,15 +157,15 @@
     }
 
     .menu-deroulant > div {
-        @apply absolute right-0 z-50 mt-1 min-w-64 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg;
+        @apply absolute right-0 z-50 mt-1 min-w-64 overflow-hidden rounded-lg border border-filet bg-surface shadow-lg;
     }
 
     .menu-deroulant .option {
-        @apply block w-full border-b border-slate-200 px-3 py-2.5 text-left text-sm last:border-b-0 hover:bg-entite-clair;
+        @apply block w-full border-b border-filet px-3 py-2.5 text-left font-titre text-sm last:border-b-0 hover:bg-entite-clair;
     }
 
     .lien-navigation {
-        @apply rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900;
+        @apply rounded-md px-3 py-2 font-titre text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900;
     }
 
     .lien-navigation[aria-current='page'] {

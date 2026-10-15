@@ -99,23 +99,45 @@ it('co-brande l\'en-tête avec le GDS de l\'élevage de l\'éleveur (§ 8.1)', f
 
 it('affiche le logo officiel du GDS, avec son nom en texte alternatif', function () {
     $this->actingAs($this->jeu->eleveur24a)->get(route('accueil'))
-        ->assertSee('images/logos/gds-24.jpg', false)
+        ->assertSee('img/logos/gds-24.jpg', false)
         ->assertSee('alt="GDS Dordogne"', false);
 
     $this->actingAs($this->jeu->eleveur47)->get(route('accueil'))
-        ->assertSee('images/logos/gds-47.jpg', false)
+        ->assertSee('img/logos/gds-47.jpg', false)
         ->assertSee('alt="GDS Lot-et-Garonne"', false)
         ->assertDontSee('gds-24.jpg');
 });
 
 it('affiche le logo GDS France réduit en pied de page, y compris sur la page de connexion (§ 8.1)', function () {
     $this->actingAs($this->jeu->technicien24)->get(route('travail'))
-        ->assertSee('images/logos/gds-france.png', false)
+        ->assertSee('img/logos/gds-france.png', false)
         ->assertSee('alt="Réseau GDS France"', false);
 
     $this->post(route('logout'));
-    $this->get(route('login'))->assertSee('images/logos/gds-france.png', false);
+    $this->get(route('login'))->assertSee('img/logos/gds-france.png', false);
 });
+
+it('affiche le logotype co-brandé du GDS de l\'élevage, et le logotype général avant connexion (kit graphique v1)', function () {
+    $this->actingAs($this->jeu->eleveur47)->get(route('accueil'))
+        ->assertSee('img/marque/focus-troupeau-horizontal-gds47.svg', false)
+        ->assertDontSee('focus-troupeau-horizontal-gds24.svg');
+
+    $this->actingAs($this->jeu->eleveur24a)->get(route('accueil'))
+        ->assertSee('img/marque/focus-troupeau-horizontal-gds24.svg', false);
+
+    $this->post(route('logout'));
+    $this->get(route('login'))
+        ->assertSee('img/marque/focus-troupeau-horizontal.svg', false)
+        ->assertSee('favicon.svg', false)
+        ->assertSee('site.webmanifest', false);
+});
+
+it('sert les polices, le signe et les icônes du kit depuis l\'application', function (string $fichier) {
+    expect(file_exists(public_path($fichier)))->toBeTrue();
+})->with([
+    'fonts/Outfit.woff2', 'fonts/SourceSerif4.woff2', 'fonts/SourceSerif4-Italic.woff2', 'fonts/Outfit-OFL.txt',
+    'img/marque/signe-focus.svg', 'img/icones/focus-troupeau-icons.svg', 'favicon.ico', 'site.webmanifest',
+]);
 
 it('remplace par un cartouche le logo d\'un GDS qui n\'a pas encore de fichier', function () {
     $gds = new Gds(['id' => 33, 'code' => '33', 'nom' => 'GDS Gironde', 'couleur_locale' => '#000000']);

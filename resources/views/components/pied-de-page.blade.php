@@ -6,7 +6,7 @@
             <p class="font-serif italic text-violet-sante">{{ config('brand.signature') }}</p>
         </div>
         <div class="flex items-center gap-4 sm:flex-row-reverse sm:text-right">
-            <img src="{{ asset('images/logos/gds-france.png') }}" alt="Réseau GDS France" class="h-8 w-auto">
+            <img src="{{ asset('img/logos/gds-france.png') }}" alt="Réseau GDS France" class="h-8 w-auto">
             <p>Version {{ config('app.version') }}</p>
         </div>
     </div>

@@ -1,0 +1,82 @@
+/* Jetons du kit graphique Focus Troupeau v1 (06_jetons/tokens.css), repris tel quel : source de vérité des couleurs. */
+/* Focus Troupeau — jetons de couleur. Charte GDS 24/47 v2.0.
+   Thème clair sur :root, thème sombre sous prefers-color-scheme et [data-theme].
+   Les couleurs locales ne se mélangent jamais dans un même bloc. */
+:root{
+  --ft-bleu-gds: #0083CA;
+  --ft-violet-sante: #9D3293;
+  --ft-vert-prairie: #54B948;
+  --ft-gris-territoire: #939598;
+  --ft-quasi-noir: #231F20;
+  /* entité émettrice — redéfinir sur <html data-gds="24"> ou "47" */
+  --ft-entite-primaire: #006BA0;
+  --ft-entite-fond-clair: #E6F4FB;
+  --ft-entite-texte-sur-clair: #006BA0;
+  --ft-etat-critique: #B91C1C;
+  --ft-etat-critique-fond: #FEF2F2;
+  --ft-etat-alerte: #B45309;
+  --ft-etat-alerte-fond: #FFFBEB;
+  --ft-etat-vigilance: #0369A1;
+  --ft-etat-vigilance-fond: #E0F2FE;
+  --ft-etat-couvert: #2E7D32;
+  --ft-etat-couvert-fond: #F0FDF4;
+  --ft-etat-information: #4A5568;
+  --ft-etat-information-fond: #F1F5F9;
+  --ft-pilier-hydratation: #0083CA;
+  --ft-pilier-nutrition: #54B948;
+  --ft-pilier-physique: #939598;
+  --ft-pilier-environnement: #231F20;
+  --ft-pilier-bien-etre: #9D3293;
+  --ft-position-faible: #7FC1E4;
+  --ft-position-normal: #0083CA;
+  --ft-position-eleve: #00527E;
+  --ft-surface: #FFFFFF;
+  --ft-fond: #F6F8FA;
+  --ft-texte: #231F20;
+  --ft-texte-doux: #4A5568;
+  --ft-filet: #DCE4EC;
+  --ft-police-titre: 'Outfit','Aptos Display',Calibri,sans-serif;
+  --ft-police-corps: 'Source Serif 4',Cambria,Georgia,serif;
+}
+[data-gds="47"]{
+  --ft-entite-primaire: #D4820A;
+  --ft-entite-fond-clair: #FDF3E3;
+  --ft-entite-texte-sur-clair: #7A5200;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ft-bleu-gds:#3DAAE8; --ft-violet-sante:#CB74C1; --ft-vert-prairie:#6FD061;
+    --ft-gris-territoire:#A6ABB1; --ft-quasi-noir:#ECEFF2;
+    --ft-entite-primaire:#4BA3D2; --ft-entite-fond-clair:#16262F;
+    --ft-entite-texte-sur-clair:#4BA3D2;
+    --ft-pilier-hydratation:#3DAAE8; --ft-pilier-nutrition:#6FD061;
+    --ft-pilier-physique:#A6ABB1; --ft-pilier-environnement:#ECEFF2;
+    --ft-pilier-bien-etre:#CB74C1;
+    --ft-etat-critique:#F87171; --ft-etat-critique-fond:#2A1516;
+    --ft-etat-alerte:#F2B957; --ft-etat-alerte-fond:#2A2113;
+    --ft-etat-vigilance:#60B9E8; --ft-etat-vigilance-fond:#122633;
+    --ft-etat-couvert:#6FD061; --ft-etat-couvert-fond:#13261A;
+    --ft-etat-information:#BAC4CE; --ft-etat-information-fond:#232B33;
+    --ft-surface:#1B2127; --ft-fond:#13171B; --ft-texte:#ECEFF2;
+    --ft-texte-doux:#BAC4CE; --ft-filet:#2D363F;
+    color-scheme: dark;
+  }
+}
+[data-gds="47"][data-theme="dark"],[data-theme="dark"][data-gds="47"]{--ft-entite-primaire:#E8A646;--ft-entite-fond-clair:#2A2318;--ft-entite-texte-sur-clair:#E8A646;}
+[data-theme="dark"]{
+  --ft-bleu-gds:#3DAAE8; --ft-violet-sante:#CB74C1; --ft-vert-prairie:#6FD061;
+  --ft-gris-territoire:#A6ABB1; --ft-quasi-noir:#ECEFF2;
+  --ft-entite-primaire:#4BA3D2; --ft-entite-fond-clair:#16262F;
+  --ft-entite-texte-sur-clair:#4BA3D2;
+  --ft-pilier-hydratation:#3DAAE8; --ft-pilier-nutrition:#6FD061;
+  --ft-pilier-physique:#A6ABB1; --ft-pilier-environnement:#ECEFF2;
+  --ft-pilier-bien-etre:#CB74C1;
+  --ft-etat-critique:#F87171; --ft-etat-critique-fond:#2A1516;
+  --ft-etat-alerte:#F2B957; --ft-etat-alerte-fond:#2A2113;
+  --ft-etat-vigilance:#60B9E8; --ft-etat-vigilance-fond:#122633;
+  --ft-etat-couvert:#6FD061; --ft-etat-couvert-fond:#13261A;
+  --ft-etat-information:#BAC4CE; --ft-etat-information-fond:#232B33;
+  --ft-surface:#1B2127; --ft-fond:#13171B; --ft-texte:#ECEFF2;
+  --ft-texte-doux:#BAC4CE; --ft-filet:#2D363F;
+  color-scheme: dark;
+}
