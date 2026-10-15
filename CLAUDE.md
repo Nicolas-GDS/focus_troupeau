@@ -7,7 +7,8 @@ qui n'y figure pas — si une information manque, le dire et proposer, ne pas co
 
 ## Pile et conventions
 
-- PHP 8.3, Laravel 12, Livewire 3, Blade, Alpine.js, Tailwind (jetons du système de design Coélab, palette charte GDS v2.0).
+- PHP 8.3, Laravel 12, Livewire 3, Blade, Alpine.js, Tailwind (bases graphiques de SAGEMA, application Laravel du GDS — et non Coélab, qui n'est pas en Laravel —
+  avec la palette de la charte GDS v2.0 ; fichiers de départ dans `ressources/css/`).
 - PostgreSQL 16 + PostGIS 3.4 ; Redis ; Pest ; Pint ; Larastan niveau 6.
 - Le socle de données existant (schémas `ref`, `prive`, `fourrage`, `sig`, `valo`) vient des scripts `database/sql/01..02_*.sql`
   (document 02 du dossier Approche globale) : ils sont exécutés tels quels par la migration `0001_socle_document02`
