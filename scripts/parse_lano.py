@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
-"""Parseur des bulletins LANO (pdftotext -layout) -> table structurée."""
-import re, os, glob, json, csv, sys
+"""Parseur des bulletins LANO (pdftotext -layout) -> table structurée.
 
-SRC = os.path.expanduser("~/fourrages_txt")
+Deux usages (chapitre 6.1, EF-M9-01) :
+  python3 parse_lano.py --json bulletin.pdf
+      extraction d'un bulletin pour l'application : pdftotext -layout, puis JSON sur la sortie standard
+      {"entete": {...}, "famille_rapport": "...", "resultats": {"MS": 88.0, "MS__unit": "% brut", ...}} ;
+  python3 parse_lano.py --lot dossier_txt fichier_sortie.csv
+      traitement par lots historique (fichiers .txt déjà extraits -> CSV « ; »).
+
+Les fonctions d'extraction (parse_header, parse_results, parse_myco) sont celles du script d'origine, inchangées.
+"""
+import re, os, glob, json, csv, sys, subprocess
 
 # Codes de paramètres reconnus en début de ligne (ordre : les plus longs d'abord)
 CODES = [
@@ -168,54 +176,83 @@ def parse_myco(lines):
             res[key + "__unit"] = "µg/kg sec"
     return res
 
-rows = []
-for f in sorted(glob.glob(os.path.join(SRC, "*.txt"))):
-    lines = open(f, encoding="utf-8").read().split("\n")
-    h = parse_header(lines)
-    h["fichier"] = os.path.basename(f).replace(".txt", ".pdf")
-    if "MYCOTOXINES" in h["type_rapport"].upper():
-        h["famille_rapport"] = "MYCOTOXINES"
-        h.update(parse_myco(lines))
-    else:
-        tr = h["type_rapport"].upper()
-        if "MAÏS" in tr or "MAIS" in tr: fam = "ENSILAGE_MAIS"
-        elif "FOINS" in tr: fam = "FOIN"
-        elif "ENSILAGES/ENRUBANNAGES" in tr: fam = "ENSILAGE_ENRUBANNAGE_HERBE"
-        elif "DIVERS" in tr: fam = "FOURRAGE_DIVERS"
-        elif "CONCENTRE" in tr: fam = "CONCENTRE"
-        elif "VERTS" in tr: fam = "FOURRAGE_VERT"
-        else: fam = "AUTRE"
-        h["famille_rapport"] = fam
-        h.update(parse_results(lines))
-    rows.append(h)
 
-# colonnes ordonnées
-meta = ["num_echantillon","fichier","famille_rapport","type_rapport","date_prelevement","date_reception","date_edition",
-        "code_dossier","tiers","eleveur","adresse","technicien","client_lano","code_postal","commune","nom_echantillon",
-        "espece_fourrage","cycle_coupe","date_recolte","date_semis","date_ouverture_silo","type_prelevement",
-        "mode_sechage","mode_ensilage","etat_actuel","conservateur","variete","aliment"]
-params = ["MS","MM","MO","MAT","CB","DCS","SSR","AMI","MGT","MG","LIG","pH","NDF","ADF","ADL",
-          "P","Ca","Mg","K","Na","Cu","Zn","Mn","Fe","S","Al",
-          "dMO","UFL","UFV","PDIN","PDIE","PDIA","UEL","UEB","UEM","AMIDR","dMOna","dNDF","P_abs","Ca_abs","BACA","BE",
-          "UFL_2018","UFV_2018","PDI","PDIA_2018","BPR","DT6_N","DT6_AMI","AMIDR_2018","AMI_BYPASS","NI","EB",
-          "DON","ZEA","FUM"]
-units = {}
-for r in rows:
-    for p in params:
-        u = r.get(p + "__unit")
-        if u: units.setdefault(p, u)
-cols = meta + params
-out = os.path.expanduser("~/mnt/Approche globale/Livrables/analyses_fourrages_LANO_extraction.csv")
-with open(out, "w", newline="", encoding="utf-8-sig") as fh:
-    w = csv.writer(fh, delimiter=";")
-    w.writerow(cols)
-    w.writerow([""]*len(meta) + [units.get(p, "") for p in params])
+def famille_rapport(type_rapport):
+    tr = type_rapport.upper()
+    if "MYCOTOXINES" in tr: return "MYCOTOXINES"
+    if "MAÏS" in tr or "MAIS" in tr: return "ENSILAGE_MAIS"
+    if "FOINS" in tr: return "FOIN"
+    if "ENSILAGES/ENRUBANNAGES" in tr: return "ENSILAGE_ENRUBANNAGE_HERBE"
+    if "DIVERS" in tr: return "FOURRAGE_DIVERS"
+    if "CONCENTRE" in tr: return "CONCENTRE"
+    if "VERTS" in tr: return "FOURRAGE_VERT"
+    return "AUTRE"
+
+def analyser_lignes(lines):
+    """Un bulletin (lignes de pdftotext -layout) -> en-tête, famille de rapport et résultats."""
+    h = parse_header(lines)
+    fam = famille_rapport(h["type_rapport"])
+    res = parse_myco(lines) if fam == "MYCOTOXINES" else parse_results(lines)
+    return h, fam, res
+
+def extraire_pdf(chemin_pdf):
+    """Extraction d'un bulletin PDF pour l'application (mode --json)."""
+    txt = subprocess.run(["pdftotext", "-layout", chemin_pdf, "-"], capture_output=True, text=True, check=True).stdout
+    h, fam, res = analyser_lignes(txt.split("\n"))
+    return {"entete": h, "famille_rapport": fam, "resultats": res}
+
+def traiter_lot(src, sortie):
+    """Traitement par lots historique : dossier de .txt (pdftotext -layout) -> CSV « ; » avec ligne des unités."""
+    rows = []
+    for f in sorted(glob.glob(os.path.join(src, "*.txt"))):
+        lines = open(f, encoding="utf-8").read().split("\n")
+        h, fam, res = analyser_lignes(lines)
+        h["fichier"] = os.path.basename(f).replace(".txt", ".pdf")
+        h["famille_rapport"] = fam
+        h.update(res)
+        rows.append(h)
+
+    # colonnes ordonnées
+    meta = ["num_echantillon","fichier","famille_rapport","type_rapport","date_prelevement","date_reception","date_edition",
+            "code_dossier","tiers","eleveur","adresse","technicien","client_lano","code_postal","commune","nom_echantillon",
+            "espece_fourrage","cycle_coupe","date_recolte","date_semis","date_ouverture_silo","type_prelevement",
+            "mode_sechage","mode_ensilage","etat_actuel","conservateur","variete","aliment"]
+    params = ["MS","MM","MO","MAT","CB","DCS","SSR","AMI","MGT","MG","LIG","pH","NDF","ADF","ADL",
+              "P","Ca","Mg","K","Na","Cu","Zn","Mn","Fe","S","Al",
+              "dMO","UFL","UFV","PDIN","PDIE","PDIA","UEL","UEB","UEM","AMIDR","dMOna","dNDF","P_abs","Ca_abs","BACA","BE",
+              "UFL_2018","UFV_2018","PDI","PDIA_2018","BPR","DT6_N","DT6_AMI","AMIDR_2018","AMI_BYPASS","NI","EB",
+              "DON","ZEA","FUM"]
+    units = {}
     for r in rows:
-        w.writerow([r.get(c, "") if r.get(c) is not None else "" for c in cols])
-print("rows:", len(rows), "->", out)
-# résumé de contrôle
-from collections import Counter
-print(Counter(r["famille_rapport"] for r in rows))
-for r in rows:
-    nvals = sum(1 for p in params if r.get(p) not in (None, ""))
-    print(f'{r["num_echantillon"]} | {r["famille_rapport"]:28s} | {str(r.get("nom_echantillon"))[:38]:38s} | {r.get("code_postal")} {str(r.get("commune"))[:22]:22s} | n={nvals:2d} | MS={r.get("MS")} MAT={r.get("MAT")} UFL={r.get("UFL")} PDI={r.get("PDI")} BPR={r.get("BPR")} Cu={r.get("Cu")}')
+        for p in params:
+            u = r.get(p + "__unit")
+            if u: units.setdefault(p, u)
+    cols = meta + params
+    out = sortie
+    with open(out, "w", newline="", encoding="utf-8-sig") as fh:
+        w = csv.writer(fh, delimiter=";")
+        w.writerow(cols)
+        w.writerow([""]*len(meta) + [units.get(p, "") for p in params])
+        for r in rows:
+            w.writerow([r.get(c, "") if r.get(c) is not None else "" for c in cols])
+    print("rows:", len(rows), "->", out)
+    # résumé de contrôle
+    from collections import Counter
+    print(Counter(r["famille_rapport"] for r in rows))
+    for r in rows:
+        nvals = sum(1 for p in params if r.get(p) not in (None, ""))
+        print(f'{r["num_echantillon"]} | {r["famille_rapport"]:28s} | {str(r.get("nom_echantillon"))[:38]:38s} | {r.get("code_postal")} {str(r.get("commune"))[:22]:22s} | n={nvals:2d} | MS={r.get("MS")} MAT={r.get("MAT")} UFL={r.get("UFL")} PDI={r.get("PDI")} BPR={r.get("BPR")} Cu={r.get("Cu")}')
+
+
+def main(argv):
+    if len(argv) == 3 and argv[1] == "--json":
+        print(json.dumps(extraire_pdf(argv[2]), ensure_ascii=False))
+        return 0
+    if len(argv) == 4 and argv[1] == "--lot":
+        traiter_lot(os.path.expanduser(argv[2]), os.path.expanduser(argv[3]))
+        return 0
+    print(__doc__, file=sys.stderr)
+    return 2
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

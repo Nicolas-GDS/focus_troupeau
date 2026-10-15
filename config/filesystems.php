@@ -40,6 +40,16 @@ return [
             'report' => false,
         ],
 
+        // Bulletins de laboratoire (EF-M9-01, ENF-SEC-05) : hors racine web, servis par une route de l'application
+        // soumise aux policies ; arborescence bulletins/{gds}/{élevage}/ (§ 6.4).
+        'bulletins' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/bulletins'),
+            'serve' => false,
+            'throw' => true,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

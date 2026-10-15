@@ -10,6 +10,8 @@ use App\Models\Fourrage\Elevage;
 use App\Policies\ConsentementPolicy;
 use App\Policies\ConventionPolicy;
 use App\Policies\ElevagePolicy;
+use App\Services\Import\ExtracteurBulletin;
+use App\Services\Import\ExtracteurLano;
 use App\Services\Referentiels\ReferentielsBdd;
 use App\View\Composers\EspaceComposer;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +29,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // Référentiels (chapitre 6.2) : interface du domaine, implémentation en base avec cache.
         $this->app->singleton(Referentiels::class, ReferentielsBdd::class);
+
+        // Extraction des bulletins (EF-M9-01) : script LANO existant ; un export structuré la remplacera.
+        $this->app->bind(ExtracteurBulletin::class, ExtracteurLano::class);
     }
 
     public function boot(): void
