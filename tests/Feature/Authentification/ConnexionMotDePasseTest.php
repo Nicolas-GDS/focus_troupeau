@@ -11,6 +11,8 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Cache::flush();
+    // Horloge figée : les durées de verrouillage annoncées (« 60 secondes ») ne dépendent pas de la vitesse du test.
+    $this->freezeTime();
 });
 
 function connecter(string $email, string $motDePasse): TestResponse
