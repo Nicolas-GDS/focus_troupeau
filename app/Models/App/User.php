@@ -1,0 +1,92 @@
+<?php
+
+namespace App\Models\App;
+
+use App\Models\Fourrage\Elevage;
+use Database\Factories\App\UserFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
+
+/**
+ * Compte applicatif (chapitre 5.2) : éleveur, vétérinaire d'élevage (compte propre),
+ * technicien, vétérinaire conseil, administrateur (Entra ID).
+ *
+ * @property int $id
+ * @property string $email
+ * @property string $nom
+ * @property string|null $prenom
+ * @property string|null $password
+ * @property string|null $entra_oid
+ * @property int|null $personne_id
+ * @property string|null $telephone
+ * @property bool $pref_email
+ * @property bool $pref_sms
+ * @property Carbon|null $derniere_connexion
+ * @property bool $actif
+ * @property bool $deux_facteurs_email
+ * @property Carbon|null $notice_rgpd_acceptee_le
+ * @property Carbon $cree_le
+ * @property Carbon $maj_le
+ */
+class User extends Authenticatable
+{
+    /** @use HasFactory<UserFactory> */
+    use HasFactory, Notifiable;
+
+    public const CREATED_AT = 'cree_le';
+
+    public const UPDATED_AT = 'maj_le';
+
+    protected $table = 'app.user';
+
+    protected $fillable = [
+        'email', 'nom', 'prenom', 'password', 'entra_oid', 'personne_id', 'telephone',
+        'pref_email', 'pref_sms', 'actif', 'deux_facteurs_email',
+    ];
+
+    protected $hidden = ['password', 'remember_token'];
+
+    protected function casts(): array
+    {
+        return [
+            'password' => 'hashed',
+            'pref_email' => 'boolean',
+            'pref_sms' => 'boolean',
+            'actif' => 'boolean',
+            'deux_facteurs_email' => 'boolean',
+            'derniere_connexion' => 'datetime',
+            'notice_rgpd_acceptee_le' => 'datetime',
+        ];
+    }
+
+    /**
+     * GDS de rattachement (technicien, vétérinaire conseil, administrateur) — app.user_gds.
+     *
+     * @return BelongsToMany<Gds, $this>
+     */
+    public function gds(): BelongsToMany
+    {
+        return $this->belongsToMany(Gds::class, 'app.user_gds', 'user_id', 'gds_id');
+    }
+
+    /**
+     * Élevages rattachés au compte (éleveur ou vétérinaire d'élevage) — app.elevage_acces.
+     *
+     * @return BelongsToMany<Elevage, $this, ElevageAcces, 'acces'>
+     */
+    public function elevages(): BelongsToMany
+    {
+        return $this->belongsToMany(Elevage::class, 'app.elevage_acces', 'user_id', 'elevage_id')
+            ->using(ElevageAcces::class)
+            ->as('acces')
+            ->withPivot('role', 'consentement_id');
+    }
+
+    public function nomComplet(): string
+    {
+        return trim(($this->prenom ?? '').' '.$this->nom);
+    }
+}
