@@ -9,11 +9,13 @@ use App\Models\App\Convention;
 use App\Models\App\ImportBulletin;
 use App\Models\Fourrage\Analyse;
 use App\Models\Fourrage\Elevage;
+use App\Models\Fourrage\Interpretation;
 use App\Policies\AnalysePolicy;
 use App\Policies\ConsentementPolicy;
 use App\Policies\ConventionPolicy;
 use App\Policies\ElevagePolicy;
 use App\Policies\ImportBulletinPolicy;
+use App\Policies\InterpretationPolicy;
 use App\Services\Import\ExtracteurBulletin;
 use App\Services\Import\ExtracteurLano;
 use App\Services\Referentiels\ReferentielsBdd;
@@ -55,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Consentement::class, ConsentementPolicy::class);
         Gate::policy(ImportBulletin::class, ImportBulletinPolicy::class);
         Gate::policy(Analyse::class, AnalysePolicy::class);
+        Gate::policy(Interpretation::class, InterpretationPolicy::class);
 
         View::composer(['components.layouts.espace', 'espace.*', 'rgpd.*'], EspaceComposer::class);
 
