@@ -11,7 +11,7 @@
 | Authentification | Laravel Fortify (mot de passe, 2FA par e-mail), lien de connexion signé (`URL::temporarySignedRoute`, 15 min), Laravel Socialite fournisseur Microsoft (Entra ID, OpenID Connect) | D14 |
 | Autorisations | `spatie/laravel-permission` + policies Laravel + scopes globaux de cloisonnement | Chapitre 2 |
 | PDF | Browsershot (Chromium headless) rendant les vues Blade de restitution à la charte ; même chaîne que les fiches HTML → PDF existantes | EF-GEN-08 |
-| Extraction des bulletins LANO | Script Python `parse_lano.py` existant (pdftotext), appelé par un job via `Symfony\Process` ; sortie CSV ingérée par PHP | EF-M9-01 ; réécriture en PHP non justifiée tant que le format LANO n'est pas conventionné |
+| Extraction des bulletins LANO | Script Python `scripts/parse_lano.py` existant (pdftotext), appelé par un job via `Symfony\Process` en mode `--json` (un bulletin, sortie JSON ingérée par PHP ; le mode `--lot` historique produit un CSV) | EF-M9-01 ; réécriture en PHP non justifiée tant que le format LANO n'est pas conventionné ; JSON plutôt que CSV : censure et unités portées sans échappement (décision du lot L2) |
 | Notifications | Canal Laravel `mail` via Brevo SMTP/API et canal `sms` via l'API Brevo ; journalisation dans `app.notification` | EF-M8 |
 | Graphiques | Chart.js (lignes, bandes Q1-Q3, projections) rendu côté client, données fournies par Livewire ; export SVG pour le PDF | Chapitre 8 |
 | Tests | Pest (PHP), jeux de données de référence partagés avec `calculs/` (Python) | Chapitre 9 |

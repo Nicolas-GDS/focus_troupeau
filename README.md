@@ -61,6 +61,17 @@ Les ports se changent dans `.env` (`APP_PORT`, `DB_FORWARD_PORT`, `MAILPIT_UI_PO
 Le script `03_chargement_campagne_*.sql` (données nominatives) n'est pas versionné : il est chargé à la main,
 en recette uniquement.
 
+### À savoir en développement
+
+- **Files d'attente** : le service `queue-worker` garde le code en mémoire. Après toute modification du code PHP,
+  `docker compose exec app php artisan queue:restart` (à faire aussi à chaque déploiement).
+- **Styles** : Tailwind ne génère que les classes présentes dans les vues lors de la compilation. Après avoir modifié
+  une vue, recompiler (`docker compose run --rm --no-deps node npm run build`) ou garder le serveur Vite actif
+  (`docker compose --profile front up node`).
+- **Bulletins** : `scripts/parse_lano.py` extrait les PDF LANO (`--json fichier.pdf`) ; bulletins anonymisés
+  d'exemple dans `tests/Fixtures/lano/`.
+- **Recette** : procédures par lot dans `docs/recette/` (lot L2 : `L2_recette_J0.md`, commandes `bulletins:*`).
+
 ## Qualité
 
 ```bash

@@ -20,8 +20,8 @@ Les cas `T-10` à `T-16` sont exécutables (`python3 calculs/test_calculs.py`, 6
 |---|---|---|---|
 | T-01 | EF-M9-01, RC-1 | Importer les 59 PDF de J0 | 59 analyses créées, 58 en `controle`, ratios calculés, alertes générées conformes à la campagne (93 % des lots sous 7 mg Cu) |
 | T-02 | RC-2 | Bulletin HA25-42515 | Statut `anomalie`, quatre résultats `flag_anomalie`, exclu des références, technicien notifié |
-| T-03 | RC-1, EF-M2-02 | Foin MAT 61 g, Cu 4,2 mg, Fe 166 mg, K 18 g | Alertes : MAT faible (1), Cu carence probable (2), K élevé (1) ; Fe sans alerte ; niveau proposé 2 |
-| T-04 | RC-1.4 | Même lot avec un événement « non-délivrance » enregistré dans les 12 mois | Rehaussement proposé affiché, niveau retenu laissé au technicien |
+| T-03 | RC-1, EF-M2-02 | Foin MAT 61 g, Cu 4,2 mg, Fe 166 mg, K 18 g | Alertes : MAT faible (1), Cu carence probable (2) ; Fe et K sans alerte (K 18 g sous le seuil « élevé » de 30 g de la grille v1) ; niveau proposé 2 |
+| T-04 | RC-1.4 | Foin à Mg 1,6 g/kg MS (Mg bas, niveau 1) avec un événement « tétanie » enregistré dans les 12 mois (lien de force 3, chapitre 11) ; contrôle : le lot de T-03 avec une « non-délivrance » n'est pas rehaussé (aucun lien MAT ou Cu, niveau déjà 2) | Rehaussement proposé au niveau 2 avec son motif, niveau retenu laissé au technicien |
 | T-05 | EF-M2-04 | Interprétation de niveau 3 publiée par un technicien | Refus ; publication possible seulement après visa vétérinaire conseil |
 | T-06 | EF-M2-07 | Publication d'une visite puis modification | Version 2 créée, version 1 archivée et consultable, PDF v1 conservé |
 | T-07 | RC-3 | Type de fourrage avec 4 lots | « Référence insuffisante (n = 4) » ; avec 5 lots : quartiles affichés |
@@ -83,6 +83,7 @@ Estimation indicative pour un développement interne assisté par IA, à affiner
 | 10 | Nom de domaine et hébergeur | L8 | Direction |
 | 11 | Convention LANO pour un export structuré | L2 (ultérieur) | Direction |
 | 12 | Nom définitif (Focus Troupeau / Mise au point) | L1 (jetons) | Conseil d'administration |
+| 13 | Béliers : la catégorie `BOUC_MALE` (« mâles caprins / ovins ») est rattachée à l'espèce caprine ; aucun seuil Ca/P (urolithiase) ne s'applique aux béliers depuis la correction de la grille v3 — créer une catégorie ovine dédiée et son seuil ? | L2 / E24 | Comité technique |
 
 ## 9.5 Risques
 

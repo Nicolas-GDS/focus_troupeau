@@ -2,13 +2,27 @@
 
 namespace App\Providers;
 
+use App\Domain\Referentiels\Referentiels;
 use App\Listeners\JournaliserAuthentification;
 use App\Models\App\Consentement;
 use App\Models\App\Convention;
+use App\Models\App\ImportBulletin;
+use App\Models\Fourrage\Analyse;
 use App\Models\Fourrage\Elevage;
+use App\Models\Fourrage\Interpretation;
+use App\Models\Ref\PlagePlausibilite;
+use App\Models\Ref\SeuilInterpretation;
+use App\Models\Ref\VersionReferentiel;
+use App\Policies\AnalysePolicy;
 use App\Policies\ConsentementPolicy;
 use App\Policies\ConventionPolicy;
 use App\Policies\ElevagePolicy;
+use App\Policies\ImportBulletinPolicy;
+use App\Policies\InterpretationPolicy;
+use App\Policies\ReferentielPolicy;
+use App\Services\Import\ExtracteurBulletin;
+use App\Services\Import\ExtracteurLano;
+use App\Services\Referentiels\ReferentielsBdd;
 use App\View\Composers\EspaceComposer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
@@ -23,7 +37,11 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // Référentiels (chapitre 6.2) : interface du domaine, implémentation en base avec cache.
+        $this->app->singleton(Referentiels::class, ReferentielsBdd::class);
+
+        // Extraction des bulletins (EF-M9-01) : script LANO existant ; un export structuré la remplacera.
+        $this->app->bind(ExtracteurBulletin::class, ExtracteurLano::class);
     }
 
     public function boot(): void
@@ -41,6 +59,13 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Elevage::class, ElevagePolicy::class);
         Gate::policy(Convention::class, ConventionPolicy::class);
         Gate::policy(Consentement::class, ConsentementPolicy::class);
+        Gate::policy(ImportBulletin::class, ImportBulletinPolicy::class);
+        Gate::policy(Analyse::class, AnalysePolicy::class);
+        Gate::policy(Interpretation::class, InterpretationPolicy::class);
+        // E24 — Référentiels versionnés
+        Gate::policy(VersionReferentiel::class, ReferentielPolicy::class);
+        Gate::policy(SeuilInterpretation::class, ReferentielPolicy::class);
+        Gate::policy(PlagePlausibilite::class, ReferentielPolicy::class);
 
         View::composer(['components.layouts.espace', 'espace.*', 'rgpd.*'], EspaceComposer::class);
 

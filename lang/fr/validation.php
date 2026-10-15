@@ -28,6 +28,8 @@ return [
         'string' => 'Le champ :attribute ne doit pas dépasser :max caractères.',
     ],
     'mimes' => 'Le fichier :attribute doit être de type : :values.',
+    'mimetypes' => 'Le fichier :attribute doit être de type : :values.',
+    'uuid' => 'Le champ :attribute doit être un identifiant valide.',
     'min' => [
         'numeric' => 'Le champ :attribute doit être au moins égal à :min.',
         'string' => 'Le champ :attribute doit contenir au moins :min caractères.',

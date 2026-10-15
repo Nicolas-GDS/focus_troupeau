@@ -53,3 +53,6 @@ Zone.Identifier
 
 # --- Claude Code : réglages personnels ---
 .claude/settings.local.json
+
+# --- Claude Code : copies de travail des sous-agents ---
+/.claude/worktrees/
