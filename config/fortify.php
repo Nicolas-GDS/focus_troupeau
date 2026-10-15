@@ -27,7 +27,8 @@ return [
 
     'lowercase_usernames' => true,
 
-    'home' => '/accueil',
+    // Aiguillage par rôle après connexion (AiguillageController).
+    'home' => '/',
 
     'prefix' => '',
 

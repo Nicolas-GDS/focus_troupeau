@@ -9,8 +9,10 @@ use App\Models\Fourrage\Elevage;
 use App\Policies\ConsentementPolicy;
 use App\Policies\ConventionPolicy;
 use App\Policies\ElevagePolicy;
+use App\View\Composers\EspaceComposer;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use SocialiteProviders\Manager\SocialiteWasCalled;
@@ -33,6 +35,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Elevage::class, ElevagePolicy::class);
         Gate::policy(Convention::class, ConventionPolicy::class);
         Gate::policy(Consentement::class, ConsentementPolicy::class);
+
+        View::composer(['components.layouts.espace', 'espace.*', 'rgpd.*'], EspaceComposer::class);
 
         Event::subscribe(JournaliserAuthentification::class);
         Event::listen(SocialiteWasCalled::class, [MicrosoftExtendSocialite::class, 'handle']);

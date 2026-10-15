@@ -29,7 +29,7 @@ it('redirige un visiteur non connecté vers la connexion', function () {
 it('connecte un éleveur avec son e-mail et son mot de passe', function () {
     $eleveur = User::factory()->create(['email' => 'eleveur@exemple.fr', 'password' => 'un-mot-de-passe-solide']);
 
-    connecter('Eleveur@Exemple.fr', 'un-mot-de-passe-solide')->assertRedirect('/accueil');
+    connecter('Eleveur@Exemple.fr', 'un-mot-de-passe-solide')->assertRedirect('/');
 
     $this->assertAuthenticatedAs($eleveur);
     expect($eleveur->fresh()?->derniere_connexion)->not->toBeNull()
@@ -75,7 +75,7 @@ it('verrouille la connexion après 5 échecs, même avec le bon mot de passe (EN
     expect(Journal::query()->where('action', 'verrouillage_connexion')->count())->toBe(1);
 
     $this->travel(61)->seconds();
-    connecter('eleveur@exemple.fr', 'un-mot-de-passe-solide')->assertRedirect('/accueil');
+    connecter('eleveur@exemple.fr', 'un-mot-de-passe-solide')->assertRedirect('/');
 });
 
 it('double la durée du verrouillage à chaque nouvel échec', function () {
@@ -97,11 +97,11 @@ it('remet le compteur d\'échecs à zéro après une connexion réussie', functi
     foreach (range(1, 4) as $essai) {
         connecter('eleveur@exemple.fr', 'faux-'.$essai);
     }
-    connecter('eleveur@exemple.fr', 'un-mot-de-passe-solide')->assertRedirect('/accueil');
+    connecter('eleveur@exemple.fr', 'un-mot-de-passe-solide')->assertRedirect('/');
     $this->post(route('logout'));
 
     connecter('eleveur@exemple.fr', 'faux-5');
-    connecter('eleveur@exemple.fr', 'un-mot-de-passe-solide')->assertRedirect('/accueil');
+    connecter('eleveur@exemple.fr', 'un-mot-de-passe-solide')->assertRedirect('/');
 });
 
 it('déconnecte l\'utilisateur et journalise la déconnexion', function () {

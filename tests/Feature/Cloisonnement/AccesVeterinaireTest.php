@@ -20,7 +20,7 @@ beforeEach(function () {
 
 it('connecte le vétérinaire désigné par un consentement actif', function () {
     $this->post(route('login.store'), ['email' => 'veto@cabinet.fr', 'password' => 'un-mot-de-passe-solide'])
-        ->assertRedirect('/accueil');
+        ->assertRedirect('/');
 
     $this->assertAuthenticatedAs($this->jeu->veterinaire);
 });

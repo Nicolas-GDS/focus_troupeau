@@ -68,7 +68,7 @@ it('n\'épuise pas le lien à son ouverture : la connexion demande une confirmat
 it('connecte l\'éleveur par le lien et journalise la méthode', function () {
     demanderLien('eleveur@exemple.fr');
 
-    $this->post(lienEnvoye($this->eleveur))->assertRedirect('/accueil');
+    $this->post(lienEnvoye($this->eleveur))->assertRedirect('/');
 
     $this->assertAuthenticatedAs($this->eleveur);
     expect(Journal::query()->where('action', 'connexion')->sole()->detail)->toEqual(['methode' => 'lien']);
@@ -77,7 +77,7 @@ it('connecte l\'éleveur par le lien et journalise la méthode', function () {
 it('rend le lien inutilisable une seconde fois (T-30)', function () {
     demanderLien('eleveur@exemple.fr');
     $lien = lienEnvoye($this->eleveur);
-    $this->post($lien)->assertRedirect('/accueil');
+    $this->post($lien)->assertRedirect('/');
     $this->post(route('logout'));
 
     $this->post($lien)->assertRedirect(route('connexion.lien'))->assertSessionHasErrors('email');
@@ -102,7 +102,7 @@ it('accepte encore le lien juste avant 15 minutes', function () {
 
     $this->travel(14)->minutes();
 
-    $this->post($lien)->assertRedirect('/accueil');
+    $this->post($lien)->assertRedirect('/');
     $this->assertAuthenticatedAs($this->eleveur);
 });
 

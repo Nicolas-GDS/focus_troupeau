@@ -49,7 +49,7 @@ it('active le compte : mot de passe enregistré, connexion ouverte, activation j
     $lien = lienActivation($this->eleveur);
 
     $this->get($lien)->assertOk()->assertSee('Choisissez votre mot de passe');
-    activer($lien, 'prairie-fleurie-2026')->assertRedirect('/accueil');
+    activer($lien, 'prairie-fleurie-2026')->assertRedirect('/');
 
     $this->assertAuthenticatedAs($this->eleveur);
     expect(Hash::check('prairie-fleurie-2026', (string) $this->eleveur->fresh()?->password))->toBeTrue()

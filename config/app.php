@@ -13,7 +13,10 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Focus Troupeau'),
+
+    // Version affichée dans le pied de page et dans les PDF (ENF-EXP-03) ; voir CHANGELOG.md.
+    'version' => env('APP_VERSION', '0.1.0-dev'),
 
     /*
     |--------------------------------------------------------------------------

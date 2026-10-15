@@ -2,12 +2,12 @@
     @if ($valide)
         <form method="POST" action="{{ request()->fullUrl() }}">
             @csrf
-            <button type="submit" class="w-full rounded bg-slate-900 px-4 py-2 font-medium text-white">Me connecter</button>
+            <button type="submit" class="bouton-principal w-full">Me connecter</button>
         </form>
     @else
-        <p class="rounded border border-red-700 bg-red-50 p-3 text-sm" role="alert">
+        <p class="rounded-md border border-etat-critique bg-etat-critique-fond p-3 text-sm" role="alert">
             <span class="font-semibold">Lien expiré ou déjà utilisé.</span> Ce lien n'est plus valable.
         </p>
-        <p class="mt-4 text-sm"><a class="underline" href="{{ route('connexion.lien') }}">Demander un nouveau lien</a></p>
+        <p class="mt-4 text-sm"><a class="lien" href="{{ route('connexion.lien') }}">Demander un nouveau lien</a></p>
     @endif
 </x-layouts.invite>

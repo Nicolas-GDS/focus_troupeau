@@ -10,6 +10,7 @@ use App\Models\Fourrage\Elevage;
 
 /**
  * Jeu de cloisonnement minimal (inspiré de J4, § 9.1) : deux GDS, trois élevages, un compte par rôle.
+ * Tous les comptes ont accepté la notice RGPD (ENF-RGPD-02).
  *
  *   GDS 24 : elevage24a (éleveur24a, vétérinaire consenti), elevage24b
  *   GDS 47 : elevage47
@@ -83,7 +84,7 @@ final class JeuCloisonnement
      */
     private static function agent(string|array $roles, array $gds): User
     {
-        $user = User::factory()->entra()->create();
+        $user = User::factory()->entra()->create(['notice_rgpd_acceptee_le' => now()]);
         $user->assignRole($roles);
         $user->gds()->attach($gds);
 
@@ -92,7 +93,7 @@ final class JeuCloisonnement
 
     private static function compte(string $role): User
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['notice_rgpd_acceptee_le' => now()]);
         $user->assignRole($role);
 
         return $user;

@@ -55,7 +55,7 @@ it('n\'envoie aucun code si le mot de passe est faux', function () {
 it('connecte avec le bon code et journalise la méthode', function () {
     etapeMotDePasse();
 
-    $this->post(route('connexion.code.verifier'), ['code' => codeEnvoye($this->eleveur)])->assertRedirect('/accueil');
+    $this->post(route('connexion.code.verifier'), ['code' => codeEnvoye($this->eleveur)])->assertRedirect('/');
 
     $this->assertAuthenticatedAs($this->eleveur);
     expect(Journal::query()->where('action', 'connexion')->sole()->detail)->toEqual(['methode' => 'mot_de_passe_code']);
@@ -94,7 +94,7 @@ it('refuse un code expiré', function () {
 it('ne permet d\'utiliser un code qu\'une fois', function () {
     etapeMotDePasse();
     $code = codeEnvoye($this->eleveur);
-    $this->post(route('connexion.code.verifier'), ['code' => $code])->assertRedirect('/accueil');
+    $this->post(route('connexion.code.verifier'), ['code' => $code])->assertRedirect('/');
     $this->post(route('logout'));
 
     $this->withSession(['connexion.code' => ['user_id' => $this->eleveur->id, 'remember' => false]])
@@ -113,7 +113,7 @@ it('annule l\'ancien code quand un nouveau est envoyé', function () {
     if ($ancien !== $nouveau) {
         $this->post(route('connexion.code.verifier'), ['code' => $ancien])->assertSessionHasErrors('code');
     }
-    $this->post(route('connexion.code.verifier'), ['code' => $nouveau])->assertRedirect('/accueil');
+    $this->post(route('connexion.code.verifier'), ['code' => $nouveau])->assertRedirect('/');
 });
 
 it('renvoie vers la connexion si aucune connexion n\'est en attente de code', function () {

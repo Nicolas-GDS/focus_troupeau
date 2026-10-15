@@ -5,19 +5,19 @@
         <form method="POST" action="{{ request()->fullUrl() }}" class="mt-4 space-y-4">
             @csrf
             <div>
-                <label for="password" class="block text-sm font-medium">Mot de passe</label>
+                <label for="password" class="etiquette">Mot de passe</label>
                 <input id="password" name="password" type="password" required minlength="12" autocomplete="new-password"
-                       class="mt-1 w-full rounded border border-slate-400 px-3 py-2">
+                       class="champ">
             </div>
             <div>
-                <label for="password_confirmation" class="block text-sm font-medium">Confirmation du mot de passe</label>
+                <label for="password_confirmation" class="etiquette">Confirmation du mot de passe</label>
                 <input id="password_confirmation" name="password_confirmation" type="password" required minlength="12" autocomplete="new-password"
-                       class="mt-1 w-full rounded border border-slate-400 px-3 py-2">
+                       class="champ">
             </div>
-            <button type="submit" class="w-full rounded bg-slate-900 px-4 py-2 font-medium text-white">Activer mon compte</button>
+            <button type="submit" class="bouton-principal w-full">Activer mon compte</button>
         </form>
     @else
-        <p class="rounded border border-red-700 bg-red-50 p-3 text-sm" role="alert">
+        <p class="rounded-md border border-etat-critique bg-etat-critique-fond p-3 text-sm" role="alert">
             <span class="font-semibold">Lien d'activation expiré ou déjà utilisé.</span>
             Demandez une nouvelle invitation à votre technicien GDS.
         </p>

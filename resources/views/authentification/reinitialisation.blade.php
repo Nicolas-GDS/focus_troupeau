@@ -3,20 +3,20 @@
         @csrf
         <input type="hidden" name="token" value="{{ $request->route('token') }}">
         <div>
-            <label for="email" class="block text-sm font-medium">Adresse e-mail</label>
+            <label for="email" class="etiquette">Adresse e-mail</label>
             <input id="email" name="email" type="email" value="{{ old('email', $request->query('email')) }}" required autocomplete="username"
-                   class="mt-1 w-full rounded border border-slate-400 px-3 py-2">
+                   class="champ">
         </div>
         <div>
-            <label for="password" class="block text-sm font-medium">Nouveau mot de passe (12 caractères minimum)</label>
+            <label for="password" class="etiquette">Nouveau mot de passe (12 caractères minimum)</label>
             <input id="password" name="password" type="password" required minlength="12" autocomplete="new-password"
-                   class="mt-1 w-full rounded border border-slate-400 px-3 py-2">
+                   class="champ">
         </div>
         <div>
-            <label for="password_confirmation" class="block text-sm font-medium">Confirmation</label>
+            <label for="password_confirmation" class="etiquette">Confirmation</label>
             <input id="password_confirmation" name="password_confirmation" type="password" required minlength="12" autocomplete="new-password"
-                   class="mt-1 w-full rounded border border-slate-400 px-3 py-2">
+                   class="champ">
         </div>
-        <button type="submit" class="w-full rounded bg-slate-900 px-4 py-2 font-medium text-white">Enregistrer</button>
+        <button type="submit" class="bouton-principal w-full">Enregistrer</button>
     </form>
 </x-layouts.invite>

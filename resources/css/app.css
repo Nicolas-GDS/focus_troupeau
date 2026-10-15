@@ -1,3 +1,16 @@
+/*
+ * Focus Troupeau — système de design (§ 8.2).
+ * Bases graphiques reprises de SAGEMA (neutres ardoise, rayons, menus déroulants) ; palette de la charte GDS v2.0.
+ * Polices chargées localement (pas de police externe en production).
+ */
+@import '@fontsource/outfit/400.css';
+@import '@fontsource/outfit/500.css';
+@import '@fontsource/outfit/600.css';
+@import '@fontsource/outfit/700.css';
+@import '@fontsource/source-serif-4/400.css';
+@import '@fontsource/source-serif-4/400-italic.css';
+@import '@fontsource/source-serif-4/600.css';
+
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -5,7 +18,140 @@
 @source '../**/*.blade.php';
 @source '../**/*.js';
 
+/*
+ * Couleur d'entité : déterminée par le GDS de l'élevage courant (attribut data-gds sur <html>).
+ * Les deux couleurs locales ne sont jamais mélangées dans un même bloc (§ 8.1).
+ * « action » : couleur des boutons et liens actifs, contrastée AA avec le blanc (ENF-ACC-01) ;
+ * l'Or Agenais #D4820A est réservé aux grands titres et aux filets, le texte courant du GDS 47 est en #7A5200.
+ */
+:root {
+    --entite: #0083ca;          /* sans GDS : Bleu GDS (couleur nationale) */
+    --entite-clair: #e6f4fb;
+    --entite-texte: #005f93;
+    --entite-action: #006ba0;
+}
+
+[data-gds='24'] {
+    --entite: #006ba0;          /* Bleu Périgord */
+    --entite-clair: #e6f4fb;    /* Ciel Dordogne */
+    --entite-texte: #006ba0;
+    --entite-action: #006ba0;
+}
+
+[data-gds='47'] {
+    --entite: #d4820a;          /* Or Agenais */
+    --entite-clair: #fdf3e3;    /* Crème Agenais */
+    --entite-texte: #7a5200;
+    --entite-action: #7a5200;
+}
+
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+    --font-titre: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+    --font-serif: 'Source Serif 4', ui-serif, Georgia, serif;
+
+    /* Couleurs nationales de la charte GDS v2.0 */
+    --color-bleu-gds: #0083ca;
+    --color-violet-sante: #9d3293;
+    --color-vert-prairie: #54b948;
+    --color-gris-territoire: #939598;
+    --color-quasi-noir: #231f20;
+
+    /* Couleurs locales (usage direct : logos, filets) */
+    --color-bleu-perigord: #006ba0;
+    --color-ciel-dordogne: #e6f4fb;
+    --color-or-agenais: #d4820a;
+    --color-creme-agenais: #fdf3e3;
+    --color-texte-agenais: #7a5200;
+
+    /* Couleur de l'entité courante */
+    --color-entite: var(--entite);
+    --color-entite-clair: var(--entite-clair);
+    --color-entite-texte: var(--entite-texte);
+    --color-entite-action: var(--entite-action);
+
+    /* Couleurs d'état : toujours doublées d'un libellé et de la valeur (EF-GEN-03) */
+    --color-etat-critique: #b91c1c;
+    --color-etat-critique-fond: #fef2f2;
+    --color-etat-alerte: #b45309;
+    --color-etat-alerte-fond: #fffbeb;
+    --color-etat-vigilance: #0369a1;
+    --color-etat-vigilance-fond: #e0f2fe;
+    --color-etat-couvert: #2e7d32;
+    --color-etat-couvert-fond: #f0fdf4;
+    --color-etat-information: #4a5568;
+}
+
+@layer base {
+    body {
+        @apply bg-slate-50 font-sans text-quasi-noir antialiased;
+    }
+
+    h1, h2, h3 {
+        @apply font-titre;
+    }
+
+    :focus-visible {
+        @apply outline-2 outline-offset-2 outline-entite-action;
+    }
+}
+
+@layer components {
+    .bouton-principal {
+        @apply inline-flex items-center justify-center rounded-md bg-entite-action px-4 py-2 font-medium text-white hover:opacity-90;
+    }
+
+    .bouton-secondaire {
+        @apply inline-flex items-center justify-center rounded-md border border-slate-300 bg-white px-4 py-2 font-medium text-slate-800 hover:bg-slate-50;
+    }
+
+    .champ {
+        @apply mt-1 w-full rounded-md border border-slate-400 bg-white px-3 py-2 text-base;
+    }
+
+    .etiquette {
+        @apply block text-sm font-medium text-slate-800;
+    }
+
+    .lien {
+        @apply text-entite-texte underline underline-offset-2 hover:no-underline;
+    }
+
+    .carte {
+        @apply rounded-lg border border-slate-200 bg-white p-6 shadow-sm;
+    }
+
+    /* Menus déroulants (repris des menus de SAGEMA), sans JavaScript : <details> natif, accessible au clavier */
+    .menu-deroulant {
+        @apply relative;
+    }
+
+    .menu-deroulant > summary {
+        @apply flex cursor-pointer list-none items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900;
+    }
+
+    .menu-deroulant > summary::-webkit-details-marker {
+        display: none;
+    }
+
+    .menu-deroulant > summary::after {
+        content: '\25BE';
+        @apply text-xs text-slate-500;
+    }
+
+    .menu-deroulant > div {
+        @apply absolute right-0 z-50 mt-1 min-w-64 overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg;
+    }
+
+    .menu-deroulant .option {
+        @apply block w-full border-b border-slate-200 px-3 py-2.5 text-left text-sm last:border-b-0 hover:bg-entite-clair;
+    }
+
+    .lien-navigation {
+        @apply rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900;
+    }
+
+    .lien-navigation[aria-current='page'] {
+        @apply bg-entite-clair text-entite-texte;
+    }
 }

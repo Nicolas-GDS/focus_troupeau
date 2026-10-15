@@ -53,7 +53,7 @@ function retourEntra(array $groupes, string $oid = 'oid-agent-1', string $email 
 }
 
 it('crée le compte à la première connexion avec le rôle et le GDS des groupes (T-31)', function () {
-    retourEntra([GROUPE_TECH_24, 'groupe-sans-rapport'])->assertRedirect('/accueil');
+    retourEntra([GROUPE_TECH_24, 'groupe-sans-rapport'])->assertRedirect('/');
 
     $agent = User::query()->where('entra_oid', 'oid-agent-1')->sole();
     $this->assertAuthenticatedAs($agent);
@@ -114,7 +114,7 @@ it('ne réécrit pas les rôles gérés dans l\'application aux connexions suiva
     $agent->gds()->sync([24, 47]);
     $this->post(route('logout'));
 
-    retourEntra([GROUPE_TECH_24])->assertRedirect('/accueil');
+    retourEntra([GROUPE_TECH_24])->assertRedirect('/');
 
     expect($agent->fresh()?->getRoleNames()->sort()->values()->all())->toBe(['admin', 'technicien'])
         ->and($agent->gds()->pluck('id')->sort()->values()->all())->toBe([24, 47]);
