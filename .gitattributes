@@ -1,0 +1,37 @@
+# Fins de ligne normalisées en LF (développement sous WSL / Windows)
+* text=auto eol=lf
+
+*.blade.php diff=html
+*.css diff=css
+*.html diff=html
+*.md diff=markdown
+*.php diff=php
+*.py diff=python
+*.sql linguist-detectable
+
+# Scripts Windows
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binaires
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.pdf binary
+*.docx binary
+*.xlsx binary
+*.pptx binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.zip binary
+*.gpkg binary
+*.shp binary
+*.dbf binary
+
+/.github export-ignore
+CHANGELOG.md export-ignore
