@@ -9,9 +9,10 @@ qui n'y figure pas — si une information manque, le dire et proposer, ne pas co
 
 - PHP 8.3, Laravel 12, Livewire 3, Blade, Alpine.js, Tailwind (jetons du système de design Coélab, palette charte GDS v2.0).
 - PostgreSQL 16 + PostGIS 3.4 ; Redis ; Pest ; Pint ; Larastan niveau 6.
-- Le socle de données existant (schémas `ref`, `prive`, `fourrage`, `sig`, `valo`) vient des scripts `database/sql/01..03_*.sql`
+- Le socle de données existant (schémas `ref`, `prive`, `fourrage`, `sig`, `valo`) vient des scripts `database/sql/01..02_*.sql`
   (document 02 du dossier Approche globale) : ils sont exécutés tels quels par la migration `0001_socle_document02`
-  et ne sont jamais modifiés ; les extensions vont dans des migrations SQL brutes (`DB::unprepared`) par schéma
+  et ne sont jamais modifiés. Le script 03 (chargement des données) n'est pas versionné : il est passé directement
+  en base par l'administrateur, hors migrations — ne pas le recréer ni en dépendre dans les tests (seeders dédiés). Les extensions vont dans des migrations SQL brutes (`DB::unprepared`) par schéma
   (`app`, `dossier`, `stock`, `plan`), conformément au chapitre 5.
 - Toute la logique métier est dans `app/Domain/` (classes PHP pures, DTO, sans Eloquent), testée unitairement.
   Les composants Livewire appellent des services (`app/Services/`), qui appellent le domaine. Aucun calcul dans une vue ou un modèle.
