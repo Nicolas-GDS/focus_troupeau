@@ -75,6 +75,12 @@ class InterpretationPolicy
             && $this->couvreInterpretation($user, $interpretation);
     }
 
+    /** Refus de visa : mêmes conditions que le visa (décision du 15/10/2026). */
+    public function refuserVisa(User $user, Interpretation $interpretation): bool
+    {
+        return $this->viser($user, $interpretation);
+    }
+
     /** Publication (EF-M2-04, T-05) : niveaux 0-2 depuis « valide », niveau 3 depuis « visee ». */
     public function publier(User $user, Interpretation $interpretation): bool
     {

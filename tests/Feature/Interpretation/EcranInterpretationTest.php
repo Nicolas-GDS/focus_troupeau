@@ -224,3 +224,29 @@ it('propose le lien « Interpréter » dans E19 pour un bulletin contrôlé', fu
         ->assertSee('Interpréter')
         ->assertSee(route('analyses.interpretation', $this->analyse->id));
 });
+
+it('laisse le vétérinaire conseil refuser le visa depuis l\'écran ; le technicien retrouve le motif sur son brouillon', function () {
+    $interpretation = interpretationEcranValidee($this->analyse, 3);
+
+    $this->actingAs($this->jeu->technicien24);
+    Livewire::test(InterpretationBulletin::class, ['analyse' => $this->analyse])
+        ->assertDontSee('Refuser le visa')
+        ->call('refuserVisa')
+        ->assertForbidden();
+
+    $this->actingAs($this->jeu->veterinaireConseil24);
+    Livewire::test(InterpretationBulletin::class, ['analyse' => $this->analyse])
+        ->assertSee('Refuser le visa')
+        ->call('refuserVisa')
+        ->assertHasErrors(['motifRefusVisa'])
+        ->set('motifRefusVisa', 'Niveau 3 non justifié par les valeurs : à revoir.')
+        ->call('refuserVisa')
+        ->assertHasNoErrors();
+
+    expect($interpretation->fresh()?->statut)->toBe('brouillon');
+
+    $this->actingAs($this->jeu->technicien24);
+    Livewire::test(InterpretationBulletin::class, ['analyse' => $this->analyse])
+        ->assertSee('Visa refusé')
+        ->assertSee('Niveau 3 non justifié par les valeurs');
+});

@@ -115,7 +115,7 @@ it('calcule les ratios d\'un bulletin réel avant classement (Ca/P de la grille)
 });
 
 it('lit la version de grille, les paramètres par défaut et les correspondances des référentiels', function () {
-    expect(referentiels()->versionGrilleCourante())->toBe('2')
+    expect(referentiels()->versionGrilleCourante())->toBe('3')
         ->and(referentiels()->parametre('interpretation.fenetre_evenements_mois'))->toBe(12.0)
         ->and(referentiels()->parametre('cle.inconnue'))->toBeNull()
         ->and(referentiels()->familleDuType('ENRUB_LUZ'))->toBe('ENRUB')

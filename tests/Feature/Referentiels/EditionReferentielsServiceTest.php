@@ -17,9 +17,19 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->jeu = JeuCloisonnement::creer();
+    $this->versionInitiale = (int) DB::table('ref.version_referentiel')->max(DB::raw('numero::int'));
     $this->service = app(EditionReferentielsService::class);
     $this->referentiels = app(Referentiels::class);
 });
+
+/**
+ * Numéro de version relatif à la version courante au début du test (0 : courante, 1 : la suivante…) :
+ * les tests ne dépendent pas du nombre de versions déjà livrées.
+ */
+function versionE24(int $decalage): string
+{
+    return (string) (test()->versionInitiale + $decalage);
+}
 
 /**
  * Ligne active d'un seuil de la grille v1 (document 02), par paramètre et classe.
@@ -52,14 +62,14 @@ function derniereVersionE24(): string
 it('crée un seuil dans une nouvelle version (numéro suivant, auteur, date, décision)', function () {
     $id = $this->service->creerSeuil(saisieE24(), 'Comité technique du 15/10/2026 : classe intermédiaire MAT', $this->jeu->admin24);
 
-    $version = DB::table('ref.version_referentiel')->where('numero', '3')->first();
+    $version = DB::table('ref.version_referentiel')->where('numero', versionE24(1))->first();
     expect($version)->not->toBeNull()
         ->and($version->auteur_id)->toBe($this->jeu->admin24->id)
         ->and($version->commentaire)->toBe('Comité technique du 15/10/2026 : classe intermédiaire MAT')
         ->and((string) $version->date_version)->toBe(today()->toDateString());
 
     $ligne = DB::table('ref.seuil_interpretation')->find($id);
-    expect($ligne->version_creation)->toBe('3')->and($ligne->version_fin)->toBeNull()->and($ligne->actif)->toBeTrue()
+    expect($ligne->version_creation)->toBe(versionE24(1))->and($ligne->version_fin)->toBeNull()->and($ligne->actif)->toBeTrue()
         ->and($ligne->sens)->toBe('bas')->and((float) $ligne->borne_min)->toBe(80.0);
 });
 
@@ -70,11 +80,11 @@ it('modifie un seuil en clôturant l\'ancienne ligne et en insérant la nouvelle
     $nouveau = $this->service->modifierSeuil($ancien['id'], SaisieSeuil::depuis(['borne_max' => '85'] + $ancien), 'Relèvement du seuil MAT faible', $this->jeu->adminGlobal);
 
     expect(DB::table('ref.seuil_interpretation')->count())->toBe($avant + 1)
-        ->and(DB::table('ref.seuil_interpretation')->find($ancien['id'])->version_fin)->toBe('3')
+        ->and(DB::table('ref.seuil_interpretation')->find($ancien['id'])->version_fin)->toBe(versionE24(1))
         ->and((float) DB::table('ref.seuil_interpretation')->find($ancien['id'])->borne_max)->toBe(80.0);
 
     $ligne = DB::table('ref.seuil_interpretation')->find($nouveau);
-    expect($ligne->version_creation)->toBe('3')->and($ligne->version_fin)->toBeNull()
+    expect($ligne->version_creation)->toBe(versionE24(1))->and($ligne->version_fin)->toBeNull()
         ->and((float) $ligne->borne_max)->toBe(85.0)->and($ligne->message)->toBe($ancien['message'])
         ->and($ligne->reference_id)->toBe($ancien['reference_id']);
 });
@@ -84,8 +94,8 @@ it('retire un seuil en le clôturant', function () {
 
     $version = $this->service->retirerSeuil($ancien['id'], 'Seuil remplacé par les repères du lot L5', $this->jeu->admin24);
 
-    expect($version)->toBe('3')
-        ->and(DB::table('ref.seuil_interpretation')->find($ancien['id'])->version_fin)->toBe('3')
+    expect($version)->toBe(versionE24(1))
+        ->and(DB::table('ref.seuil_interpretation')->find($ancien['id'])->version_fin)->toBe(versionE24(1))
         ->and(collect($this->referentiels->seuilsActifs())->pluck('id'))->not->toContain($ancien['id']);
 });
 
@@ -93,9 +103,9 @@ it('numérote les versions successives', function () {
     $this->service->creerSeuil(saisieE24(), 'Décision 1', $this->jeu->admin24);
     $this->service->creerSeuil(saisieE24(['borne_min' => '100', 'borne_max' => '120', 'classe' => 'bon']), 'Décision 2', $this->jeu->admin24);
 
-    expect(derniereVersionE24())->toBe('4')
-        ->and($this->service->versionCourante()?->numero)->toBe('4')
-        ->and($this->referentiels->versionGrilleCourante())->toBe('4');
+    expect(derniereVersionE24())->toBe(versionE24(2))
+        ->and($this->service->versionCourante()?->numero)->toBe(versionE24(2))
+        ->and($this->referentiels->versionGrilleCourante())->toBe(versionE24(2));
 });
 
 it('vide le cache : les seuils actifs lus par Referentiels reflètent la modification', function () {
@@ -114,7 +124,7 @@ it('refuse un chevauchement avec un seuil actif au même niveau de précision', 
     expect(fn () => $this->service->creerSeuil(saisieE24(['borne_min' => '70', 'borne_max' => '90']), 'Essai', $this->jeu->admin24))
         ->toThrow(EditionRefusee::class, 'Chevauchement');
 
-    expect(derniereVersionE24())->toBe('2')
+    expect(derniereVersionE24())->toBe(versionE24(0))
         ->and(Journal::query()->where('action', 'modification_referentiel')->count())->toBe(0);
 });
 
@@ -140,7 +150,7 @@ it('refuse les incohérences', function (array $surcharges, string $champ) {
         expect($refus->erreurs)->toHaveKey($champ);
     }
 
-    expect(derniereVersionE24())->toBe('2');
+    expect(derniereVersionE24())->toBe(versionE24(0));
 })->with([
     'type hors famille' => [['famille_fourrage_code' => 'ENRUB', 'type_fourrage_code' => 'FOIN_LUZ'], 'type_fourrage_code'],
     'bornes inversées' => [['borne_min' => '120', 'borne_max' => '100'], 'borne_max'],
@@ -152,7 +162,7 @@ it('refuse les incohérences', function (array $surcharges, string $champ) {
 
 it('refuse un enregistrement sans décision du comité technique', function () {
     expect(fn () => $this->service->creerSeuil(saisieE24(), '  ', $this->jeu->admin24))->toThrow(EditionRefusee::class);
-    expect(derniereVersionE24())->toBe('2');
+    expect(derniereVersionE24())->toBe(versionE24(0));
 });
 
 it('refuse de modifier ou retirer une ligne déjà clôturée', function () {
@@ -171,7 +181,7 @@ it('journalise chaque modification avec le détail avant / après (ENF-SEC-08)',
     expect($journal->user_id)->toBe($this->jeu->admin24->id)
         ->and($journal->objet)->toBe('ref.seuil_interpretation#'.$ancien['id'])
         ->and($journal->detail['operation'])->toBe('modification')
-        ->and($journal->detail['version'])->toBe('3')
+        ->and($journal->detail['version'])->toBe(versionE24(1))
         ->and($journal->detail['decision'])->toBe('Relèvement du seuil')
         ->and((float) $journal->detail['avant']['borne_max'])->toBe(80.0)
         ->and((float) $journal->detail['apres']['borne_max'])->toBe(85.0)
@@ -185,7 +195,7 @@ it('gère les plages de plausibilité : création, modification, retrait, une se
         ->toThrow(EditionRefusee::class);
 
     $nouvelle = $this->service->modifierPlage($foin['id'], SaisiePlage::depuis(['borne_min' => '70'] + $foin), 'Foin : borne basse à 70 % MS', $this->jeu->admin24);
-    expect(DB::table('ref.plage_plausibilite')->find($foin['id'])->version_fin)->toBe('3')
+    expect(DB::table('ref.plage_plausibilite')->find($foin['id'])->version_fin)->toBe(versionE24(1))
         ->and(collect($this->referentiels->plagesPlausibiliteActives())->first(fn ($p) => $p->parametreCode === 'MS' && $p->familleFourrageCode === 'FOIN')?->borneMin)->toBe(70.0);
 
     expect(fn () => $this->service->modifierPlage($nouvelle, SaisiePlage::depuis(['borne_min' => '99'] + $foin), 'Inversée', $this->jeu->admin24))
@@ -203,13 +213,13 @@ it('fournit l\'historique : lignes créées et clôturées par version', functio
     $nouveau = $this->service->modifierSeuil($ancien['id'], SaisieSeuil::depuis(['borne_max' => '85'] + $ancien), 'Relèvement', $this->jeu->admin24);
 
     $historique = $this->service->historique();
-    expect(array_map(fn ($e) => $e['version']->numero, $historique))->toBe(['3', '2', '1']);
+    expect(array_map(fn ($e) => $e['version']->numero, $historique))->toBe(array_map('strval', range((int) versionE24(1), 1, -1)));
 
     $v3 = $historique[0];
     expect($v3['auteur'])->toBe($this->jeu->admin24->nomComplet())
         ->and(array_column($v3['seuils_crees'], 'id'))->toBe([$nouveau])
         ->and(array_column($v3['seuils_clotures'], 'id'))->toBe([$ancien['id']])
-        ->and($historique[2]['seuils_crees'])->not->toBeEmpty();
+        ->and($historique[array_key_last($historique)]['seuils_crees'])->not->toBeEmpty();
 });
 
 it('laisse lisible une interprétation enregistrée avec une version de grille antérieure', function () {
@@ -237,5 +247,5 @@ it('laisse lisible une interprétation enregistrée avec une version de grille a
         ->and(DB::table('ref.version_referentiel')->where('numero', '2')->exists())->toBeTrue()
         ->and((float) $seuilDeLAlerte->borne_max)->toBe(80.0)
         ->and($seuilDeLAlerte->version_creation)->toBe('1')
-        ->and($seuilDeLAlerte->version_fin)->toBe('3');
+        ->and($seuilDeLAlerte->version_fin)->toBe(versionE24(1));
 });

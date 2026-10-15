@@ -83,6 +83,7 @@ Estimation indicative pour un développement interne assisté par IA, à affiner
 | 10 | Nom de domaine et hébergeur | L8 | Direction |
 | 11 | Convention LANO pour un export structuré | L2 (ultérieur) | Direction |
 | 12 | Nom définitif (Focus Troupeau / Mise au point) | L1 (jetons) | Conseil d'administration |
+| 13 | Béliers : la catégorie `BOUC_MALE` (« mâles caprins / ovins ») est rattachée à l'espèce caprine ; aucun seuil Ca/P (urolithiase) ne s'applique aux béliers depuis la correction de la grille v3 — créer une catégorie ovine dédiée et son seuil ? | L2 / E24 | Comité technique |
 
 ## 9.5 Risques
 

@@ -33,6 +33,9 @@ use Illuminate\Support\Carbon;
  * @property string|null $motifs_rehaussement tableau PostgreSQL des motifs du niveau proposé (RC-1.4, ajout)
  * @property int|null $vise_par
  * @property Carbon|null $vise_le
+ * @property string|null $refus_visa_motif
+ * @property int|null $refus_visa_par
+ * @property Carbon|null $refus_visa_le
  */
 class Interpretation extends Model
 {
@@ -62,7 +65,7 @@ class Interpretation extends Model
         'analyse_id', 'version', 'date_interpretation', 'technicien_id', 'categorie_cible_code', 'niveau_global',
         'niveau_propose', 'synthese', 'lecture_nutritionnelle', 'lecture_sanitaire', 'lecture_mineraux', 'recommandations',
         'orientation_veterinaire', 'statut', 'version_grille', 'utilisation_conseillee', 'utilisation_deconseillee',
-        'vise_par', 'vise_le', 'motifs_rehaussement',
+        'vise_par', 'vise_le', 'motifs_rehaussement', 'refus_visa_motif', 'refus_visa_par', 'refus_visa_le',
     ];
 
     protected $attributes = ['version' => 1, 'statut' => self::STATUT_BROUILLON, 'orientation_veterinaire' => false];
@@ -72,6 +75,7 @@ class Interpretation extends Model
         return [
             'date_interpretation' => 'date',
             'vise_le' => 'datetime',
+            'refus_visa_le' => 'datetime',
             'orientation_veterinaire' => 'boolean',
             'niveau_global' => 'integer',
             'niveau_propose' => 'integer',

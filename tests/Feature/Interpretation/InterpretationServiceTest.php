@@ -325,3 +325,53 @@ it('réserve la rédaction au technicien du périmètre', function () {
         ->and(Gate::forUser($jeu->admin24)->allows('update', $interpretation))->toBeFalse()
         ->and(Gate::forUser($jeu->adminGlobal)->allows('update', $interpretation))->toBeFalse();
 });
+
+it('laisse le vétérinaire conseil refuser un visa : retour en brouillon avec le motif, puis reprise et nouveau visa (décision du 15/10/2026)', function () {
+    $jeu = $this->jeu;
+    $interpretation = interpretationValidee(3);
+
+    expect(Gate::forUser($jeu->technicien24)->allows('refuserVisa', $interpretation))->toBeFalse()
+        ->and(Gate::forUser($jeu->veterinaireConseil24)->allows('refuserVisa', $interpretation))->toBeTrue()
+        ->and(fn () => $this->service->refuserVisa($interpretation, '  ', $jeu->veterinaireConseil24))->toThrow(InterpretationRefusee::class);
+
+    $refusee = $this->service->refuserVisa($interpretation, 'Le niveau 3 ne me paraît pas justifié : revoir la lecture minérale.', $jeu->veterinaireConseil24);
+
+    expect($refusee->statut)->toBe('brouillon')
+        ->and($refusee->refus_visa_motif)->toContain('lecture minérale')
+        ->and($refusee->refus_visa_par)->toBe($jeu->veterinaireConseil24->id)
+        ->and(Analyse::query()->withoutGlobalScopes()->find($refusee->analyse_id)?->statut)->toBe('controle')
+        ->and(Journal::query()->where('action', 'refus_visa_interpretation')->exists())->toBeTrue()
+        ->and(Gate::forUser($jeu->technicien24)->allows('update', $refusee))->toBeTrue();
+
+    $revalidee = $this->service->valider($refusee, $jeu->technicien24);
+    expect($this->service->viser($revalidee, $jeu->veterinaireConseil24)->statut)->toBe('visee');
+});
+
+it('ne refuse le visa que d\'une interprétation validée de niveau 3', function () {
+    expect(fn () => $this->service->refuserVisa(interpretationValidee(2), 'Motif quelconque', $this->jeu->veterinaireConseil24))
+        ->toThrow(InterpretationRefusee::class);
+});
+
+it('laisse le technicien retenir un niveau 2 sur un lot proposé au niveau 3, publiable sans visa (décision du 15/10/2026)', function () {
+    $analyse = AnalyseEssai::creer($this->jeu->elevage24a, ['CU' => 23.0]);
+    $interpretation = $this->service->creerBrouillon($analyse, $this->jeu->technicien24, 'BREBIS_ALL');
+    expect($interpretation->niveau_propose)->toBe(3);
+
+    $interpretation = $this->service->enregistrer($interpretation, new RedactionInterpretation(
+        synthese: 'Cuivre élevé pour des brebis : à vérifier avant distribution.',
+        niveauRetenu: 2,
+    ));
+    $validee = $this->service->valider($interpretation, $this->jeu->technicien24);
+
+    expect($validee->niveau_propose)->toBe(3)
+        ->and($validee->niveau_global)->toBe(2)
+        ->and($this->service->publier($validee, $this->jeu->technicien24)->statut)->toBe('publie');
+});
+
+it('a clôturé en version 3 le seuil Ca/P ovin des mâles BOUC_MALE ; le seuil caprin reste en vigueur', function () {
+    $seuils = collect(app(Referentiels::class)->seuilsActifs())->filter(fn ($s) => $s->parametreCode === 'CA_P');
+
+    expect($seuils->pluck('especeCode')->all())->toBe(['CAP'])
+        ->and(DB::table('ref.seuil_interpretation')->where('parametre_code', 'CA_P')->where('espece_code', 'OVI')->value('version_fin'))->toBe('3')
+        ->and(app(Referentiels::class)->versionGrilleCourante())->toBe('3');
+});

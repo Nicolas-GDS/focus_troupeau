@@ -15,7 +15,17 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->jeu = JeuCloisonnement::creer();
+    $this->versionInitiale = (int) DB::table('ref.version_referentiel')->max(DB::raw('numero::int'));
 });
+
+/**
+ * Numéro de version relatif à la version courante au début du test (0 : courante, 1 : la suivante…) :
+ * les tests ne dépendent pas du nombre de versions déjà livrées.
+ */
+function versionEcranE24(int $decalage): string
+{
+    return (string) (test()->versionInitiale + $decalage);
+}
 
 it('ouvre l\'écran aux seuls administrateurs, pour chaque table', function (string $profil, int $statut) {
     $this->actingAs($this->jeu->{$profil});
@@ -48,7 +58,7 @@ it('affiche la version courante, les seuils actifs, leur source et le signalemen
 
     $this->actingAs($this->jeu->admin24)->get(route('admin.referentiels', ['table' => 'seuils']))
         ->assertOk()
-        ->assertSee('Version courante des référentiels : 2')
+        ->assertSee('Version courante des référentiels : '.versionEcranE24(0))
         ->assertSee('ROCHEREAU2024')
         ->assertSee('À valider')
         ->assertSee('[−∞ ; 80[', false);
@@ -84,7 +94,7 @@ it('crée un seuil depuis l\'écran, avec la décision du comité technique', fu
         ->assertSet('formulaireOuvert', false);
 
     $ligne = DB::table('ref.seuil_interpretation')->where('classe', 'moyen')->first();
-    expect($ligne->version_creation)->toBe('3')->and($ligne->statut_epistemique)->toBe('hypothese_locale')
+    expect($ligne->version_creation)->toBe(versionEcranE24(1))->and($ligne->statut_epistemique)->toBe('hypothese_locale')
         ->and(Journal::query()->where('action', 'modification_referentiel')->count())->toBe(1);
 });
 
@@ -111,7 +121,7 @@ it('refuse depuis l\'écran un commentaire manquant, un chevauchement, un type h
         ->set('formulaire.borne_min', '1,5')->set('formulaire.borne_max', 'abc')->set('decision', 'Décision du comité')
         ->call('enregistrer')->assertHasErrors('formulaire.borne_max');
 
-    expect(DB::table('ref.version_referentiel')->count())->toBe(2);
+    expect(DB::table('ref.version_referentiel')->count())->toBe($this->versionInitiale);
 });
 
 it('modifie et retire une ligne depuis l\'écran', function () {
@@ -127,7 +137,7 @@ it('modifie et retire une ligne depuis l\'écran', function () {
         ->assertHasNoErrors();
 
     $nouveau = (int) DB::table('ref.seuil_interpretation')->where('parametre_code', 'MAT')->where('classe', 'faible')->whereNull('version_fin')->value('id');
-    expect($nouveau)->not->toBe($id)->and(DB::table('ref.seuil_interpretation')->find($id)->version_fin)->toBe('3');
+    expect($nouveau)->not->toBe($id)->and(DB::table('ref.seuil_interpretation')->find($id)->version_fin)->toBe(versionEcranE24(1));
 
     Livewire::test(Referentiels::class, ['table' => 'seuils'])
         ->call('demanderRetrait', $nouveau)
@@ -135,7 +145,7 @@ it('modifie et retire une ligne depuis l\'écran', function () {
         ->set('decision', 'Retrait décidé par le comité')
         ->call('retirer')->assertHasNoErrors();
 
-    expect(DB::table('ref.seuil_interpretation')->find($nouveau)->version_fin)->toBe('4');
+    expect(DB::table('ref.seuil_interpretation')->find($nouveau)->version_fin)->toBe(versionEcranE24(2));
 });
 
 it('modifie une plage de plausibilité depuis l\'écran', function () {
@@ -175,7 +185,7 @@ it('vérifie l\'autorisation d\'écriture côté serveur dans chaque action (ENF
     $composant()->set('decision', 'Décision du comité')->call('enregistrer')->assertForbidden();
     $composant()->set('decision', 'Décision du comité')->call('retirer')->assertForbidden();
 
-    expect(DB::table('ref.version_referentiel')->count())->toBe(2);
+    expect(DB::table('ref.version_referentiel')->count())->toBe($this->versionInitiale);
 });
 
 it('refuse le composant à un technicien', function () {

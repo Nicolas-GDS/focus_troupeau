@@ -60,6 +60,9 @@ class InterpretationBulletin extends Component
     /** @var array<int, string> motif d'écart saisi par alerte */
     public array $motifsEcart = [];
 
+    /** Motif d'un refus de visa (vétérinaire conseil). */
+    public string $motifRefusVisa = '';
+
     /** @var array{parametre: string, classe: string, gravite: string, message: string} */
     public array $nouvelleAlerte = ['parametre' => '', 'classe' => '', 'gravite' => '1', 'message' => ''];
 
@@ -171,6 +174,18 @@ class InterpretationBulletin extends Component
         $this->executer(function () use ($service, $interpretation) {
             $service->viser($interpretation, $this->utilisateur());
             session()->flash('status', 'Interprétation visée : le technicien peut la publier.');
+        });
+    }
+
+    public function refuserVisa(InterpretationService $service): void
+    {
+        $interpretation = $this->interpretationAutorisee('refuserVisa');
+        $this->validate(['motifRefusVisa' => ['required', 'string', 'min:5', 'max:1000']], [], ['motifRefusVisa' => 'motif du refus']);
+
+        $this->executer(function () use ($service, $interpretation) {
+            $service->refuserVisa($interpretation, $this->motifRefusVisa, $this->utilisateur());
+            $this->motifRefusVisa = '';
+            session()->flash('status', 'Visa refusé : l\'interprétation revient en brouillon chez le technicien.');
         });
     }
 

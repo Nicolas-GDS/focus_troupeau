@@ -325,6 +325,24 @@
             </div>
         @endif
 
+        {{-- Refus de visa (EF-M2-04) : retour en brouillon avec motif --}}
+        @if ($peutViser)
+            <div class="carte">
+                <label for="motif-refus-visa" class="etiquette">Refuser le visa — motif adressé au technicien</label>
+                <textarea id="motif-refus-visa" wire:model="motifRefusVisa" rows="2" class="champ"></textarea>
+                @error('motifRefusVisa') <p class="mt-1 text-sm text-etat-critique">{{ $message }}</p> @enderror
+                <button type="button" wire:click="refuserVisa" class="bouton-secondaire mt-2">Refuser le visa</button>
+            </div>
+        @endif
+
+        @if ($interpretation->refus_visa_motif && $interpretation->statut === 'brouillon')
+            <div class="rounded-md border border-etat-alerte bg-etat-alerte-fond p-3 text-sm" role="note">
+                <x-pastille etat="alerte" libelle="Visa refusé" />
+                <p class="mt-1">{{ $interpretation->refus_visa_motif }}</p>
+                <p class="mt-1 text-xs text-texte-doux">Le {{ $interpretation->refus_visa_le?->format('d/m/Y à H:i') }}</p>
+            </div>
+        @endif
+
         @if ($interpretation->statut === 'valide' && $interpretation->niveau_global === 3 && ! $peutViser)
             <p class="text-sm text-texte-doux">Niveau 3 : en attente du visa du vétérinaire conseil avant publication.</p>
         @endif

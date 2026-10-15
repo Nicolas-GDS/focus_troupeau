@@ -251,6 +251,35 @@ class InterpretationService
     }
 
     /**
+     * Refus de visa par le vétérinaire conseil (EF-M2-04, décision du 15/10/2026) : l'interprétation validée de niveau 3
+     * revient en brouillon avec le motif, pour que le technicien la reprenne ; l'analyse redevient « controle ».
+     */
+    public function refuserVisa(Interpretation $interpretation, string $motif, User $veterinaire): Interpretation
+    {
+        if ($interpretation->statut !== Interpretation::STATUT_VALIDE || $interpretation->niveau_global !== 3) {
+            throw new InterpretationRefusee('Seule une interprétation validée de niveau 3 peut voir son visa refusé.');
+        }
+
+        if (self::texte($motif) === null) {
+            throw new InterpretationRefusee('Le motif du refus de visa est obligatoire.');
+        }
+
+        DB::transaction(function () use ($interpretation, $motif, $veterinaire) {
+            $interpretation->update([
+                'statut' => Interpretation::STATUT_BROUILLON,
+                'refus_visa_motif' => trim($motif),
+                'refus_visa_par' => $veterinaire->id,
+                'refus_visa_le' => now(),
+            ]);
+            Analyse::query()->withoutGlobalScopes()->whereKey($interpretation->analyse_id)->update(['statut' => Analyse::STATUT_CONTROLE]);
+
+            $this->journaliser('refus_visa_interpretation', $veterinaire, $interpretation);
+        });
+
+        return $interpretation->refresh();
+    }
+
+    /**
      * Publication (EF-M2-04, T-05) : niveaux 0 à 2 depuis « valide » ; niveau 3 seulement depuis « visee ».
      *
      * Lot L2 : changement de statut journalisé seulement. Le lot L3 complétera la publication (fiche figée HTML et PDF,
