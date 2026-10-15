@@ -1,0 +1,54 @@
+parametre_code;espece_code;categorie_code;type_repere;valeur_min;valeur_max;unite;reference_cle;statut_epistemique;commentaire
+CA;BOV;;besoin;4;10;g/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;Bovins viande, selon poids et stade (NASEM 2016 via Merck) – INRA 2018 raisonne en Ca absorbable
+P;BOV;;besoin;2;4;g/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;Bovins viande (NASEM 2016 via Merck)
+MG;BOV;;besoin;1;2;g/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;Besoin d'entretien INRA : pertes 3 mg/kg PV fécales + 4 mg/kg PV urinaires (Meschy 2007)
+MG;BOV;;max_tolerable;;4;g/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;NASEM 2016
+K;BOV;;besoin;6;7;g/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;
+K;BOV;;max_tolerable;;20;g/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;Les herbes jeunes dépassent souvent 30 g/kg MS : lire avec Mg et BACA
+S;BOV;;besoin;1.5;2;g/kg MS ration;MESCHY2007;publie;2 g/kg MS (Meschy 2007) – 0,15 % MS (NASEM 2016) – + 4,5 g S pour 100 g d'urée
+S;CAP;;besoin;2.2;2.7;g/kg MS ration;MESCHY2007;publie;Caprins légèrement plus élevés selon le stade
+S;BOV;;max_tolerable;3;5;g/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;0,30-0,50 % MS (NASEM 2016) – 0,40 % MS cité par ISU pour la PEM – > 3-3,5 g/kg MS gêne Cu et Zn (Meschy 2007)
+NA;BOV;;besoin;0.6;1;g/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;Meschy 2007 : 15 mg/kg PV/j (+50 % taries et gestantes) soit 1,2-2,2 g/kg MS de ration (seuil existant)
+CL;BOV;;besoin;;;;MESCHY2007;publie;Besoin en Cl = 150 % du besoin en Na (Meschy 2007)
+CU;BOV;;besoin;9;10;mg/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;10 (NASEM 2016), 9 (Merck micro-minéraux), 10 INRA 2018 (besoin existant VL) – 4-10 minimum selon Mo/S (Maas 2009)
+CU;BOV;;max_tolerable;;40;mg/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;NASEM 2016 – Maas 2009 : 40-50 mg/kg MS
+CU;BOV;VEAU;max_reglementaire_ue;;15;mg/kg aliment complet (12 % humidité);REG2018_1039;publie;Bovins avant le début de la rumination
+CU;BOV;;max_reglementaire_ue;;30;mg/kg aliment complet (12 % humidité);REG2018_1039;publie;Autres bovins – étiquetage « risque de carence » si < 20 mg/kg pour bovins au pâturage riche en Mo/S
+CU;OVI;;besoin;5;11;mg/kg MS ration;FILLEY2024;publie_source_secondaire;7-11 (NRC 1985 via OSU) – 5 (7 Mérinos) selon Maas 2009 – dépend du Mo (< 1 mg/kg)
+CU;OVI;;max_tolerable;;25;mg/kg MS ration;FILLEY2024;publie_source_secondaire;NRC 1985 via OSU – Maas 2009 : ne pas dépasser 10 mg/kg, 15-25 potentiellement toxique
+CU;OVI;;max_reglementaire_ue;;15;mg/kg aliment complet (12 % humidité);REG2018_1039;publie;Mention obligatoire « peut provoquer un empoisonnement chez certaines races d'ovins » au-delà de 10 mg/kg
+CU;CAP;;max_reglementaire_ue;;35;mg/kg aliment complet (12 % humidité);REG2018_1039;publie;Sensibilité clinique des caprins intermédiaire entre ovins et bovins (Maas 2009) : prudence malgré le plafond élevé
+ZN;BOV;;besoin;30;50;mg/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;30 (NASEM 2016), 28-60 (Merck micro-minéraux), 50 INRA 2018 (besoin existant VL)
+ZN;BOV;;max_tolerable;;500;mg/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;
+ZN;OVI;;besoin;20;33;mg/kg MS ration;FILLEY2024;publie_source_secondaire;NRC 1985 via OSU
+ZN;OVI;;max_tolerable;;750;mg/kg MS ration;FILLEY2024;publie_source_secondaire;
+ZN;;;max_reglementaire_ue;;120;mg/kg aliment complet (12 % humidité);REG2016_1095;publie;« Autres espèces » dont ruminants
+MN;BOV;;besoin;20;50;mg/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;20-40 (NASEM 2016), 40 vaches (UNL 2025), 50 INRA 2018 (besoin existant VL)
+MN;BOV;;max_tolerable;;1000;mg/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;
+MN;OVI;;besoin;20;40;mg/kg MS ration;FILLEY2024;publie_source_secondaire;
+MN;;;max_reglementaire_ue;;150;mg/kg aliment complet (12 % humidité);REG2017_1490;publie;Autres espèces que les poissons
+FE;BOV;;besoin;50;100;mg/kg MS ration;MERCK_MICROMIN;publie;50 (NASEM 2016) – fourrages presque toujours au-dessus
+FE;BOV;;max_tolerable;;500;mg/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;Antagonisme Cu/Mn dès 200-400 mg/kg MS (UNL 2025, Point Vétérinaire 2019)
+FE;OVI;;max_tolerable;;500;mg/kg MS ration;FILLEY2024;publie_source_secondaire;
+FE;;;max_reglementaire_ue;;;mg/kg aliment complet (12 % humidité);REG2017_2330;ordre_de_grandeur;Plafonds par espèce dans l'annexe du règlement 2017/2330 (ordre de 450-500 mg/kg pour bovins et ovins) : annexe non revérifiée en ligne le 15/10/2026, à confirmer avant usage
+SE;BOV;;besoin;0.1;0.3;mg/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;0,10 (NASEM 2016 bovins viande), 0,3 (Merck micro-minéraux / NASEM 2021 laitières), 0,1-0,2 INRA (besoin existant VL)
+SE;BOV;;max_tolerable;;5;mg/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;5 mg/kg (NASEM 2016 – Merck sélénose chronique)
+SE;OVI;;besoin;0.1;0.2;mg/kg MS ration;FILLEY2024;publie_source_secondaire;
+SE;OVI;;max_tolerable;;2;mg/kg MS ration;FILLEY2024;publie_source_secondaire;NRC 1985 via OSU
+SE;;;max_reglementaire_ue;;0.5;mg/kg aliment complet (12 % humidité);REG121_2014;publie_source_secondaire;Sélénium total – dont sélénium organique limité à 0,2 mg/kg – valeur reprise de la base existante, annexe non revérifiée ce jour
+I;BOV;;besoin;0.5;0.5;mg/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;0,5 (NASEM 2016, Merck) – 0,016-0,02 mg/kg PV/j (Paulíková 2002) – à majorer avec goitrogènes et en gestation
+I;BOV;;max_tolerable;;50;mg/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;Effets immunitaires dès 50 mg/animal/j en EDDI continu (Paulíková 2002)
+I;OVI;;besoin;0.1;0.8;mg/kg MS ration;FILLEY2024;publie_source_secondaire;Plus élevé en gestation et lactation
+I;OVI;;max_tolerable;;50;mg/kg MS ration;FILLEY2024;publie_source_secondaire;
+I;BOV;VL;max_reglementaire_ue;;2;mg/kg aliment complet (12 % humidité);REG2015_861;publie;Vaches laitières et petits ruminants laitiers (EFSA 2013 : exposition du consommateur via le lait)
+I;;;max_reglementaire_ue;;5;mg/kg aliment complet (12 % humidité);REG2015_861;publie_source_secondaire;Autres ruminants – valeur non revérifiée dans l'annexe ce jour
+CO;BOV;;besoin;0.15;0.3;mg/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;0,15 (NASEM 2016), 0,2 (Merck micro-minéraux), AJR INRA relevé à 0,3 (Meschy 2007)
+CO;BOV;;max_tolerable;;25;mg/kg MS ration;MERCK_BEEF_REQ;publie_source_secondaire;
+CO;OVI;;besoin;0.1;0.2;mg/kg MS ration;FILLEY2024;publie_source_secondaire;
+CO;OVI;;max_tolerable;;10;mg/kg MS ration;FILLEY2024;publie_source_secondaire;
+CO;;;max_reglementaire_ue;;1;mg/kg aliment complet (12 % humidité);EFSA2009CO;publie;Recommandation EFSA 2009 (plafond ramené de 2 à 1 mg/kg, supplémentation ≤ 0,3 mg/kg) reprise dans la réglementation ultérieure (règlement non consulté)
+MO_OLIGO;OVI;;besoin;0.5;0.5;mg/kg MS ration;FILLEY2024;publie_source_secondaire;Besoin propre marginal – rôle essentiellement comme antagoniste du Cu
+MO_OLIGO;OVI;;max_tolerable;;10;mg/kg MS ration;FILLEY2024;publie_source_secondaire;
+MO_OLIGO;OVI;;max_reglementaire_ue;;2.5;mg/kg aliment complet (12 % humidité);REG2019_1965;publie;Molybdate de sodium dihydraté autorisé pour les ovins – Cu/Mo à maintenir entre 3 et 10
+CU_MO;BOV;;besoin;5;10;ratio;MAAS2009;publie;Cu/Mo 5-10 : 1 au pâturage – < 2 : 1 = carence induite
+CU_MO;OVI;;besoin;3;10;ratio;REG2019_1965;publie;3-10 (règlement 2019/1965) – Merck : 6 : 1 idéal, 10 : 1 tolérable – Maas : 5 : 1

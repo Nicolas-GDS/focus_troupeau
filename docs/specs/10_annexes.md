@@ -65,6 +65,7 @@ Reprise du dictionnaire du document 02 (`ref.parametre`) : MS, MM, MO, MAT, CB, 
 | 08/10/2026 | Nommage : concept « Focus » retenu, « Focus Troupeau » recommandé | Cahier d'identité |
 | 15/10/2026 | Décisions D1 à D23 (§ 1.3) | Cadrage des spécifications |
 | 15/10/2026 | Lot L1 : bases graphiques de SAGEMA (et non Coélab) ; `app.convention` porte `cree_par` et `maj_par` (EF-GEN-06) ; GDS 47 nommé « GDS Lot-et-Garonne » | Revue du lot L1 |
+| 15/10/2026 | Référentiel minéraux × troubles (chapitre 11) : rehaussement RC-1.4 par les seuls liens de force ≥ 2 (paramètre réglable) ; colonne `sens` sur les seuils ; repères minéraux reportés au lot L5 ; REG2018_1039 relevée en « vérifiée » | Préparation du lot L2 |
 | 15/10/2026 | T-03 : pas d'alerte K à 18 g (seuil « élevé » de la grille v1 à 30 g) ; RC-1 : ordre de priorité du texte retenu contre celui de `ref.f_classer_valeur`, départage par gravité, chevauchements interdits dans E24 | Préparation du lot L2 |
 
 ## 10.5 Références bibliographiques
