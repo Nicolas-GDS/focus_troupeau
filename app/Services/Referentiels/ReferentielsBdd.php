@@ -2,6 +2,7 @@
 
 namespace App\Services\Referentiels;
 
+use App\Domain\Interpretation\LienCompatibilite;
 use App\Domain\Interpretation\PlagePlausibilite;
 use App\Domain\Interpretation\Seuil;
 use App\Domain\Referentiels\Referentiels;
@@ -47,6 +48,7 @@ class ReferentielsBdd implements Referentiels
             message: $l['message'],
             referenceId: $l['reference_id'] === null ? null : (int) $l['reference_id'],
             statutEpistemique: StatutEpistemique::from((string) $l['statut_epistemique']),
+            sens: $l['sens'],
         ), $lignes);
     }
 
@@ -105,26 +107,45 @@ class ReferentielsBdd implements Referentiels
         return $espece === null ? null : (string) $espece;
     }
 
-    public function parametresCompatibles(array $typesEvenements): array
+    public function liensCompatibilite(): array
     {
-        if ($typesEvenements === []) {
-            return [];
+        /** @var list<array<string, mixed>> $lignes */
+        $lignes = $this->cache->remember(self::CLE_CACHE.'compatibilites', self::DUREE_CACHE, fn () => DB::table('ref.compatibilite_parametre_trouble')
+            ->whereNull('version_fin')
+            ->orderBy('id')
+            ->get()
+            ->map(fn ($ligne) => (array) $ligne)
+            ->all());
+
+        return array_map(fn (array $l) => new LienCompatibilite(
+            parametreCode: (string) $l['parametre_code'],
+            sens: (string) $l['sens'],
+            troubleCode: (string) $l['trouble_code'],
+            force: (int) $l['force'],
+            especes: self::tableau($l['especes']),
+            categories: self::tableau($l['categories']),
+        ), $lignes);
+    }
+
+    /**
+     * Tableau PostgreSQL littéral « {A,B} » en liste PHP ; NULL reste NULL (toutes).
+     *
+     * @return list<string>|null
+     */
+    private static function tableau(mixed $valeur): ?array
+    {
+        if ($valeur === null) {
+            return null;
         }
 
-        return DB::table('ref.compatibilite_parametre_trouble')
-            ->whereIn('type_evenement', $typesEvenements)
-            ->whereNull('version_fin')
-            ->distinct()
-            ->orderBy('parametre_code')
-            ->pluck('parametre_code')
-            ->map(fn ($code) => (string) $code)
-            ->values()
-            ->all();
+        $contenu = trim((string) $valeur, '{}');
+
+        return $contenu === '' ? [] : array_map(fn ($v) => trim($v, '"'), explode(',', $contenu));
     }
 
     public function oublier(): void
     {
-        foreach (['seuils', 'plages', 'version'] as $cle) {
+        foreach (['seuils', 'plages', 'version', 'compatibilites'] as $cle) {
             $this->cache->forget(self::CLE_CACHE.$cle);
         }
     }

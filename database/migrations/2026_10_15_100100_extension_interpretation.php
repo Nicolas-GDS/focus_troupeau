@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\DB;
  *
  * Repris du § 5.3 : fourrage.analyse.exclu_references et motif_exclusion ; fourrage.interpretation.version_grille,
  * utilisation_conseillee, utilisation_deconseillee, niveau_propose, vise_par, vise_le ; statuts « visee » et « publie » ;
- * ref.version_referentiel, version_creation / version_fin des seuils et besoins, ref.plage_plausibilite,
- * ref.compatibilite_parametre_trouble.
+ * ref.version_referentiel, version_creation / version_fin des seuils et besoins, ref.plage_plausibilite.
+ * Le référentiel des troubles et de leur compatibilité est créé par la migration 2026_10_15_100300 (chapitre 11).
  *
  * Ajouts signalés « ajout » (absents du § 5.3) :
  * - levée d'anomalie tracée sur fourrage.analyse (RC-2 : « lève l'anomalie, avec motif ») ;
@@ -85,18 +85,6 @@ INSERT INTO ref.plage_plausibilite (parametre_code, famille_fourrage_code, borne
   ('MN', NULL, 10, 400, 'Spécifications § 4.1 RC-2 [CP]', '1'),
   ('FE', NULL, 20, 3000, 'Spécifications § 4.1 RC-2 [CP]', '1');
 
--- RC-1.4 : compatibilité paramètre d'analyse × trouble sanitaire (contenu fourni par le vétérinaire conseil)
-CREATE TABLE ref.compatibilite_parametre_trouble (
-  parametre_code text NOT NULL REFERENCES ref.parametre(code),
-  type_evenement text NOT NULL,                       -- valeurs de fourrage.evenement_sanitaire.type_evenement
-  source text,
-  statut_epistemique text NOT NULL DEFAULT 'hypothese_locale'
-    CHECK (statut_epistemique IN ('publie','publie_source_secondaire','consensus_professionnel','ordre_de_grandeur','hypothese_locale')),
-  version_creation text NOT NULL REFERENCES ref.version_referentiel(numero),
-  version_fin text REFERENCES ref.version_referentiel(numero),
-  PRIMARY KEY (parametre_code, type_evenement)
-);
-
 -- Analyses : exclusion des références (§ 5.3) et levée d'anomalie (ajout, RC-2)
 ALTER TABLE fourrage.analyse
   ADD COLUMN exclu_references boolean NOT NULL DEFAULT false,
@@ -163,7 +151,7 @@ ALTER TABLE fourrage.analyse
   DROP COLUMN IF EXISTS exclu_references, DROP COLUMN IF EXISTS motif_exclusion,
   DROP COLUMN IF EXISTS anomalie_levee_le, DROP COLUMN IF EXISTS anomalie_levee_par,
   DROP COLUMN IF EXISTS anomalie_motif_levee;
-DROP TABLE IF EXISTS ref.compatibilite_parametre_trouble, ref.plage_plausibilite;
+DROP TABLE IF EXISTS ref.plage_plausibilite;
 ALTER TABLE ref.besoin_animal DROP COLUMN IF EXISTS version_creation, DROP COLUMN IF EXISTS version_fin;
 ALTER TABLE ref.seuil_interpretation DROP COLUMN IF EXISTS version_creation, DROP COLUMN IF EXISTS version_fin;
 DROP TABLE IF EXISTS ref.version_referentiel;

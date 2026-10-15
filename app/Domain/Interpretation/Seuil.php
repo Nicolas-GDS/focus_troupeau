@@ -6,7 +6,8 @@ use App\Domain\Referentiels\StatutEpistemique;
 
 /**
  * Un seuil actif de la grille d'interprétation (ref.seuil_interpretation) : intervalle [borneMin ; borneMax[,
- * bornes nulles non bornées.
+ * bornes nulles non bornées ; sens « bas » (carence, valeur faible) ou « haut » (excès, valeur élevée), qui relie
+ * l'alerte aux liens de compatibilité avec les troubles sanitaires (RC-1.4).
  */
 final readonly class Seuil
 {
@@ -25,7 +26,12 @@ final readonly class Seuil
         public ?string $message = null,
         public ?int $referenceId = null,
         public StatutEpistemique $statutEpistemique = StatutEpistemique::Publie,
+        public ?string $sens = null,
     ) {}
+
+    public const SENS_BAS = 'bas';
+
+    public const SENS_HAUT = 'haut';
 
     public function contient(float $valeur): bool
     {

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Referentiels;
 
+use App\Domain\Interpretation\LienCompatibilite;
 use App\Domain\Interpretation\PlagePlausibilite;
 use App\Domain\Interpretation\Seuil;
 
@@ -40,12 +41,11 @@ interface Referentiels
     public function especeDeLaCategorie(string $categorieCode): ?string;
 
     /**
-     * Paramètres d'analyse compatibles avec au moins un des types d'événements sanitaires donnés (RC-1.4).
+     * Liens de compatibilité paramètre × trouble en vigueur (RC-1.4, chapitre 11).
      *
-     * @param  list<string>  $typesEvenements
-     * @return list<string>
+     * @return list<LienCompatibilite>
      */
-    public function parametresCompatibles(array $typesEvenements): array;
+    public function liensCompatibilite(): array;
 
     /** Efface le cache après une modification des référentiels (E24). */
     public function oublier(): void;

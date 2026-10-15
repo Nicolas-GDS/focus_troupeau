@@ -1,13 +1,17 @@
 <?php
 
 use App\Domain\Interpretation\Classeur;
+use App\Domain\Interpretation\CompatibiliteEvenements;
 use App\Domain\Interpretation\ContexteLot;
+use App\Domain\Interpretation\EvenementSanitaire;
 use App\Domain\Interpretation\NiveauGlobal;
+use App\Domain\Interpretation\NiveauPropose;
 use App\Domain\Interpretation\Plausibilite;
 use App\Domain\Interpretation\Ratios;
 use App\Domain\Interpretation\ValeurAnalysee;
 use App\Domain\Referentiels\Referentiels;
 use App\Domain\Referentiels\StatutEpistemique;
+use Database\Seeders\Ref\TroublesSanitairesSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 
@@ -111,11 +115,11 @@ it('calcule les ratios d\'un bulletin réel avant classement (Ca/P de la grille)
 });
 
 it('lit la version de grille, les paramètres par défaut et les correspondances des référentiels', function () {
-    expect(referentiels()->versionGrilleCourante())->toBe('1')
+    expect(referentiels()->versionGrilleCourante())->toBe('2')
         ->and(referentiels()->parametre('interpretation.fenetre_evenements_mois'))->toBe(12.0)
         ->and(referentiels()->parametre('cle.inconnue'))->toBeNull()
         ->and(referentiels()->familleDuType('ENRUB_LUZ'))->toBe('ENRUB')
-        ->and(referentiels()->parametresCompatibles(['non_delivrance']))->toBe([]);
+        ->and(count(referentiels()->liensCompatibilite()))->toBe(111);
 });
 
 it('préfère la valeur par défaut propre au GDS à celle de l\'instance', function () {
@@ -125,4 +129,75 @@ it('préfère la valeur par défaut propre au GDS à celle de l\'instance', func
 
     expect(referentiels()->parametre('interpretation.fenetre_evenements_mois', 47))->toBe(18.0)
         ->and(referentiels()->parametre('interpretation.fenetre_evenements_mois', 24))->toBe(12.0);
+});
+
+/**
+ * Niveau proposé d'un bulletin avec les événements sanitaires de l'élevage (RC-1.4, chapitre 11), sur les référentiels réels.
+ *
+ * @param  array<string, float>  $valeurs
+ * @param  list<EvenementSanitaire>  $evenements
+ */
+function niveauAvecEvenements(array $valeurs, array $evenements): NiveauPropose
+{
+    $lot = new ContexteLot('FOIN_PP', 'FOIN');
+    $alertes = array_values(array_filter(
+        (new Classeur)->classerTout(bulletin($valeurs), $lot, referentiels()->seuilsActifs()),
+        fn ($c) => $c->produitUneAlerte(),
+    ));
+    $compatibilite = new CompatibiliteEvenements;
+    $correspondances = $compatibilite->correspondances(
+        $alertes, $evenements, referentiels()->liensCompatibilite(), new DateTimeImmutable('2026-10-15'),
+        (int) referentiels()->parametre('interpretation.fenetre_evenements_mois'),
+    );
+
+    return (new NiveauGlobal)->proposer(
+        array_map(fn ($c) => $c->seuil->gravite, $alertes),
+        array_map(fn ($c) => $c->valeur->parametreCode, $alertes),
+        $compatibilite->parametresPourRehaussement($correspondances, (int) referentiels()->parametre('interpretation.force_min_rehaussement')),
+        $lot,
+        null,
+        null,
+    );
+}
+
+it('T-04 (proposé) : foin à Mg bas (niveau 1) et tétanie dans l\'année → rehaussement proposé au niveau 2, motif affiché', function () {
+    $niveau = niveauAvecEvenements(['MG' => 1.6], [new EvenementSanitaire('tetanie', 'BOV', new DateTimeImmutable('2026-04-20'))]);
+
+    expect($niveau->niveauAvantRehaussement)->toBe(1)
+        ->and($niveau->niveau)->toBe(2)
+        ->and($niveau->rehaussements[0])->toContain('MG');
+});
+
+it('ne rehausse pas le lot de T-03 pour une non-délivrance : aucun lien MAT ou Cu, et niveau déjà à 2', function () {
+    $niveau = niveauAvecEvenements(
+        ['MAT' => 61, 'CU' => 4.2, 'FE' => 166, 'K' => 18],
+        [new EvenementSanitaire('retention_placentaire', 'BOV', new DateTimeImmutable('2026-03-01'), 'VA')],
+    );
+
+    expect($niveau->niveau)->toBe(2)->and($niveau->rehaussements)->toBe([]);
+});
+
+it('ne rehausse pas pour un lien de force 1 (minimum paramétré à 2)', function () {
+    // Ca bas ↔ rétention placentaire : force 1 dans le référentiel du chapitre 11 ; seuil Ca bas absent de la grille v1 :
+    // on vérifie le paramètre de force et la présence du lien.
+    $lien = collect(referentiels()->liensCompatibilite())
+        ->first(fn ($l) => $l->parametreCode === 'CA' && $l->troubleCode === 'retention_placentaire');
+
+    expect($lien?->force)->toBe(1)
+        ->and(referentiels()->parametre('interpretation.force_min_rehaussement'))->toBe(2.0);
+});
+
+it('charge le référentiel des troubles avec ses codes historiques et ses références résolues', function () {
+    expect(DB::table('ref.trouble_sanitaire')->count())->toBe(32)
+        ->and(DB::table('ref.trouble_sanitaire')->whereNotNull('type_evenement_existant')->count())->toBe(10)
+        ->and(DB::table('ref.compatibilite_parametre_trouble')->whereNull('reference_id')->count())->toBe(0)
+        ->and(DB::table('ref.reference_biblio')->where('cle', 'REG2018_1039')->value('statut_verif'))->toBe('verifie')
+        ->and(DB::table('ref.seuil_interpretation')->whereNull('sens')->count())->toBe(0);
+});
+
+it('rejoue le chargement du référentiel des troubles sans doublon', function () {
+    (new TroublesSanitairesSeeder)->run();
+
+    expect(DB::table('ref.compatibilite_parametre_trouble')->count())->toBe(111)
+        ->and(DB::table('ref.reference_biblio')->count())->toBe(64);
 });
