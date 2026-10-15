@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\App\Gds;
 use App\Models\App\Journal;
 use App\Models\App\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -94,6 +95,25 @@ it('co-brande l\'en-tête avec le GDS de l\'élevage de l\'éleveur (§ 8.1)', f
         ->assertSee('data-gds="47"', false)
         ->assertSee('GDS Lot-et-Garonne')
         ->assertDontSee('GDS Dordogne');
+});
+
+it('affiche le logo officiel du GDS, avec son nom en texte alternatif', function () {
+    $this->actingAs($this->jeu->eleveur24a)->get(route('accueil'))
+        ->assertSee('images/logos/gds-24.jpg', false)
+        ->assertSee('alt="GDS Dordogne"', false);
+
+    $this->actingAs($this->jeu->eleveur47)->get(route('accueil'))
+        ->assertSee('images/logos/gds-47.jpg', false)
+        ->assertSee('alt="GDS Lot-et-Garonne"', false)
+        ->assertDontSee('gds-24.jpg');
+});
+
+it('remplace par un cartouche le logo d\'un GDS qui n\'a pas encore de fichier', function () {
+    $gds = new Gds(['id' => 33, 'code' => '33', 'nom' => 'GDS Gironde', 'couleur_locale' => '#000000']);
+
+    $html = Blade::render('<x-logo-gds :gds="$gds" />', ['gds' => $gds]);
+
+    expect($html)->toContain('GDS Gironde')->not->toContain('<img');
 });
 
 it('change l\'en-tête avec l\'élevage choisi par un agent rattaché aux deux GDS', function () {
