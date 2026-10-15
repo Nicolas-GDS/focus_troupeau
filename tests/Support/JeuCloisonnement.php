@@ -3,20 +3,32 @@
 namespace Tests\Support;
 
 use App\Models\App\Consentement;
-use App\Models\App\Convention;
-use App\Models\App\ElevageAcces;
 use App\Models\App\User;
 use App\Models\Fourrage\Elevage;
+use Database\Seeders\JeuJ4Seeder;
 
 /**
- * Jeu de cloisonnement minimal (inspiré de J4, § 9.1) : deux GDS, trois élevages, un compte par rôle.
- * Tous les comptes ont accepté la notice RGPD (ENF-RGPD-02).
+ * Accès commode aux objets du jeu d'essai J4 (§ 9.1), chargé par Database\Seeders\JeuJ4Seeder :
+ * le jeu n'est décrit qu'à un seul endroit, le seeder, utilisé aussi en développement.
  *
  *   GDS 24 : elevage24a (éleveur24a, vétérinaire consenti), elevage24b
- *   GDS 47 : elevage47
+ *   GDS 47 : elevage47 (éleveur47)
  */
 final class JeuCloisonnement
 {
+    /** Profils J4 → adresse e-mail du compte */
+    public const PROFILS = [
+        'technicien24' => 'technicien.24@j4.test',
+        'technicien47' => 'technicien.47@j4.test',
+        'chargeDeMission' => 'charge.mission@j4.test',
+        'veterinaireConseil24' => 'veterinaire.conseil.24@j4.test',
+        'admin24' => 'admin.24@j4.test',
+        'adminGlobal' => 'admin.global@j4.test',
+        'eleveur24a' => 'eleveur.24a@j4.test',
+        'eleveur47' => 'eleveur.47@j4.test',
+        'veterinaire' => 'veterinaire@j4.test',
+    ];
+
     public Elevage $elevage24a;
 
     public Elevage $elevage24b;
@@ -45,57 +57,22 @@ final class JeuCloisonnement
 
     public static function creer(): self
     {
+        (new JeuJ4Seeder)->run();
+
         $jeu = new self;
+        $elevages = Elevage::query()->withoutGlobalScopes()->get()->keyBy('code_pseudo');
+        $jeu->elevage24a = $elevages['J4-24A'];
+        $jeu->elevage24b = $elevages['J4-24B'];
+        $jeu->elevage47 = $elevages['J4-47'];
 
-        $jeu->elevage24a = Elevage::factory()->gds(24)->create(['code_pseudo' => 'J4-24A']);
-        $jeu->elevage24b = Elevage::factory()->gds(24)->create(['code_pseudo' => 'J4-24B']);
-        $jeu->elevage47 = Elevage::factory()->gds(47)->create(['code_pseudo' => 'J4-47']);
-
-        foreach ([$jeu->elevage24a, $jeu->elevage24b, $jeu->elevage47] as $elevage) {
-            Convention::factory()->create(['elevage_id' => $elevage->id]);
+        $comptes = User::query()->whereIn('email', self::PROFILS)->get()->keyBy('email');
+        foreach (self::PROFILS as $propriete => $email) {
+            $jeu->{$propriete} = $comptes[$email];
         }
 
-        $jeu->technicien24 = self::agent('technicien', [24]);
-        $jeu->technicien47 = self::agent('technicien', [47]);
-        $jeu->chargeDeMission = self::agent(['technicien', 'admin'], [24, 47]);
-        $jeu->veterinaireConseil24 = self::agent('veterinaire_gds', [24]);
-        $jeu->admin24 = self::agent('admin', [24]);
-        $jeu->adminGlobal = self::agent('admin_global', []);
-
-        $jeu->eleveur24a = self::compte('eleveur');
-        $jeu->eleveur24a->elevages()->attach($jeu->elevage24a->id, ['role' => ElevageAcces::ROLE_ELEVEUR]);
-        $jeu->eleveur47 = self::compte('eleveur');
-        $jeu->eleveur47->elevages()->attach($jeu->elevage47->id, ['role' => ElevageAcces::ROLE_ELEVEUR]);
-
-        $jeu->veterinaire = self::compte('veterinaire');
-        $jeu->consentementVeterinaire = Consentement::factory()->veterinaire($jeu->veterinaire)
-            ->create(['elevage_id' => $jeu->elevage24a->id]);
-        $jeu->veterinaire->elevages()->attach($jeu->elevage24a->id, [
-            'role' => ElevageAcces::ROLE_VETERINAIRE,
-            'consentement_id' => $jeu->consentementVeterinaire->id,
-        ]);
+        $jeu->consentementVeterinaire = Consentement::query()->withoutGlobalScopes()
+            ->where('veterinaire_user_id', $jeu->veterinaire->id)->sole();
 
         return $jeu;
-    }
-
-    /**
-     * @param  string|list<string>  $roles
-     * @param  list<int>  $gds
-     */
-    private static function agent(string|array $roles, array $gds): User
-    {
-        $user = User::factory()->entra()->create(['notice_rgpd_acceptee_le' => now()]);
-        $user->assignRole($roles);
-        $user->gds()->attach($gds);
-
-        return $user;
-    }
-
-    private static function compte(string $role): User
-    {
-        $user = User::factory()->create(['notice_rgpd_acceptee_le' => now()]);
-        $user->assignRole($role);
-
-        return $user;
     }
 }

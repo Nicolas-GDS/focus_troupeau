@@ -37,6 +37,25 @@ docker compose run --rm --no-deps node sh -c "npm install && npm run build"
 | `mailpit` | Capture des e-mails en développement | http://localhost:8026 |
 | `node` | Vite / Tailwind (profil `front`) | `docker compose --profile front up node` (port 5174) |
 
+### Comptes de démonstration (jeu d'essai J4, § 9.1)
+
+`migrate --seed` charge le jeu J4, entièrement synthétique (interdit en production). Mot de passe commun :
+`J4_MOT_DE_PASSE` dans `.env` (par défaut `j4-developpement-seulement`).
+
+| Compte | Rôle | Périmètre |
+|---|---|---|
+| `technicien.24@j4.test` | technicien | GDS 24 : J4-24A, J4-24B |
+| `technicien.47@j4.test` | technicien | GDS 47 : J4-47 |
+| `charge.mission@j4.test` | technicien + admin | GDS 24 et 47 |
+| `veterinaire.conseil.24@j4.test` | veterinaire_gds | GDS 24 |
+| `admin.24@j4.test` | admin | GDS 24 |
+| `admin.global@j4.test` | admin_global | toute l'instance |
+| `eleveur.24a@j4.test` | eleveur | J4-24A |
+| `eleveur.47@j4.test` | eleveur | J4-47 |
+| `veterinaire@j4.test` | veterinaire | J4-24A (consentement actif) |
+
+En production, les agents se connectent par Entra ID et n'ont pas de mot de passe local.
+
 Les ports se changent dans `.env` (`APP_PORT`, `DB_FORWARD_PORT`, `MAILPIT_UI_PORT`, `VITE_PORT`).
 
 Le script `03_chargement_campagne_*.sql` (données nominatives) n'est pas versionné : il est chargé à la main,

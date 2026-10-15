@@ -31,4 +31,7 @@ return [
         'memoire_heures' => 24,
     ],
 
+    // Mot de passe des comptes du jeu d'essai J4 (*@j4.test), développement uniquement (§ 9.1).
+    'mot_de_passe_j4' => env('J4_MOT_DE_PASSE') ?: 'j4-developpement-seulement',
+
 ];

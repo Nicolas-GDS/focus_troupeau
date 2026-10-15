@@ -33,7 +33,9 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app/private'),
-            'serve' => true,
+            // ENF-SEC-05 : pas de service générique des fichiers privés (routes storage/{path}) ;
+            // bulletins et photos sont servis par des routes de l'application, soumises aux policies.
+            'serve' => false,
             'throw' => false,
             'report' => false,
         ],

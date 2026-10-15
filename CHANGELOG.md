@@ -12,3 +12,4 @@ Le numéro de version est affiché dans le pied de page de l'application et dans
 - Authentification : mot de passe, code par e-mail, lien de connexion, activation, Entra ID (EF-M0-03 à EF-M0-05).
 - Rôles, cloisonnement par GDS et par élevage, policies (chapitre 6.3).
 - Mise en page bi-entité, navigation, sélecteur d'élevage, notice RGPD (§ 8.1, § 8.2, EF-M0-08, ENF-RGPD-02).
+- Jeu d'essai J4 (seeder) et tests de cloisonnement T-40 sur chaque route et chaque rôle, avec registre obligatoire des routes.

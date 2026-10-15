@@ -10,6 +10,7 @@ use App\Policies\ConsentementPolicy;
 use App\Policies\ConventionPolicy;
 use App\Policies\ElevagePolicy;
 use App\View\Composers\EspaceComposer;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
@@ -27,6 +28,11 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Hors production : une affectation ignorée (attribut non modifiable) ou un chargement paresseux
+        // de relation lève une erreur au lieu de passer inaperçu.
+        Model::preventSilentlyDiscardingAttributes(! $this->app->isProduction());
+        Model::preventLazyLoading(! $this->app->isProduction());
+
         // ENF-SEC-02 : 12 caractères minimum, vérification contre les mots de passe compromis
         // (Have I Been Pwned, k-anonymat : seuls les 5 premiers caractères de l'empreinte SHA-1 sont transmis).
         Password::defaults(fn () => Password::min(12)->uncompromised());

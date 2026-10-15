@@ -99,7 +99,8 @@ it('co-brande l\'en-tête avec le GDS de l\'élevage de l\'éleveur (§ 8.1)', f
 it('change l\'en-tête avec l\'élevage choisi par un agent rattaché aux deux GDS', function () {
     $this->actingAs($this->jeu->chargeDeMission);
 
-    $this->get(route('travail'))->assertSee('data-gds="24"', false);
+    $this->post(route('elevage-courant'), ['elevage' => $this->jeu->elevage24a->id]);
+    $this->get(route('travail'))->assertSee('data-gds="24"', false)->assertSee('GDS Dordogne');
 
     $this->from(route('travail'))
         ->post(route('elevage-courant'), ['elevage' => $this->jeu->elevage47->id])
@@ -126,10 +127,7 @@ it('refuse de choisir un élevage hors périmètre', function () {
 });
 
 it('affiche la raison sociale de l\'élevage quand elle est connue', function () {
-    DB::table('prive.elevage_identite')->insert([
-        'elevage_id' => $this->jeu->elevage24a->id,
-        'raison_sociale' => 'GAEC des Essais',
-    ]);
+    DB::table('prive.elevage_identite')->where('elevage_id', $this->jeu->elevage24a->id)->update(['raison_sociale' => 'GAEC des Essais']);
 
     $this->actingAs($this->jeu->eleveur24a)->get(route('accueil'))->assertSee('GAEC des Essais');
 });

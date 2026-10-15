@@ -52,5 +52,6 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/deconnexion', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-    Route::put('/compte/mot-de-passe', [PasswordController::class, 'update'])->name('user-password.update');
+    Route::put('/compte/mot-de-passe', [PasswordController::class, 'update'])
+        ->middleware(['compte.actif', 'notice.rgpd'])->name('user-password.update');
 });
