@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\App\Gds;
+use App\Models\App\ImportBulletin;
 use App\Models\App\Journal;
 use App\Models\App\Notification;
 use App\Models\App\ParametreDefaut;
@@ -14,7 +15,8 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 // Chapitre 5.1 et 6.3 : « toutes les tables portant elevage_id sont soumises au cloisonnement ».
-// Garde-fou : tout modèle Eloquent dont la table porte elevage_id ou gds_id doit déclarer le scope
+// Garde-fou : tout modèle Eloquent dont la table porte elevage_id (ou prelevement_id, analyse_id, interpretation_id)
+// ou gds_id doit déclarer le scope
 // correspondant, sauf exception justifiée ci-dessous. Un nouveau modèle oublié fait échouer ce test.
 uses(RefreshDatabase::class);
 
@@ -24,6 +26,7 @@ const MODELES_HORS_CLOISONNEMENT = [
     ParametreDefaut::class => 'référentiel : gds_id NULL = valeur de l\'instance, lu par tous les rôles (D10)',
     Journal::class => 'journal d\'audit : lecture réservée à l\'administrateur par permission (journal.lire)',
     Notification::class => 'notifications : propres à leur destinataire (user_id), accès par policy au lot L3',
+    ImportBulletin::class => 'dépôts de bulletins : cloisonnés par GdsScope ; l\'élevage est porté par l\'analyse créée (analyse_id)',
 ];
 
 /**
@@ -38,7 +41,7 @@ function modelesEloquent(): array
         ->all();
 }
 
-it('cloisonne tout modèle dont la table porte elevage_id ou gds_id', function () {
+it('cloisonne tout modèle rattaché à un élevage (directement ou non) ou à un GDS', function () {
     $manquants = [];
 
     foreach (modelesEloquent() as $classe) {
@@ -50,7 +53,10 @@ it('cloisonne tout modèle dont la table porte elevage_id ou gds_id', function (
         $colonnes = Schema::getColumnListing($modele->getTable());
         $scopes = array_keys($modele->getGlobalScopes());
 
-        if (in_array('elevage_id', $colonnes, true) && ! in_array(ElevageScope::class, $scopes, true)) {
+        // Rattachement direct (elevage_id) ou indirect (par le prélèvement, l'analyse ou l'interprétation)
+        $rattacheElevage = array_intersect(['elevage_id', 'prelevement_id', 'analyse_id', 'interpretation_id'], $colonnes) !== [];
+
+        if ($rattacheElevage && ! in_array(ElevageScope::class, $scopes, true)) {
             $manquants[] = "{$classe} : ElevageScope";
         }
 
