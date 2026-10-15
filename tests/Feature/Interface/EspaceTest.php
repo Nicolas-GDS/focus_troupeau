@@ -108,6 +108,15 @@ it('affiche le logo officiel du GDS, avec son nom en texte alternatif', function
         ->assertDontSee('gds-24.jpg');
 });
 
+it('affiche le logo GDS France réduit en pied de page, y compris sur la page de connexion (§ 8.1)', function () {
+    $this->actingAs($this->jeu->technicien24)->get(route('travail'))
+        ->assertSee('images/logos/gds-france.png', false)
+        ->assertSee('alt="Réseau GDS France"', false);
+
+    $this->post(route('logout'));
+    $this->get(route('login'))->assertSee('images/logos/gds-france.png', false);
+});
+
 it('remplace par un cartouche le logo d\'un GDS qui n\'a pas encore de fichier', function () {
     $gds = new Gds(['id' => 33, 'code' => '33', 'nom' => 'GDS Gironde', 'couleur_locale' => '#000000']);
 
