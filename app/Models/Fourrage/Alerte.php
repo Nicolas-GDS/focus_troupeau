@@ -49,7 +49,7 @@ class Alerte extends Model
 
     protected function casts(): array
     {
-        return ['retenue' => 'boolean'];
+        return ['retenue' => 'boolean', 'gravite' => 'integer'];
     }
 
     /** @return BelongsTo<Interpretation, $this> */

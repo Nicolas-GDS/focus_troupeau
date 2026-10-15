@@ -9,6 +9,7 @@ use App\Models\App\Convention;
 use App\Models\App\ImportBulletin;
 use App\Models\Fourrage\Analyse;
 use App\Models\Fourrage\Elevage;
+use App\Models\Fourrage\Interpretation;
 use App\Models\Ref\PlagePlausibilite;
 use App\Models\Ref\SeuilInterpretation;
 use App\Models\Ref\VersionReferentiel;
@@ -17,6 +18,7 @@ use App\Policies\ConsentementPolicy;
 use App\Policies\ConventionPolicy;
 use App\Policies\ElevagePolicy;
 use App\Policies\ImportBulletinPolicy;
+use App\Policies\InterpretationPolicy;
 use App\Policies\ReferentielPolicy;
 use App\Services\Import\ExtracteurBulletin;
 use App\Services\Import\ExtracteurLano;
@@ -59,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Consentement::class, ConsentementPolicy::class);
         Gate::policy(ImportBulletin::class, ImportBulletinPolicy::class);
         Gate::policy(Analyse::class, AnalysePolicy::class);
+        Gate::policy(Interpretation::class, InterpretationPolicy::class);
         // E24 — Référentiels versionnés
         Gate::policy(VersionReferentiel::class, ReferentielPolicy::class);
         Gate::policy(SeuilInterpretation::class, ReferentielPolicy::class);

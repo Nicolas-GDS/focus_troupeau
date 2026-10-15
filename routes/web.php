@@ -4,6 +4,7 @@ use App\Http\Controllers\AiguillageController;
 use App\Http\Controllers\BulletinPdfController;
 use App\Http\Controllers\ElevageCourantController;
 use App\Http\Controllers\NoticeRgpdController;
+use App\Livewire\Interpretation\InterpretationBulletin;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -44,6 +45,9 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
         Route::view('/import/bulletins', 'espace.import.bulletins')->middleware('permission:bulletin.importer')->name('import.bulletins');
         Route::get('/import/bulletins/{import}/pdf', [BulletinPdfController::class, 'import'])->middleware('signed')->name('import.bulletins.pdf');
         Route::get('/bulletins/{analyse}/pdf', [BulletinPdfController::class, 'analyse'])->middleware('signed')->name('bulletins.pdf');
+
+        // E20 — Interprétation d'un bulletin (EF-M2-02 à EF-M2-04) ; analyse liée à travers les scopes (404 hors périmètre)
+        Route::get('/analyses/{analyse}/interpretation', InterpretationBulletin::class)->middleware('permission:interpretation.lire')->name('analyses.interpretation');
 
         // E23 — Administration : GDS, comptes, conventions
         Route::middleware('role:admin|admin_global')->prefix('admin')->name('admin.')->group(function () {

@@ -71,6 +71,8 @@ const REGISTRE_ROUTES = [
     'GET import/bulletins/{import}/pdf' => ['acces' => 'objet'],
     'GET bulletins/{analyse}/pdf' => ['acces' => 'objet'],
 
+    // Lot L2 — E20 (objet testé dans tests/Feature/Interpretation/EcranInterpretationTest.php)
+    'GET analyses/{analyse}/interpretation' => ['acces' => 'objet'],
     // Lot L2 — E24 (référentiels versionnés) : appelée ici avec une table fictive, la route répond 404 aux
     // administrateurs et 403 aux autres rôles ; accès réel (seuils, plages) testé dans
     // tests/Feature/Referentiels/EcranReferentielsTest.php
