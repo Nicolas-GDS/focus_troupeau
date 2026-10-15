@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main, 'lot*']
+  pull_request:
+
+jobs:
+  qualite-et-tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: focustroupeau_test
+          POSTGRES_USER: focustroupeau
+          POSTGRES_PASSWORD: focustroupeau
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U focustroupeau"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_pgsql, pgsql, intl, zip, bcmath, redis
+          coverage: none
+
+      - name: Dépendances Composer
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Environnement
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Style (Pint)
+        run: vendor/bin/pint --test
+
+      - name: Analyse statique (Larastan niveau 6)
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+      - name: Tests (Pest)
+        run: php artisan test
