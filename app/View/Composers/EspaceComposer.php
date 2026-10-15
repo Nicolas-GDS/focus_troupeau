@@ -62,6 +62,10 @@ class EspaceComposer
             $liens[] = ['libelle' => 'Mon travail', 'route' => 'travail'];
         }
 
+        if ($user->can('bulletin.importer')) {
+            $liens[] = ['libelle' => 'Import des bulletins', 'route' => 'import.bulletins'];
+        }
+
         if ($user->hasAnyRole(['admin', Perimetre::ROLE_GLOBAL])) {
             $liens[] = ['libelle' => 'Utilisateurs', 'route' => 'admin.utilisateurs'];
             $liens[] = ['libelle' => 'Conventions', 'route' => 'admin.conventions'];

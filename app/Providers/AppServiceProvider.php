@@ -6,10 +6,14 @@ use App\Domain\Referentiels\Referentiels;
 use App\Listeners\JournaliserAuthentification;
 use App\Models\App\Consentement;
 use App\Models\App\Convention;
+use App\Models\App\ImportBulletin;
+use App\Models\Fourrage\Analyse;
 use App\Models\Fourrage\Elevage;
+use App\Policies\AnalysePolicy;
 use App\Policies\ConsentementPolicy;
 use App\Policies\ConventionPolicy;
 use App\Policies\ElevagePolicy;
+use App\Policies\ImportBulletinPolicy;
 use App\Services\Import\ExtracteurBulletin;
 use App\Services\Import\ExtracteurLano;
 use App\Services\Referentiels\ReferentielsBdd;
@@ -49,6 +53,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Elevage::class, ElevagePolicy::class);
         Gate::policy(Convention::class, ConventionPolicy::class);
         Gate::policy(Consentement::class, ConsentementPolicy::class);
+        Gate::policy(ImportBulletin::class, ImportBulletinPolicy::class);
+        Gate::policy(Analyse::class, AnalysePolicy::class);
 
         View::composer(['components.layouts.espace', 'espace.*', 'rgpd.*'], EspaceComposer::class);
 

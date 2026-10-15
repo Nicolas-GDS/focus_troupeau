@@ -89,7 +89,17 @@ class ImportBulletinService
      */
     public function traiter(ImportBulletin $import): ImportBulletin
     {
-        $import->update(['statut' => 'en_extraction']);
+        // Réservation atomique : un dépôt n'est traité qu'une fois, même si le job est relancé ou exécuté en double.
+        $reserve = ImportBulletin::query()->withoutGlobalScopes()
+            ->whereKey($import->id)
+            ->where('statut', 'recu')
+            ->update(['statut' => 'en_extraction']);
+
+        if ($reserve === 0) {
+            return $import->refresh();
+        }
+
+        $import->refresh();
 
         try {
             $donnees = $this->extracteur->extraire(Storage::disk(self::DISQUE)->path((string) $import->chemin));

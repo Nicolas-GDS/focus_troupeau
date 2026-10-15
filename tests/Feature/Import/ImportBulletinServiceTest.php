@@ -227,3 +227,33 @@ it('exécute le job d\'extraction de bout en bout sur un vrai bulletin', functio
     expect($import->fresh()?->statut)->toBe('a_rapprocher')
         ->and($import->fresh()?->donnees_extraites['entete']['num_echantillon'])->toBe('HA25-41527');
 });
+
+it('ne traite un dépôt qu\'une fois, même si le job est exécuté en double', function () {
+    $import = deposerExemple('HA25-41526');
+    $this->service->traiter($import);
+    $this->service->rapprocher($import->fresh(), $this->jeu->elevage24a, $this->jeu->technicien24);
+
+    $encore = $this->service->traiter($import->fresh());
+
+    expect($encore->statut)->toBe('importe')
+        ->and(Analyse::query()->withoutGlobalScopes()->count())->toBe(1);
+});
+
+it('ne remplace jamais un résultat obtenu par l\'échec d\'un job concurrent', function () {
+    $import = deposerExemple('HA25-41526');
+    $this->service->rapprocher($this->service->traiter($import), $this->jeu->elevage24a, $this->jeu->technicien24);
+
+    (new ExtraireBulletinLano($import->id))->failed(new RuntimeException('Classe introuvable'));
+
+    expect($import->fresh()?->statut)->toBe('importe');
+});
+
+it('passe en erreur, avec un message lisible, un dépôt dont le job a échoué avant tout résultat', function () {
+    $import = deposerExemple('HA25-41526');
+
+    (new ExtraireBulletinLano($import->id))->failed(new RuntimeException('Target [X] is not instantiable'));
+
+    expect($import->fresh()?->statut)->toBe('erreur')
+        ->and($import->fresh()?->erreur)->toContain('erreur technique')
+        ->and($import->fresh()?->erreur)->not->toContain('instantiable');
+});

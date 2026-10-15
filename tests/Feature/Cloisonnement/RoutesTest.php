@@ -21,6 +21,7 @@ use Tests\Support\JeuCloisonnement;
 |   connecte    : tout compte connecté
 |   roles       : compte connecté ayant l'un des rôles listés (sinon 403)
 |   elevage     : action portant sur un élevage passé dans la requête — 404 hors périmètre
+|   objet       : route portant sur un objet (signée + policy), testée avec ses objets dans le fichier de l'écran
 |
 */
 
@@ -64,6 +65,11 @@ const REGISTRE_ROUTES = [
     'GET admin/gds' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global']],
     'GET admin/utilisateurs' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global']],
     'GET admin/conventions' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global']],
+
+    // Lot L2 — E19 et PDF des bulletins (objets testés dans tests/Feature/Import/EcranImportBulletinsTest.php)
+    'GET import/bulletins' => ['acces' => 'roles', 'roles' => ['technicien']],
+    'GET import/bulletins/{import}/pdf' => ['acces' => 'objet'],
+    'GET bulletins/{analyse}/pdf' => ['acces' => 'objet'],
 ];
 
 /**
@@ -129,7 +135,7 @@ it('déclare chaque route de l\'application dans le registre de cloisonnement', 
 
 it('protège chaque route de l\'espace : un visiteur est renvoyé vers la connexion', function (string $cle) {
     appeler($cle)->assertRedirect(route('login'));
-})->with(fn () => array_keys(array_filter(REGISTRE_ROUTES, fn ($r) => in_array($r['acces'], ['connecte', 'roles', 'elevage'], true))));
+})->with(fn () => array_keys(array_filter(REGISTRE_ROUTES, fn ($r) => in_array($r['acces'], ['connecte', 'roles', 'elevage', 'objet'], true))));
 
 it('renvoie un compte connecté vers son espace depuis les pages de connexion', function (string $cle) {
     $jeu = JeuCloisonnement::creer();

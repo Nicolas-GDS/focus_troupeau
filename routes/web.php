@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AiguillageController;
+use App\Http\Controllers\BulletinPdfController;
 use App\Http\Controllers\ElevageCourantController;
 use App\Http\Controllers\NoticeRgpdController;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +39,11 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
 
         // E18 — Travail du technicien (le vétérinaire conseil y trouve ses visas, E21)
         Route::view('/travail', 'espace.travail')->middleware('role:technicien|veterinaire_gds')->name('travail');
+
+        // E19 — Import des bulletins (EF-M9-01) ; PDF servis par route signée et policy (ENF-SEC-05)
+        Route::view('/import/bulletins', 'espace.import.bulletins')->middleware('permission:bulletin.importer')->name('import.bulletins');
+        Route::get('/import/bulletins/{import}/pdf', [BulletinPdfController::class, 'import'])->middleware('signed')->name('import.bulletins.pdf');
+        Route::get('/bulletins/{analyse}/pdf', [BulletinPdfController::class, 'analyse'])->middleware('signed')->name('bulletins.pdf');
 
         // E23 — Administration : GDS, comptes, conventions
         Route::middleware('role:admin|admin_global')->prefix('admin')->name('admin.')->group(function () {

@@ -22,17 +22,17 @@ it('attribue à chaque rôle les permissions de la matrice du § 2.3', function 
     expect($user->getAllPermissions()->pluck('name')->sort()->values()->all())->toBe($permissions);
 })->with([
     'éleveur' => ['eleveur', [
-        'consentement.gerer_propre', 'consentement.lire', 'convention.lire', 'elevage.lire',
+        'bulletin.lire', 'consentement.gerer_propre', 'consentement.lire', 'convention.lire', 'elevage.lire',
         'plan.ecrire', 'plan.lire', 'stock.ecrire', 'stock.lire',
     ]],
     'technicien' => ['technicien', [
-        'compte.inviter', 'compte.lire', 'consentement.lire', 'convention.ecrire', 'convention.lire',
+        'bulletin.controler', 'bulletin.importer', 'bulletin.lire', 'compte.inviter', 'compte.lire', 'consentement.lire', 'convention.ecrire', 'convention.lire',
         'elevage.ecrire', 'elevage.lire', 'plan.ecrire', 'plan.lire', 'referentiel.lire', 'stock.ecrire', 'stock.lire',
     ]],
-    'vétérinaire conseil' => ['veterinaire_gds', ['convention.lire', 'elevage.lire', 'plan.lire', 'referentiel.lire', 'stock.lire']],
-    'vétérinaire d\'élevage' => ['veterinaire', ['convention.lire', 'elevage.lire', 'plan.lire', 'stock.lire']],
+    'vétérinaire conseil' => ['veterinaire_gds', ['bulletin.lire', 'convention.lire', 'elevage.lire', 'plan.lire', 'referentiel.lire', 'stock.lire']],
+    'vétérinaire d\'élevage' => ['veterinaire', ['bulletin.lire', 'convention.lire', 'elevage.lire', 'plan.lire', 'stock.lire']],
     'administrateur' => ['admin', [
-        'compte.ecrire', 'compte.inviter', 'compte.lire', 'consentement.ecrire', 'consentement.lire',
+        'bulletin.lire', 'compte.ecrire', 'compte.inviter', 'compte.lire', 'consentement.ecrire', 'consentement.lire',
         'convention.ecrire', 'convention.lire', 'elevage.ecrire', 'elevage.lire', 'journal.lire',
         'plan.lire', 'referentiel.ecrire', 'referentiel.lire', 'stock.lire',
     ]],
