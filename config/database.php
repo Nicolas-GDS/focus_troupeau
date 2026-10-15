@@ -95,7 +95,9 @@ return [
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-            'search_path' => 'public',
+            // Tous les schémas de l'application (chapitre 5) : db:wipe / migrate:fresh ne vident
+            // que les schémas du search_path ; public reste en tête (extensions PostGIS, pgcrypto…).
+            'search_path' => env('DB_SEARCH_PATH', 'public,ref,prive,fourrage,sig,valo,app,dossier,stock,plan'),
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
