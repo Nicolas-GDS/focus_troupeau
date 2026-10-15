@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
  * - app.user : remember_token (session « se souvenir de moi » de Laravel), deux_facteurs_email (ENF-SEC-03)
  *   et notice_rgpd_acceptee_le (acceptation horodatée de la notice, ENF-RGPD-02) ;
  * - triggers maj_le sur le modèle du socle (ref.f_maj_horodatage) ;
+ * - app.convention : cree_par et maj_par (EF-GEN-06, décision du 15 octobre 2026, reportée au § 5.2) ;
  * - insertion des GDS 24 et 47 avant la reprise fourrage.elevage.gds_id = departement.
  * Les tables de spatie/laravel-permission (app.roles…) sont créées avec le paquet (étape 5).
  */
@@ -21,7 +22,7 @@ return new class extends Migration
     {
         DB::unprepared(<<<'SQL'
 CREATE EXTENSION IF NOT EXISTS citext;   -- ajout : type de app.user.email
-CREATE SCHEMA app;
+CREATE SCHEMA IF NOT EXISTS app;   -- migrate:fresh vide les tables mais conserve les schémas
 
 CREATE TABLE app.gds (
   id            smallint PRIMARY KEY,                 -- 24, 47
@@ -80,6 +81,7 @@ CREATE TABLE app.convention (
   statut     text NOT NULL DEFAULT 'active' CHECK (statut IN ('active','echue','resiliee')),
   reference_externe text,                             -- n° de contrat (SignClic / gestion)
   commentaire text,
+  cree_par bigint REFERENCES app."user"(id), maj_par bigint REFERENCES app."user"(id),   -- auteur (EF-GEN-06)
   cree_le timestamptz NOT NULL DEFAULT now(), maj_le timestamptz NOT NULL DEFAULT now()
 );
 CREATE INDEX ON app.convention (elevage_id, statut);

@@ -130,6 +130,21 @@ it('porte le GDS, les dates et le statut d\'une convention', function () {
         ->and(Convention::factory()->echue()->create()->estActive())->toBeFalse();
 });
 
+it('trace l\'auteur de la création et de la dernière modification d\'une convention (EF-GEN-06)', function () {
+    $technicien = User::factory()->entra()->create();
+    $collegue = User::factory()->entra()->create();
+
+    $this->actingAs($technicien);
+    $convention = Convention::factory()->create();
+
+    $this->actingAs($collegue);
+    $convention->update(['date_fin' => now()->addYear()->toDateString()]);
+
+    expect($convention->fresh()?->cree_par)->toBe($technicien->id)
+        ->and($convention->fresh()?->maj_par)->toBe($collegue->id)
+        ->and($convention->creePar?->is($technicien))->toBeTrue();
+});
+
 it('refuse un statut de convention inconnu', function () {
     Convention::factory()->create(['statut' => 'suspendue']);
 })->throws(QueryException::class);

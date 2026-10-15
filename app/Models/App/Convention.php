@@ -2,6 +2,7 @@
 
 namespace App\Models\App;
 
+use App\Models\Concerns\TraceAuteur;
 use App\Models\Fourrage\Elevage;
 use Database\Factories\App\ConventionFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,13 +22,15 @@ use Illuminate\Support\Carbon;
  * @property string $statut
  * @property string|null $reference_externe
  * @property string|null $commentaire
+ * @property int|null $cree_par
+ * @property int|null $maj_par
  * @property Carbon $cree_le
  * @property Carbon $maj_le
  */
 class Convention extends Model
 {
     /** @use HasFactory<ConventionFactory> */
-    use HasFactory;
+    use HasFactory, TraceAuteur;
 
     public const CREATED_AT = 'cree_le';
 
@@ -63,6 +66,18 @@ class Convention extends Model
     public function gds(): BelongsTo
     {
         return $this->belongsTo(Gds::class);
+    }
+
+    /** @return BelongsTo<User, $this> */
+    public function creePar(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'cree_par');
+    }
+
+    /** @return BelongsTo<User, $this> */
+    public function majPar(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'maj_par');
     }
 
     public function estActive(): bool
