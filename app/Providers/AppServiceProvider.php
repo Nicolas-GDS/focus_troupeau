@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Domain\Referentiels\Referentiels;
 use App\Listeners\JournaliserAuthentification;
 use App\Models\App\Consentement;
 use App\Models\App\Convention;
@@ -9,6 +10,7 @@ use App\Models\Fourrage\Elevage;
 use App\Policies\ConsentementPolicy;
 use App\Policies\ConventionPolicy;
 use App\Policies\ElevagePolicy;
+use App\Services\Referentiels\ReferentielsBdd;
 use App\View\Composers\EspaceComposer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
@@ -23,7 +25,8 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        //
+        // Référentiels (chapitre 6.2) : interface du domaine, implémentation en base avec cache.
+        $this->app->singleton(Referentiels::class, ReferentielsBdd::class);
     }
 
     public function boot(): void
