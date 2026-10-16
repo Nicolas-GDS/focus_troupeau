@@ -50,9 +50,18 @@ Une valeur hors plage ne détruit rien : le bulletin est conservé, le résultat
 
 **Ordre d'affichage** : campagne départementale ; puis région pédo-géologique si `n ≥ 5` ; puis bi-GDS seulement si la population départementale est insuffisante. Le seuil 5 est un paramètre (`references.n_min`).
 
+**Précisions du lot L4** (décisions du 16/10/2026, propositions [CP]) :
+
+- *Populations* : départementale = même campagne, même type de fourrage, même GDS que l'élevage ; lithologique = la départementale restreinte à la classe lithologique du prélèvement (`valo.mv_prelevement_contexte.classe_litho_gds`) ; bi-GDS = même campagne et même type sur les GDS 24 et 47. Chacune ne retient que les bulletins au statut `valide` (interprétation validée, EF-M2-03), non `exclu_references`, d'élevages au consentement `references` actif à la date du calcul, et les résultats sans `flag_anomalie`.
+- *Calcul* : nouvelles vues `valo` (le socle n'est pas modifié) donnant n, Q1, médiane, Q3, minimum et maximum par `percentile_cont`, **sans filtre sur n** ; le domaine (`Domain\Interpretation\Positionnement`) applique `references.n_min` et classe la valeur. Vues simples (non matérialisées) : une révocation du consentement retire les lots dès la requête suivante (T-08).
+- *Lot de l'élevage* : il est positionné même si son élevage n'a pas donné le consentement `references` ; il n'entre alors pas dans la population.
+- *Paramètres suivis* (EF-M3-01) : liste configurable portée par `ref.parametre` (colonne ajoutée), initialisée à MS, MAT, UFL 2018, PDI, BPR, NDF, Cu, Zn, Mn, Fe, MM, Ca, P, Mg, K, Na, BACA.
+
 ### RC-4 — Historique pluriannuel
 
 Pour un élevage, un type de fourrage et un paramètre : série des valeurs par campagne (médiane des lots de l'élevage si plusieurs lots du même type). Variation affichée entre la campagne courante et la précédente, en valeur et en pourcentage, avec un libellé neutre (« + 12 g MAT ») ; aucune classe n'est attribuée à une variation (une hausse de K n'est pas « bonne »). Les décisions enregistrées (recommandations, actions du plan) sont affichées sur la même frise.
+
+**Précisions du lot L4** (décisions du 16/10/2026, [CP]) : série tirée de `valo.v_historique_elevage` (bulletins `valide` de l'élevage, sans condition de consentement : ce sont ses propres données) ; « campagne courante » = la plus récente de la série, « précédente » = la campagne qui la précède dans la série ; pourcentage omis si la valeur précédente est nulle ; les décisions de la frise sont les actions des plans publiés (datées de la publication de la visite) et les recommandations des interprétations de lots publiées (datées de l'interprétation).
 
 ### RC-1.5 — Lecture des profils sanguins et des mesures terrain
 

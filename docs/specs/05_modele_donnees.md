@@ -434,6 +434,8 @@ CREATE TABLE plan.levier_ligne (
 
 | Vue | Rôle |
 |---|---|
+| `valo.v_reference_gds` | Quartiles par campagne × GDS × type de fourrage × paramètre, n toujours donné (RC-3, population départementale ; lot L4) |
+| `valo.v_reference_litho` | Idem restreinte à la classe lithologique du prélèvement (RC-3 ; lot L4) |
 | `valo.v_reference_bigds` | Quartiles par type de fourrage et campagne sur les deux GDS (RC-3, repli) |
 | `valo.v_historique_elevage` | Série par élevage × type × paramètre × campagne (RC-4) |
 | `valo.v_resultat_large` | Existante ; étendue aux paramètres calculés (ratios RC-1) |
@@ -441,6 +443,8 @@ CREATE TABLE plan.levier_ligne (
 | `valo.v_pilotage` | Indicateurs EF-M10-04 |
 
 Les vues de référence excluent les élevages sans consentement `references` actif, les bulletins `anomalie` et les analyses `exclu_references`. Les vues matérialisées sont rafraîchies chaque nuit et après chaque publication (job).
+
+Lot L4 (décision du 16/10/2026) : les vues existantes du socle `valo.v_reference_locale` et `valo.v_reference_par_litho` ne sont pas modifiées et ne servent pas au positionnement (pas de GDS, pas de filtre de consentement ni d'exclusion, populations de moins de cinq lots masquées) ; les vues de référence du lot L4 retiennent les bulletins au statut `valide` et ne sont pas matérialisées.
 
 ## 5.7 Correspondance Laravel
 
