@@ -8,13 +8,22 @@ ARG GID=1000
 # - libpq (PostgreSQL), libicu (intl), libzip (zip)
 # - python3 + poppler-utils (pdftotext) : le job d'extraction des bulletins LANO
 #   appelle parse_lano.py via Symfony\Process depuis le worker (chapitre 6.1)
+# - chromium + nodejs/npm : rendu des PDF à la charte par Browsershot (chapitre 6.1, EF-GEN-08, lot L3) ;
+#   fonts-liberation et fonts-dejavu-core en secours des polices auto-hébergées
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git unzip libpq-dev libicu-dev libzip-dev \
         python3 poppler-utils \
+        chromium nodejs npm fonts-liberation fonts-dejavu-core \
     && docker-php-ext-install -j"$(nproc)" pdo_pgsql pgsql intl zip bcmath pcntl opcache \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Puppeteer, piloté par Browsershot, avec le Chromium du système (pas de téléchargement de navigateur)
+ENV PUPPETEER_SKIP_DOWNLOAD=1 \
+    BROWSERSHOT_CHROME_PATH=/usr/bin/chromium \
+    BROWSERSHOT_NODE_MODULES=/usr/local/lib/node_modules
+RUN npm install -g puppeteer@23.11.1 && npm cache clean --force
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/zz-focustroupeau.ini

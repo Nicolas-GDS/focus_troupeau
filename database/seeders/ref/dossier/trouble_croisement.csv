@@ -1,0 +1,7 @@
+code;libelle;ordre;indicateurs_sanitaires;troubles_sanitaires
+non_delivrance;Non-délivrance;10;NON_DELIVRANCE;retention_placentaire
+metrite;Métrite;20;METRITE;
+troubles_reproduction;Troubles de reproduction;30;IVV;infertilite
+avortement;Avortement;40;AVORTEMENT;avortement
+veaux;Veaux : mortalité, maladies;50;MORTALITE_VEAUX_0_12M;diarrhee_veaux|mortinatalite_faiblesse_neonatale|myopathie_jeunes
+boiterie;Boiterie;60;;boiteries

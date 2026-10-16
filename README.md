@@ -37,9 +37,11 @@ docker compose run --rm --no-deps node sh -c "npm install && npm run build"
 | `mailpit` | Capture des e-mails en développement | http://localhost:8026 |
 | `node` | Vite / Tailwind (profil `front`) | `docker compose --profile front up node` (port 5174) |
 
-### Comptes de démonstration (jeu d'essai J4, § 9.1)
+### Comptes de démonstration (jeux d'essai J4 et J3, § 9.1)
 
-`migrate --seed` charge le jeu J4, entièrement synthétique (interdit en production). Mot de passe commun :
+`migrate --seed` charge le jeu J4, entièrement synthétique, puis le jeu J3 : l'élevage `ELV-0001` et ses neuf lots
+du document 04, rattachés au GDS 24 (recette : `docs/recette/L3_recette_J3.md`). Les deux sont interdits en
+production. Mot de passe commun :
 `J4_MOT_DE_PASSE` dans `.env` (par défaut `j4-developpement-seulement`).
 
 | Compte | Rôle | Périmètre |
@@ -53,6 +55,7 @@ docker compose run --rm --no-deps node sh -c "npm install && npm run build"
 | `eleveur.24a@j4.test` | eleveur | J4-24A |
 | `eleveur.47@j4.test` | eleveur | J4-47 |
 | `veterinaire@j4.test` | veterinaire | J4-24A (consentement actif) |
+| `eleveur.elv0001@j3.test` | eleveur | ELV-0001 (J3) |
 
 En production, les agents se connectent par Entra ID et n'ont pas de mot de passe local.
 

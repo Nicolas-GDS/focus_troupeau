@@ -1,0 +1,8 @@
+code;libelle;unite;decimales;ordre;definition
+EAU_PH;pH de l'eau;-;1;200;Physico-chimie
+EAU_NITRATES;Nitrates;mg/l;0;201;Physico-chimie
+EAU_FER;Fer;µg/l;0;202;Physico-chimie – en excès, gêne l'absorption du cuivre et du zinc
+EAU_DURETE;Dureté (titre hydrotimétrique);°f;0;203;Physico-chimie
+EAU_SULFATES;Sulfates;mg/l;0;204;Physico-chimie – à additionner au soufre de la ration (chapitre 11)
+EAU_COLIFORMES;Coliformes totaux;UFC/100 ml;0;210;Bactériologie
+EAU_ENTEROCOQUES;Entérocoques intestinaux;UFC/100 ml;0;211;Bactériologie

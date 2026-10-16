@@ -27,6 +27,7 @@ use Illuminate\Support\Carbon;
  * @property string $motif
  * @property bool $a_completer
  * @property string|null $commentaire
+ * @property int|null $visite_id visite d'approche globale (lot L3, EF-M1-09)
  */
 class Prelevement extends Model
 {
@@ -41,6 +42,7 @@ class Prelevement extends Model
     protected $fillable = [
         'code', 'elevage_id', 'campagne_code', 'date_prelevement', 'type_fourrage_code', 'nom_lot', 'date_recolte',
         'cycle_coupe', 'mode_conservation', 'mode_sechage', 'destination_categorie_code', 'motif', 'a_completer', 'commentaire',
+        'visite_id',
     ];
 
     protected $attributes = ['motif' => 'routine', 'a_completer' => false];

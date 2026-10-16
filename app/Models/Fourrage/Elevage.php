@@ -65,6 +65,18 @@ class Elevage extends Model
         return ['adherent_gds' => 'boolean'];
     }
 
+    /**
+     * Espèces de l'élevage (tableau PostgreSQL « {BOV,OVI} ») en liste de codes.
+     *
+     * @return list<string>
+     */
+    public function listeEspeces(): array
+    {
+        $brut = trim((string) $this->getAttribute('especes'), '{}');
+
+        return $brut === '' ? [] : array_map(fn (string $code) => trim($code, '" '), explode(',', $brut));
+    }
+
     /** @return BelongsTo<Gds, $this> */
     public function gds(): BelongsTo
     {

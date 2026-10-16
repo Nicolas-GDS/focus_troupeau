@@ -4,6 +4,7 @@ namespace App\View\Composers;
 
 use App\Models\App\Gds;
 use App\Models\App\User;
+use App\Models\Fourrage\Elevage;
 use App\Services\Cloisonnement\Perimetre;
 use App\Services\ElevageCourant;
 use Illuminate\Http\Request;
@@ -40,7 +41,7 @@ class EspaceComposer
                 'elevages' => $elevages,
                 'elevageCourant' => $courant,
                 'gds' => $gdsId === null ? null : Gds::query()->find($gdsId),
-                'navigation' => $this->navigation($user),
+                'navigation' => $this->navigation($user, $courant),
             ]);
         }
 
@@ -48,20 +49,37 @@ class EspaceComposer
     }
 
     /**
-     * Liens de navigation ; « parametres » : paramètres de route éventuels (E24 : table éditée).
+     * Liens de navigation ; « parametres » : paramètres de route éventuels (E24 : table éditée, volets du dossier :
+     * élevage courant) ; « actif » : motif des routes où le lien est marqué comme page courante.
      *
-     * @return list<array{libelle: string, route: string, parametres?: array<string, string>}>
+     * @return list<array{libelle: string, route: string, parametres?: array<string, string>, actif?: string}>
      */
-    private function navigation(User $user): array
+    private function navigation(User $user, ?Elevage $courant): array
     {
         $liens = [];
+        $dossier = $courant === null ? null : ['elevage' => $courant->id];
 
         if ($user->hasAnyRole(['eleveur', 'veterinaire'])) {
             $liens[] = ['libelle' => 'Accueil', 'route' => 'accueil'];
+
+            // E03 à E11 : l'éleveur entre par ses visites, puis navigue par volet (§ 3.4)
+            if ($dossier !== null) {
+                $liens[] = ['libelle' => 'Mon dossier', 'route' => 'visites', 'actif' => 'visites|dossier.*'];
+                $liens[] = ['libelle' => 'Plan d\'action', 'route' => 'dossier.plan', 'parametres' => $dossier];
+            }
         }
 
         if ($user->hasAnyRole(['technicien', 'veterinaire_gds'])) {
             $liens[] = ['libelle' => 'Mon travail', 'route' => 'travail'];
+        }
+
+        // Lot L3 — visites (saisie, E21)
+        if ($user->can('visite.rediger')) {
+            $liens[] = ['libelle' => 'Visites', 'route' => 'visites'];
+        }
+
+        if ($dossier !== null && $user->hasAnyRole(['technicien', 'veterinaire_gds'])) {
+            $liens[] = ['libelle' => 'Dossier', 'route' => 'dossier.fourrages', 'parametres' => $dossier, 'actif' => 'dossier.*'];
         }
 
         if ($user->can('bulletin.importer')) {

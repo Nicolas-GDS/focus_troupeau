@@ -1,0 +1,6 @@
+element;matrice;espece_code;borne_basse;borne_haute;unite;reference_cle;commentaire
+selenium;serum;BOV;0.06;0.36;mg/l;GDS24_FORGENEUF2026;Diapositive 13 – référence du profil métabolique (LDAR 24) reprise par la présentation
+iode;serum;BOV;0.1;1.7;mg/l;GDS24_FORGENEUF2026;Diapositive 13
+fer;serum;BOV;1.0;2.0;mg/l;GDS24_FORGENEUF2026;Diapositive 13 – un sérum hémolysé rend la valeur du fer non interprétable
+cupremie;serum;BOV;0.43;1.23;mg/l;GDS24_FORGENEUF2026;Diapositive 13
+zincemie;serum;BOV;0.78;1.58;mg/l;GDS24_FORGENEUF2026;Diapositive 13

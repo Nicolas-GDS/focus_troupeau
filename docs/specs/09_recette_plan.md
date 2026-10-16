@@ -7,7 +7,7 @@
 | J0 — Campagne 2025-2026 | Les 59 bulletins réels chargés par `03_chargement_campagne_2025-2026.sql` (données nominatives : environnement de recette uniquement, accès restreint) | Import, classement, positionnement, anomalie HA25-42515 |
 | J1 — Élevage allaitant synthétique | Décrit ci-dessous ; reproduit dans `calculs/test_calculs.py` | Stocks, besoins, couverture, projection, leviers, incertitude |
 | J2 — Élevage ovin synthétique | 300 brebis, foin et seau « bovins » à 300 mg Cu/kg | Maximum réglementaire cuivre (niveau 3), SMS |
-| J3 — ELV-0001 (pseudonymisé) | Les neuf lots du prototype de fiche (document 04) | Fiche de visite complète, PDF, positionnement |
+| J3 — ELV-0001 (pseudonymisé) | Les neuf lots du prototype de fiche (document 04, figures 2 et 3 : MS, UFL 2018, PDI, BPR, MAT, minéraux, BACA ; numéros d'échantillon fictifs), avec ses messages et son plan d'action ; seeder `JeuJ3Seeder` | Fiche de visite complète, PDF, positionnement |
 | J4 — Cloisonnement | Deux GDS, trois élevages, un technicien par GDS, un chargé de mission bi-GDS, un vétérinaire consenti sur un seul élevage | Tests d'accès |
 
 **J1 en détail.** Inventaire au 1er novembre 2026, période du 1er novembre 2026 au 31 mars 2027 (151 jours), pertes à la distribution 13 % (déroulé au sol), marge de sécurité 15 %. Stocks : un silo de maïs couloir L1 30 m, L2 6 m, largeur 8 m, hauteur 2 m, MS 33 %, amidon 30 % (non consommé dans l'exemple, pour vérifier RC-5 seul) ; foin 2025 : 40 t MS utiles (lot déjà calculé) ; foin 2026 : 400 balles de 300 kg, MS 85 %, sous toit (3 %) ; enrubannage 2026 : 150 balles de 650 kg, MS 45 % (analyse), sous toit ; paille : 100 balles de 280 kg, MS 90 %, sous toit. Lots d'animaux : 100 vaches allaitantes en lactation (foin 4 kg MS, enrubannage 7 kg MS, correcteur azoté 0,88 kg MS, minéral 100 g) ; 30 génisses 1-2 ans (foin 5 kg MS, paille 1 kg MS). Résultats attendus : stock utile 205,94 t MS ; besoin prélevé 222,16 t MS ; sécurité 33,32 t ; bilan − 49,54 t ; autonomie 139 jours ; rupture de l'enrubannage le 23 décembre 2026 ; foin 2025 épuisé le 3 janvier 2027 sans rupture de la famille foin ; un achat de 30 t d'enrubannage livré le 15 décembre repousse la rupture au 30 janvier 2027 ; un re-comptage du foin 2026 à 50 t le 15 janvier produit un écart de recalage de 41,53 t. Couverture du lot des vaches : UFL 96 % (limite), PDI couvert, Ca/P 2,50, cuivre 23 mg/kg MS (excès informatif).
@@ -40,7 +40,7 @@ Les cas `T-10` à `T-16` sont exécutables (`python3 calculs/test_calculs.py`, 6
 | T-23 | EF-M7-02 | Quatre scénarios | Comparaison côte à côte ; un seul scénario `retenu` à la fois |
 | T-24 | EF-M7-05 | Scénario retenu avec achat | Mouvement `achat` créé à la date de livraison, lié à la ligne |
 | T-25 | EF-GEN-04 | Libellés générés | Aucun nom de produit dans les messages, propositions et PDF (recherche automatique sur une liste de marques courantes) |
-| T-26 | EF-GEN-08 | Export PDF des trois gabarits | Charte bi-entité, mentions de limites, version de grille, en moins de 10 s |
+| T-26 | EF-GEN-08 | Export PDF des trois gabarits (fiche de visite au lot L3 ; bilan et scénario au lot L6) | Charte bi-entité, mentions de limites, version de grille, en moins de 10 s |
 | T-27 | EF-M9-03 | Import SAGEMA (fichier de test) | Création et mise à jour par EDE, rapport d'import, aucune écriture externe |
 | T-28 | EF-M9-06 | Import JSON du calculateur HTML | Inventaire créé avec les mêmes stocks utiles que le calculateur |
 | T-30 | EF-M0-03 | Lien de connexion | Expiré après 15 minutes ; inutilisable deux fois |
@@ -72,8 +72,8 @@ Estimation indicative pour un développement interne assisté par IA, à affiner
 | N° | Point | Lot | Qui tranche |
 |---|---|---|---|
 | 1 | Plages de plausibilité RC-2 (valeurs proposées [CP]) | L2 | Comité technique |
-| 2 | Grille eau d'abreuvement (paramètres et seuils) | L3 | Vétérinaire conseil |
-| 3 | Repères des mesures terrain et des profils sanguins : sources à citer ou valeurs à remplacer (statut [C] actuel) | L3 | Vétérinaire conseil |
+| 2 | Grille eau d'abreuvement (paramètres et seuils) — seul le fer est sourcé (présentation Forgeneuf) ; nitrates, pH, dureté, sulfates, bactériologie, conductivité sans seuil | L3 | Vétérinaire conseil |
+| 3 | Repères des mesures terrain et des profils sanguins : sources à citer ou valeurs à remplacer (statut [C] actuel, transcrits de la présentation Forgeneuf le 16/10/2026, marqués « repère à valider ») | L3 | Vétérinaire conseil |
 | 4 | Seuils S1/S2 du bilan sanitaire et grille trouble × cause (NBVC) : droits d'usage et source à citer | L3 | Chargé de mission |
 | 5 | Chargement des tables INRAE-CIRAD-AFZ (licence d'utilisation des Feedtables pour un usage applicatif) | L5 | Chargé de mission |
 | 6 | Besoins journaliers INRA 2018 par catégorie et stade : périmètre de la table à charger ; remplacement des repères [C] des vaches allaitantes | L5 | Vétérinaire conseil, technicien référent |
@@ -89,7 +89,7 @@ Estimation indicative pour un développement interne assisté par IA, à affiner
 
 | Risque | Effet | Parade |
 |---|---|---|
-| Référentiels non validés à temps (points 1 à 6) | Calculs justes sur des repères contestables | Statut épistémique affiché ; valeurs [C] et [CP] marquées « à valider » dans l'interface technicien ; aucune publication éleveur sur un repère non validé |
+| Référentiels non validés à temps (points 1 à 6) | Calculs justes sur des repères contestables | Statut épistémique affiché ; valeurs [C] et [CP] marquées « à valider » dans l'interface technicien ; publication éleveur possible sur un repère non validé, la valeur portant alors la mention « repère à valider » à l'écran et dans le PDF (décision du 16/10/2026) |
 | Extraction PDF LANO fragile (changement de maquette du bulletin) | Imports en échec | Tests sur J0 à chaque mise à jour ; saisie manuelle de secours ; négociation d'un export structuré |
 | Saisie des stocks trop lourde pour l'éleveur | Module non utilisé | Saisie mobile minimale (nombre de balles, poids, cotes), valeurs par défaut, inventaire fait avec le technicien la première fois |
 | Confusion entre estimation et mesure | Décisions d'achat sur des stocks surestimés | Incertitude affichée, indicateurs `estime`/`mesure`, marge de sécurité majorée si estimations majoritaires |

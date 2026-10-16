@@ -1,0 +1,8 @@
+indicateur_code;espece_code;systeme;s1;s2;reference_cle;commentaire
+RETOURNEMENT;BOV;viande;0;1;NBVC_BSE;Diapositive 8
+METRITE;BOV;viande;5;10;NBVC_BSE;Diapositive 8
+NON_DELIVRANCE;BOV;viande;8;12;NBVC_BSE;Diapositive 8
+AVORTEMENT;BOV;viande;2;3;NBVC_BSE;Diapositive 8
+DIARRHEE_ADULTE;BOV;viande;3;5;NBVC_BSE;Diapositive 8
+VELAGE_DIFFICILE;BOV;viande;5;10;NBVC_BSE;Diapositive 8
+MORTALITE_VEAUX_0_12M;BOV;viande;;5;GDS24_FORGENEUF2026;Diapositive 7 – « alerte au-delà de 5 % » retenue comme S2, sans S1 (décision du 16/10/2026)

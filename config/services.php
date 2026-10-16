@@ -36,6 +36,15 @@ return [
         'tenant' => env('MICROSOFT_TENANT_ID'),
     ],
 
+    // Brevo (EF-M8-05, chapitre 6.6) : e-mails par le SMTP Brevo (MAIL_*), SMS par l'API transactionnelle.
+    // Pilote SMS « journal » en développement et en test : aucun envoi, le texte est écrit dans le journal.
+    'brevo' => [
+        'cle_api' => env('BREVO_CLE_API'),
+        'url_api' => env('BREVO_URL_API', 'https://api.brevo.com/v3'),
+        'expediteur_sms' => env('BREVO_SMS_EXPEDITEUR', 'GDS'),
+        'pilote_sms' => env('SMS_PILOTE', 'journal'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),

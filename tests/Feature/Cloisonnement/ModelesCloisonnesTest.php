@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 // Chapitre 5.1 et 6.3 : « toutes les tables portant elevage_id sont soumises au cloisonnement ».
-// Garde-fou : tout modèle Eloquent dont la table porte elevage_id (ou prelevement_id, analyse_id, interpretation_id)
+// Garde-fou : tout modèle Eloquent dont la table porte elevage_id (ou une clé d'objet rattaché, COLONNES_RATTACHEMENT)
 // ou gds_id doit déclarer le scope
 // correspondant, sauf exception justifiée ci-dessous. Un nouveau modèle oublié fait échouer ce test.
 uses(RefreshDatabase::class);
@@ -27,6 +27,12 @@ const MODELES_HORS_CLOISONNEMENT = [
     Journal::class => 'journal d\'audit : lecture réservée à l\'administrateur par permission (journal.lire)',
     Notification::class => 'notifications : propres à leur destinataire (user_id), accès par policy au lot L3',
     ImportBulletin::class => 'dépôts de bulletins : cloisonnés par GdsScope ; l\'élevage est porté par l\'analyse créée (analyse_id)',
+];
+
+/** Colonnes rattachant une table à l'élevage, directement ou par la chaîne de ses objets (fourrage, dossier). */
+const COLONNES_RATTACHEMENT = [
+    'elevage_id', 'prelevement_id', 'analyse_id', 'interpretation_id',
+    'visite_id', 'analyse_eau_id', 'etiquette_id', 'interpretation_visite_id', 'plan_action_id', 'action_id',
 ];
 
 /**
@@ -53,8 +59,8 @@ it('cloisonne tout modèle rattaché à un élevage (directement ou non) ou à u
         $colonnes = Schema::getColumnListing($modele->getTable());
         $scopes = array_keys($modele->getGlobalScopes());
 
-        // Rattachement direct (elevage_id) ou indirect (par le prélèvement, l'analyse ou l'interprétation)
-        $rattacheElevage = array_intersect(['elevage_id', 'prelevement_id', 'analyse_id', 'interpretation_id'], $colonnes) !== [];
+        // Rattachement direct (elevage_id) ou indirect (par un objet lui-même rattaché à l'élevage)
+        $rattacheElevage = array_intersect(COLONNES_RATTACHEMENT, $colonnes) !== [];
 
         if ($rattacheElevage && ! in_array(ElevageScope::class, $scopes, true)) {
             $manquants[] = "{$classe} : ElevageScope";

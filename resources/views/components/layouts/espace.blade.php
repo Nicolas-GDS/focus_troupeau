@@ -30,7 +30,7 @@
                 <nav aria-label="Navigation principale" class="flex flex-col gap-1 sm:flex-row sm:items-center">
                     @foreach ($navigation as $lien)
                         <a href="{{ route($lien['route'], $lien['parametres'] ?? []) }}" class="lien-navigation"
-                           @if (request()->routeIs($lien['route'])) aria-current="page" @endif>{{ $lien['libelle'] }}</a>
+                           @if (request()->routeIs(...explode('|', $lien['actif'] ?? $lien['route']))) aria-current="page" @endif>{{ $lien['libelle'] }}</a>
                     @endforeach
                 </nav>
 

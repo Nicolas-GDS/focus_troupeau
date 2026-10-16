@@ -20,6 +20,7 @@ use App\Models\Fourrage\EvenementSanitaire as EvenementSanitaireModele;
 use App\Models\Fourrage\Interpretation;
 use App\Models\Fourrage\Prelevement;
 use App\Services\JournalService;
+use App\Services\Notifications\NotificationsPublication;
 use DateTimeImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -52,6 +53,18 @@ class InterpretationService
         return Interpretation::query()->withoutGlobalScopes()
             ->where('analyse_id', $analyse->id)
             ->where('statut', '!=', Interpretation::STATUT_ARCHIVE)
+            ->orderByDesc('version')
+            ->first();
+    }
+
+    /**
+     * Dernière version publiée d'une analyse : celle que lisent l'éleveur et le vétérinaire d'élevage (§ 2.3).
+     */
+    public function publiee(Analyse $analyse): ?Interpretation
+    {
+        return Interpretation::query()->withoutGlobalScopes()
+            ->where('analyse_id', $analyse->id)
+            ->where('statut', Interpretation::STATUT_PUBLIE)
             ->orderByDesc('version')
             ->first();
     }
@@ -282,10 +295,10 @@ class InterpretationService
     /**
      * Publication (EF-M2-04, T-05) : niveaux 0 à 2 depuis « valide » ; niveau 3 seulement depuis « visee ».
      *
-     * Lot L2 : changement de statut journalisé seulement. Le lot L3 complétera la publication (fiche figée HTML et PDF,
-     * version de la grille mémorisée, notification EF-M8-01, nouvelle version à chaque modification — EF-M2-07).
+     * Lot L3 : l'éleveur et le technicien sont notifiés (EF-M8-01 ; SMS au niveau 3, EF-M8-02), sauf quand le lot est
+     * publié avec sa visite, dont la notification le couvre ; la fiche figée est celle de la visite (EF-M2-07).
      */
-    public function publier(Interpretation $interpretation, User $technicien): Interpretation
+    public function publier(Interpretation $interpretation, User $technicien, bool $notifier = true): Interpretation
     {
         if (! self::publiable($interpretation)) {
             throw new InterpretationRefusee($interpretation->niveau_global === 3
@@ -293,10 +306,14 @@ class InterpretationService
                 : 'Seule une interprétation validée se publie.');
         }
 
-        DB::transaction(function () use ($interpretation, $technicien) {
+        DB::transaction(function () use ($interpretation, $technicien, $notifier) {
             $interpretation->update(['statut' => Interpretation::STATUT_PUBLIE]);
 
             $this->journaliser('publication_interpretation', $technicien, $interpretation);
+
+            if ($notifier) {
+                app(NotificationsPublication::class)->resultatPublie($interpretation, $technicien);
+            }
         });
 
         return $interpretation->refresh();
@@ -315,7 +332,7 @@ class InterpretationService
      * Résultats du bulletin, chacun avec sa classe, son repère et sa source (EF-M2-02, EF-GEN-02, EF-GEN-03),
      * classés pour la catégorie cible donnée.
      *
-     * @return list<array{code: string, libelle: string, valeur: float|null, censure: string|null, unite: string, decimales: int, calcule: bool, anomalie: bool, classe: string|null, gravite: int|null, repere: string|null, source: string|null, statut: StatutEpistemique|null}>
+     * @return list<array{code: string, libelle: string, valeur: float|null, censure: string|null, unite: string, decimales: int, calcule: bool, anomalie: bool, classe: string|null, gravite: int|null, repere: string|null, source: string|null, statut: StatutEpistemique|null, a_valider: bool}>
      */
     public function lignesResultats(Analyse $analyse, ?string $categorieCible): array
     {
@@ -359,6 +376,7 @@ class InterpretationService
                 'repere' => $seuil === null ? null : self::repere($seuil->borneMin, $seuil->borneMax, (string) $r->unite),
                 'source' => $seuil?->referenceId === null ? null : ($sources[$seuil->referenceId] ?? null),
                 'statut' => $seuil?->statutEpistemique,
+                'a_valider' => $seuil !== null && ! $seuil->valide,
             ];
         }
 

@@ -115,7 +115,8 @@ it('calcule les ratios d\'un bulletin réel avant classement (Ca/P de la grille)
 });
 
 it('lit la version de grille, les paramètres par défaut et les correspondances des référentiels', function () {
-    expect(referentiels()->versionGrilleCourante())->toBe('3')
+    // version 4 : référentiels du dossier (lot L3, étape 2)
+    expect(referentiels()->versionGrilleCourante())->toBe('4')
         ->and(referentiels()->parametre('interpretation.fenetre_evenements_mois'))->toBe(12.0)
         ->and(referentiels()->parametre('cle.inconnue'))->toBeNull()
         ->and(referentiels()->familleDuType('ENRUB_LUZ'))->toBe('ENRUB')
@@ -199,5 +200,5 @@ it('rejoue le chargement du référentiel des troubles sans doublon', function (
     (new TroublesSanitairesSeeder)->run();
 
     expect(DB::table('ref.compatibilite_parametre_trouble')->count())->toBe(111)
-        ->and(DB::table('ref.reference_biblio')->count())->toBe(64);
+        ->and(DB::table('ref.reference_biblio')->count())->toBe(67);   // dont 3 références du dossier (lot L3)
 });

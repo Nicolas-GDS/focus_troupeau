@@ -7,21 +7,45 @@ use App\Listeners\JournaliserAuthentification;
 use App\Models\App\Consentement;
 use App\Models\App\Convention;
 use App\Models\App\ImportBulletin;
+use App\Models\Dossier\Action;
+use App\Models\Dossier\AnalyseEau;
+use App\Models\Dossier\Controle;
+use App\Models\Dossier\EtiquetteAliment;
+use App\Models\Dossier\IndicateurSanitaire;
+use App\Models\Dossier\InterpretationVisite;
+use App\Models\Dossier\MesureTerrain;
+use App\Models\Dossier\NoteLiaison;
+use App\Models\Dossier\Visite;
 use App\Models\Fourrage\Analyse;
+use App\Models\Fourrage\AnalyseAnimale;
 use App\Models\Fourrage\Elevage;
 use App\Models\Fourrage\Interpretation;
 use App\Models\Ref\PlagePlausibilite;
 use App\Models\Ref\SeuilInterpretation;
 use App\Models\Ref\VersionReferentiel;
+use App\Policies\ActionPolicy;
+use App\Policies\AnalyseAnimalePolicy;
+use App\Policies\AnalyseEauPolicy;
 use App\Policies\AnalysePolicy;
 use App\Policies\ConsentementPolicy;
 use App\Policies\ConventionPolicy;
 use App\Policies\ElevagePolicy;
+use App\Policies\EtiquetteAlimentPolicy;
 use App\Policies\ImportBulletinPolicy;
+use App\Policies\IndicateurSanitairePolicy;
 use App\Policies\InterpretationPolicy;
+use App\Policies\InterpretationVisitePolicy;
+use App\Policies\MesureTerrainPolicy;
+use App\Policies\NoteLiaisonPolicy;
 use App\Policies\ReferentielPolicy;
+use App\Policies\VisitePolicy;
 use App\Services\Import\ExtracteurBulletin;
 use App\Services\Import\ExtracteurLano;
+use App\Services\Notifications\PasserelleSms;
+use App\Services\Notifications\SmsBrevo;
+use App\Services\Notifications\SmsJournal;
+use App\Services\Pdf\RenduBrowsershot;
+use App\Services\Pdf\RenduPdf;
 use App\Services\Referentiels\ReferentielsBdd;
 use App\View\Composers\EspaceComposer;
 use Illuminate\Database\Eloquent\Model;
@@ -42,6 +66,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Extraction des bulletins (EF-M9-01) : script LANO existant ; un export structuré la remplacera.
         $this->app->bind(ExtracteurBulletin::class, ExtracteurLano::class);
+        $this->app->bind(RenduPdf::class, RenduBrowsershot::class);
+        $this->app->bind(PasserelleSms::class, fn () => config('services.brevo.pilote_sms') === 'brevo' ? new SmsBrevo : new SmsJournal);
     }
 
     public function boot(): void
@@ -62,6 +88,17 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(ImportBulletin::class, ImportBulletinPolicy::class);
         Gate::policy(Analyse::class, AnalysePolicy::class);
         Gate::policy(Interpretation::class, InterpretationPolicy::class);
+        // Lot L3 — dossier (§ 2.3)
+        Gate::policy(Visite::class, VisitePolicy::class);
+        Gate::policy(AnalyseEau::class, AnalyseEauPolicy::class);
+        Gate::policy(MesureTerrain::class, MesureTerrainPolicy::class);
+        Gate::policy(AnalyseAnimale::class, AnalyseAnimalePolicy::class);
+        Gate::policy(EtiquetteAliment::class, EtiquetteAlimentPolicy::class);
+        Gate::policy(IndicateurSanitaire::class, IndicateurSanitairePolicy::class);
+        Gate::policy(InterpretationVisite::class, InterpretationVisitePolicy::class);
+        Gate::policy(Action::class, ActionPolicy::class);
+        Gate::policy(Controle::class, ActionPolicy::class);
+        Gate::policy(NoteLiaison::class, NoteLiaisonPolicy::class);
         // E24 — Référentiels versionnés
         Gate::policy(VersionReferentiel::class, ReferentielPolicy::class);
         Gate::policy(SeuilInterpretation::class, ReferentielPolicy::class);

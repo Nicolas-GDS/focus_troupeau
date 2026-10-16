@@ -6,8 +6,11 @@ use App\Domain\Referentiels\Referentiels;
 use App\Models\App\Convention;
 use App\Models\App\ImportBulletin;
 use App\Models\App\User;
+use App\Models\Dossier\Controle;
+use App\Models\Dossier\InterpretationVisite;
 use App\Models\Fourrage\Analyse;
 use App\Models\Fourrage\Interpretation;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -16,8 +19,9 @@ use Illuminate\Support\Facades\DB;
  * (les requêtes passent par les scopes de cloisonnement) et selon ses droits.
  *
  * Lot L2 : dépôts à rapprocher, bulletins en anomalie, bulletins à interpréter, brouillons, interprétations à viser,
- * interprétations à publier, conventions arrivant à échéance (EF-M0-06). Les contrôles échus (lot L3) et les
- * élevages dont l'autonomie passe sous le seuil d'alerte (lot L6) s'ajouteront avec leurs lots.
+ * interprétations à publier, conventions arrivant à échéance (EF-M0-06). Lot L3 : interprétations de visite en
+ * brouillon, à viser (niveau 3), à publier ; contrôles échus du plan d'action. Les élevages dont l'autonomie passe
+ * sous le seuil d'alerte (lot L6) s'ajouteront avec leur lot.
  */
 class FilesDeTravail
 {
@@ -51,6 +55,22 @@ class FilesDeTravail
 
         if ($user->can('interpretation.rediger')) {
             $files[] = $this->aPublier();
+        }
+
+        if ($user->can('interpretation.rediger')) {
+            $files[] = $this->visitesEnBrouillon();
+        }
+
+        if ($user->can('interpretation.viser')) {
+            $files[] = $this->visitesAViser();
+        }
+
+        if ($user->can('interpretation.rediger')) {
+            $files[] = $this->visitesAPublier();
+        }
+
+        if ($user->can('plan_action.rediger')) {
+            $files[] = $this->controlesEchus();
         }
 
         if ($user->can('convention.ecrire') && $user->can('interpretation.rediger')) {
@@ -223,6 +243,98 @@ class FilesDeTravail
             ->selectRaw('e.id, coalesce(i.raison_sociale, e.code_pseudo) as libelle')
             ->pluck('libelle', 'id')
             ->all();
+    }
+
+    /**
+     * @return array{cle: string, titre: string, total: int, lignes: list<array<string, mixed>>}
+     */
+    private function visitesEnBrouillon(): array
+    {
+        $requete = InterpretationVisite::query()->where('statut', InterpretationVisite::STATUT_BROUILLON);
+
+        return $this->file('visites_brouillon', 'Interprétations de visite en brouillon', (clone $requete)->count(),
+            $this->lignesVisites($requete->orderBy('maj_le')->limit(self::LIMITE)->get(),
+                fn (InterpretationVisite $i) => $i->refus_visa_motif ? 'Visa refusé : '.$i->refus_visa_motif : 'Version '.$i->version.' en brouillon',
+                fn (InterpretationVisite $i) => $i->refus_visa_motif ? 'vigilance' : 'information'));
+    }
+
+    /**
+     * @return array{cle: string, titre: string, total: int, lignes: list<array<string, mixed>>}
+     */
+    private function visitesAViser(): array
+    {
+        $requete = InterpretationVisite::query()->where('statut', InterpretationVisite::STATUT_VALIDE)->where('niveau_global', 3);
+
+        return $this->file('visites_a_viser', 'Interprétations de visite de niveau 3 à viser', (clone $requete)->count(),
+            $this->lignesVisites($requete->orderBy('maj_le')->limit(self::LIMITE)->get(),
+                fn () => 'Niveau 3 — visa du vétérinaire conseil attendu', fn () => 'critique'));
+    }
+
+    /**
+     * @return array{cle: string, titre: string, total: int, lignes: list<array<string, mixed>>}
+     */
+    private function visitesAPublier(): array
+    {
+        $requete = InterpretationVisite::query()->where(fn ($q) => $q
+            ->where(fn ($v) => $v->where('statut', InterpretationVisite::STATUT_VALIDE)->where('niveau_global', '<=', 2))
+            ->orWhere('statut', InterpretationVisite::STATUT_VISEE));
+
+        return $this->file('visites_a_publier', 'Visites prêtes à publier', (clone $requete)->count(),
+            $this->lignesVisites($requete->orderBy('maj_le')->limit(self::LIMITE)->get(),
+                fn (InterpretationVisite $i) => $i->statut === InterpretationVisite::STATUT_VISEE ? 'Visée — niveau 3' : 'Validée — niveau '.$i->niveau_global,
+                fn () => 'couvert'));
+    }
+
+    /**
+     * Contrôles planifiés dont l'échéance est passée, sur un plan publié (EF-M2-08, EF-M8-04).
+     *
+     * @return array{cle: string, titre: string, total: int, lignes: list<array<string, mixed>>}
+     */
+    private function controlesEchus(): array
+    {
+        $requete = Controle::query()->where('statut', Controle::STATUT_PLANIFIE)->whereDate('echeance', '<', today())
+            ->whereIn('action_id', DB::table('dossier.action as a')->join('dossier.plan_action as p', 'p.id', '=', 'a.plan_action_id')
+                ->join('dossier.interpretation_visite as i', 'i.id', '=', 'p.interpretation_visite_id')
+                ->where('i.statut', InterpretationVisite::STATUT_PUBLIE)->select('a.id'));
+        $controles = (clone $requete)->orderBy('echeance')->limit(self::LIMITE)->get();
+        $contexte = DB::table('dossier.action as a')->join('dossier.plan_action as p', 'p.id', '=', 'a.plan_action_id')
+            ->join('dossier.interpretation_visite as i', 'i.id', '=', 'p.interpretation_visite_id')
+            ->join('dossier.visite as v', 'v.id', '=', 'i.visite_id')
+            ->whereIn('a.id', $controles->pluck('action_id'))->get(['a.id', 'a.titre', 'v.id as visite_id', 'v.elevage_id'])->keyBy('id');
+        $libelles = $this->libellesElevages($contexte->pluck('elevage_id'));
+
+        return $this->file('controles_echus', 'Contrôles échus', (clone $requete)->count(), $controles->map(function (Controle $c) use ($contexte, $libelles) {
+            $ligne = $contexte[$c->action_id] ?? null;
+
+            return [
+                'libelle' => ($libelles[$ligne->elevage_id ?? ''] ?? '').' — '.($ligne->titre ?? ''),
+                'detail' => 'Cible : '.$c->cible, 'date' => $c->echeance->toDateString(),
+                'route' => 'visites.interpretation', 'parametres' => ['visite' => (int) ($ligne->visite_id ?? 0)], 'etat' => 'vigilance',
+            ];
+        })->values()->all());
+    }
+
+    /**
+     * @param  Collection<int, InterpretationVisite>  $interpretations
+     * @param  callable(InterpretationVisite): string  $detail
+     * @param  callable(InterpretationVisite): string  $etat
+     * @return list<array<string, mixed>>
+     */
+    private function lignesVisites(Collection $interpretations, callable $detail, callable $etat): array
+    {
+        $visites = DB::table('dossier.visite')->whereIn('id', $interpretations->pluck('visite_id'))->get(['id', 'elevage_id', 'date_visite'])->keyBy('id');
+        $libelles = $this->libellesElevages($visites->pluck('elevage_id'));
+
+        return $interpretations->map(function (InterpretationVisite $i) use ($visites, $libelles, $detail, $etat) {
+            $visite = $visites[$i->visite_id] ?? null;
+
+            return [
+                'libelle' => 'Visite du '.($visite === null ? '—' : Carbon::parse($visite->date_visite)->format('d/m/Y')).' — '.($libelles[$visite->elevage_id ?? ''] ?? ''),
+                'detail' => $detail($i),
+                'date' => $visite?->date_visite,
+                'route' => 'visites.interpretation', 'parametres' => ['visite' => $i->visite_id], 'etat' => $etat($i),
+            ];
+        })->values()->all();
     }
 
     /**

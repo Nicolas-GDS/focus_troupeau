@@ -373,5 +373,5 @@ it('a clôturé en version 3 le seuil Ca/P ovin des mâles BOUC_MALE ; le seuil 
 
     expect($seuils->pluck('especeCode')->all())->toBe(['CAP'])
         ->and(DB::table('ref.seuil_interpretation')->where('parametre_code', 'CA_P')->where('espece_code', 'OVI')->value('version_fin'))->toBe('3')
-        ->and(app(Referentiels::class)->versionGrilleCourante())->toBe('3');
+        ->and(DB::table('ref.version_referentiel')->where('numero', '3')->exists())->toBeTrue();
 });

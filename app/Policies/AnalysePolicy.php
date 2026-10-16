@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Bulletins de laboratoire (§ 2.3, ENF-SEC-04, ENF-SEC-05) : lecture dans le périmètre ; les comptes externes
- * (éleveur, vétérinaire d'élevage) ne lisent qu'un bulletin publié — la publication relève du lot L3, d'ici là
- * ils n'y ont pas accès. Contrôle (levée d'anomalie, annulation) : technicien.
+ * (éleveur, vétérinaire d'élevage) ne lisent qu'un bulletin publié, c'est-à-dire dont une interprétation est publiée
+ * (lot L3 : publication de la visite, EF-M1-02). Contrôle (levée d'anomalie, annulation) : technicien.
  */
 class AnalysePolicy
 {
@@ -24,7 +24,8 @@ class AnalysePolicy
     {
         return $user->can('bulletin.lire')
             && $this->perimetre->couvreElevage($user, $this->elevageDe($analyse))
-            && $this->regleStatut->voitTousLesStatuts($user);
+            && ($this->regleStatut->voitTousLesStatuts($user) || DB::table('fourrage.interpretation')
+                ->where('analyse_id', $analyse->id)->where('statut', RegleStatut::PUBLIE)->exists());
     }
 
     public function leverAnomalie(User $user, Analyse $analyse): bool
