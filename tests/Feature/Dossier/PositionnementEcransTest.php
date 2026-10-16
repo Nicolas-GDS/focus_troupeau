@@ -12,6 +12,7 @@ use App\Services\Dossier\VisiteService;
 use App\Services\Interpretation\InterpretationService;
 use App\Services\Interpretation\RedactionInterpretation;
 use App\Services\Pdf\RenduPdf;
+use App\View\Components\Positionnement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Notification;
@@ -127,4 +128,15 @@ it('rafraîchit le contexte pédo-géologique des prélèvements', function () {
     (new RafraichirContextePrelevements)->handle();
 
     expect(DB::table('valo.mv_prelevement_contexte')->where('prelevement_id', $this->lot->prelevement_id)->exists())->toBeTrue();
+});
+
+it('évite les chevauchements d\'étiquettes : lots voisins, lot en bout d\'échelle, bande étroite', function () {
+    $composant = new Positionnement('Cuivre total', 'mg/kg MS', 1,
+        new ReferenceQuartiles(ReferenceQuartiles::DEPARTEMENTALE, 5, 4.6, 4.6, 4.7, 3.9, 5.1), '5 lots', [3.9, 4.5, 4.6, 4.7, 5.1],
+        [['libelle' => 'A', 'valeur' => 1.8, 'position' => Position::Faible], ['libelle' => 'B', 'valeur' => 1.9, 'position' => Position::Faible]]);
+
+    expect(array_column($composant->etiquettesLots(), 'y'))->toBe([76, 90])
+        ->and($composant->borneLisible(1.8))->toBeFalse()
+        ->and($composant->borneLisible(5.1))->toBeTrue()
+        ->and(array_column($composant->etiquettesQuartiles(), 'ancre'))->toBe(['end', 'start']);
 });

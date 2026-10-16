@@ -37,11 +37,12 @@ docker compose run --rm --no-deps node sh -c "npm install && npm run build"
 | `mailpit` | Capture des e-mails en développement | http://localhost:8026 |
 | `node` | Vite / Tailwind (profil `front`) | `docker compose --profile front up node` (port 5174) |
 
-### Comptes de démonstration (jeux d'essai J4 et J3, § 9.1)
+### Comptes de démonstration (jeux d'essai J4, J3 et J5, § 9.1)
 
 `migrate --seed` charge le jeu J4, entièrement synthétique, puis le jeu J3 : l'élevage `ELV-0001` et ses neuf lots
-du document 04, rattachés au GDS 24 (recette : `docs/recette/L3_recette_J3.md`). Les deux sont interdits en
-production. Mot de passe commun :
+du document 04, rattachés au GDS 24 (recette : `docs/recette/L3_recette_J3.md`), et le jeu J5 : une population
+de référence synthétique (élevages `J5-…` consentants, lots validés) pour voir le positionnement et l'historique
+(`php artisan references:bilan`). Les trois sont interdits en production. Mot de passe commun :
 `J4_MOT_DE_PASSE` dans `.env` (par défaut `j4-developpement-seulement`).
 
 | Compte | Rôle | Périmètre |

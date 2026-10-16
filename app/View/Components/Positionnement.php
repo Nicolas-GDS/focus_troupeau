@@ -21,6 +21,12 @@ class Positionnement extends Component
 
     public const MARGE = 24;
 
+    /** Distance minimale entre deux étiquettes (unités du viewBox). */
+    private const ECART_ETIQUETTES = 30;
+
+    /** Les étiquettes du minimum et du maximum sont ancrées vers l'intérieur : zone de recouvrement plus large. */
+    private const ECART_BORNES = 45;
+
     public int $largeur = self::LARGEUR;
 
     public int $marge = self::MARGE;
@@ -54,6 +60,50 @@ class Positionnement extends Component
         $etendue = $this->maximum - $this->minimum;
 
         return round(self::MARGE + ($etendue == 0.0 ? 0.5 : ($valeur - $this->minimum) / $etendue) * (self::LARGEUR - 2 * self::MARGE), 1);
+    }
+
+    /**
+     * Étiquettes des lots sous l'axe : une seconde ligne quand deux étiquettes se touchent.
+     *
+     * @return list<array{x: float, y: int, texte: string}>
+     */
+    public function etiquettesLots(): array
+    {
+        $etiquettes = [];
+        $lots = $this->lots;
+        usort($lots, fn (array $a, array $b) => $a['valeur'] <=> $b['valeur']);
+
+        foreach ($lots as $lot) {
+            $x = $this->x($lot['valeur']);
+            $precedente = $etiquettes === [] ? null : $etiquettes[array_key_last($etiquettes)];
+            $y = $precedente !== null && $x - $precedente['x'] < self::ECART_ETIQUETTES && $precedente['y'] === 76 ? 90 : 76;
+            $etiquettes[] = ['x' => $x, 'y' => $y, 'texte' => $this->nombre($lot['valeur'])];
+        }
+
+        return $etiquettes;
+    }
+
+    /** Le minimum (ou le maximum) n'est écrit que si aucune étiquette de lot ne le recouvre. */
+    public function borneLisible(float $borne): bool
+    {
+        $x = $this->x($borne);
+
+        return array_filter($this->etiquettesLots(), fn (array $e) => $e['y'] === 76 && abs($e['x'] - $x) < self::ECART_BORNES) === [];
+    }
+
+    /**
+     * Étiquettes Q1 et Q3 : centrées, ou écartées de part et d'autre de la bande quand elle est étroite.
+     *
+     * @return array{q1: array{x: float, ancre: string}, q3: array{x: float, ancre: string}}
+     */
+    public function etiquettesQuartiles(): array
+    {
+        $q1 = $this->x($this->reference->q1);
+        $q3 = $this->x($this->reference->q3);
+
+        return $q3 - $q1 < 2 * self::ECART_ETIQUETTES
+            ? ['q1' => ['x' => $q1 - 2, 'ancre' => 'end'], 'q3' => ['x' => $q3 + 2, 'ancre' => 'start']]
+            : ['q1' => ['x' => $q1, 'ancre' => 'middle'], 'q3' => ['x' => $q3, 'ancre' => 'middle']];
     }
 
     public function nombre(float $valeur): string
