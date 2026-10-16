@@ -22,13 +22,16 @@ final class AnalyseEssai
         string $statut = Analyse::STATUT_CONTROLE,
         string $typeFourrage = 'FOIN_PP',
         ?string $destination = null,
+        ?string $campagne = null,
+        string $datePrelevement = '2026-06-15',
     ): Analyse {
         static $numero = 0;
         $numero++;
 
         $prelevement = Prelevement::query()->withoutGlobalScopes()->create([
             'elevage_id' => $elevage->id,
-            'date_prelevement' => '2026-06-15',
+            'campagne_code' => $campagne,
+            'date_prelevement' => $datePrelevement,
             'type_fourrage_code' => $typeFourrage,
             'nom_lot' => 'Lot essai '.$numero,
             'destination_categorie_code' => $destination,

@@ -96,5 +96,12 @@ interface Referentiels
     public function liensTroubleCause(): array;
 
     /** Efface le cache après une modification des référentiels (E24). */
+    /**
+     * Codes des paramètres positionnés dans les références (EF-M3-01), dans l'ordre du référentiel.
+     *
+     * @return list<string>
+     */
+    public function parametresSuivis(): array;
+
     public function oublier(): void;
 }
