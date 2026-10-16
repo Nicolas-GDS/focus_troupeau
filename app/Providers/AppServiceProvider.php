@@ -14,6 +14,7 @@ use App\Models\Dossier\EtiquetteAliment;
 use App\Models\Dossier\IndicateurSanitaire;
 use App\Models\Dossier\InterpretationVisite;
 use App\Models\Dossier\MesureTerrain;
+use App\Models\Dossier\NoteLiaison;
 use App\Models\Dossier\Visite;
 use App\Models\Fourrage\Analyse;
 use App\Models\Fourrage\AnalyseAnimale;
@@ -35,6 +36,7 @@ use App\Policies\IndicateurSanitairePolicy;
 use App\Policies\InterpretationPolicy;
 use App\Policies\InterpretationVisitePolicy;
 use App\Policies\MesureTerrainPolicy;
+use App\Policies\NoteLiaisonPolicy;
 use App\Policies\ReferentielPolicy;
 use App\Policies\VisitePolicy;
 use App\Services\Import\ExtracteurBulletin;
@@ -96,6 +98,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(InterpretationVisite::class, InterpretationVisitePolicy::class);
         Gate::policy(Action::class, ActionPolicy::class);
         Gate::policy(Controle::class, ActionPolicy::class);
+        Gate::policy(NoteLiaison::class, NoteLiaisonPolicy::class);
         // E24 — Référentiels versionnés
         Gate::policy(VersionReferentiel::class, ReferentielPolicy::class);
         Gate::policy(SeuilInterpretation::class, ReferentielPolicy::class);

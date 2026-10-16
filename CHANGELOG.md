@@ -29,6 +29,8 @@ Le numéro de version est affiché dans le pied de page de l'application et dans
 - Notifications (EF-M8-01, EF-M8-02, EF-M8-05, T-22) : e-mail à la publication d'une fiche ou d'un résultat, copie au
   technicien, SMS au niveau 3 toujours envoyé ; journal `app.notification`, envoi par job (SMTP Brevo, API SMS
   Brevo, pilote « journal » en développement) ; préférences et numéro de mobile, changement de mot de passe (E17).
+- Note de liaison vétérinaire (EF-M2-09, gabarit du document 04) : rédaction et envoi depuis E21 au vétérinaire désigné
+  par consentement, PDF archivé, e-mail avec lien, écran du vétérinaire et retour, technicien prévenu.
 
 ### Dépendances
 - `spatie/browsershot` (prévue au § 6.1) ; dans l'image applicative : `chromium`, `nodejs`, `npm` et `puppeteer`

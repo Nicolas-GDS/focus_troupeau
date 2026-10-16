@@ -4,9 +4,11 @@ use App\Http\Controllers\AiguillageController;
 use App\Http\Controllers\BulletinPdfController;
 use App\Http\Controllers\ElevageCourantController;
 use App\Http\Controllers\FicheVisiteController;
+use App\Http\Controllers\NoteLiaisonController;
 use App\Http\Controllers\NoticeRgpdController;
 use App\Http\Controllers\TravailController;
 use App\Livewire\Dossier\Interpretation\EcranVisite;
+use App\Livewire\Dossier\NoteLiaisonVeterinaire;
 use App\Livewire\Dossier\SaisieVisite;
 use App\Livewire\Dossier\Visites;
 use App\Livewire\Interpretation\InterpretationBulletin;
@@ -63,6 +65,10 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
         Route::get('/visites/{visite}/interpretation', EcranVisite::class)->middleware('permission:interpretation.lire')->name('visites.interpretation');
         // Fiche de visite figée (EF-M2-07, EF-GEN-08) : lien signé et policy (ENF-SEC-05)
         Route::get('/visites/{visite}/fiches/{version}/pdf', [FicheVisiteController::class, 'pdf'])->middleware('signed')->name('visites.fiche.pdf');
+
+        // Note de liaison vétérinaire (EF-M2-09) : vétérinaire destinataire et agents du périmètre (policy)
+        Route::get('/notes-liaison/{note}', NoteLiaisonVeterinaire::class)->name('notes-liaison.voir');
+        Route::get('/notes-liaison/{note}/pdf', [NoteLiaisonController::class, 'pdf'])->middleware('signed')->name('notes-liaison.pdf');
 
         // E23 — Administration : GDS, comptes, conventions
         Route::middleware('role:admin|admin_global')->prefix('admin')->name('admin.')->group(function () {

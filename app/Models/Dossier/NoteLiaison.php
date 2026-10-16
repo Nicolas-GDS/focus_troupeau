@@ -22,6 +22,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $envoyee_le
  * @property Carbon|null $retour_le
  * @property string $statut
+ * @property string|null $lot_animaux
+ * @property int|null $cree_par
  */
 class NoteLiaison extends Model
 {
@@ -41,7 +43,7 @@ class NoteLiaison extends Model
 
     protected $fillable = [
         'elevage_id', 'interpretation_id', 'interpretation_visite_id', 'veterinaire_user_id', 'question', 'retour', 'pdf',
-        'envoyee_le', 'retour_le', 'statut',
+        'envoyee_le', 'retour_le', 'statut', 'lot_animaux',
     ];
 
     protected $attributes = ['statut' => self::STATUT_BROUILLON];

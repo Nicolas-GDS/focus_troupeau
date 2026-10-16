@@ -272,6 +272,10 @@
             <livewire:dossier.interpretation.plan-actions :visite-id="$visite->id" :key="'plan-'.$interpretation->id" />
         </section>
 
+        @if ($agent)
+            <livewire:dossier.interpretation.notes-liaison :visite-id="$visite->id" :key="'notes-'.$interpretation->id" />
+        @endif
+
         {{-- Circuit (EF-M2-04) --}}
         <section class="carte space-y-3" aria-labelledby="titre-circuit">
             <h2 id="titre-circuit" class="text-lg font-semibold">Validation et publication</h2>

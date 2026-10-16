@@ -81,6 +81,9 @@ const REGISTRE_ROUTES = [
     'GET visites/{visite}/saisie' => ['acces' => 'objet'],
     'GET visites/{visite}/interpretation' => ['acces' => 'objet'],
     'GET visites/{visite}/fiches/{version}/pdf' => ['acces' => 'objet'],
+    // Note de liaison (objets testés dans tests/Feature/Dossier/NoteLiaisonTest.php)
+    'GET notes-liaison/{note}' => ['acces' => 'objet'],
+    'GET notes-liaison/{note}/pdf' => ['acces' => 'objet'],
     'GET admin/referentiels/{table}' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global'], 'statut' => 404],
 ];
 
