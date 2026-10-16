@@ -50,7 +50,7 @@
 @if ($lots !== [])
     <h2>Vos fourrages</h2>
     <table>
-        <thead><tr><th>Lot</th>@foreach (Fiche::PARAMETRES_LOTS as $code)<th>{{ $code === 'UFL_2018' ? 'UFL' : $code }}<br><span class="doux">{{ $unitesParametres[$code] ?? '' }}</span></th>@endforeach<th>Niveau</th><th>Utilisation conseillée</th></tr></thead>
+        <thead><tr><th>Lot</th>@foreach (Fiche::PARAMETRES_LOTS as $code)<th>{{ $code === 'UFL_2018' ? 'UFL' : $code }}<br><span class="doux">{{ $unitesParametres[$code] ?? '' }}</span></th>@endforeach<th>Niveau</th><th>Position campagne</th><th>Utilisation conseillée</th></tr></thead>
         <tbody>
         @foreach ($lots as $lot)
             <tr>
@@ -60,6 +60,7 @@
                     <td>@if ($v && $v['valeur'] !== null){{ $v['censure'] }}{{ Affichage::nombre($v['valeur'], $v['decimales']) }}@if ($v['classe'])<br>@include('pdf.partiels.etat', ['etat' => InterpretationBulletin::classe($v['classe'], $v['gravite'])])@endif @else — @endif</td>
                 @endforeach
                 <td>@if ($lot['interpretation'])@include('pdf.partiels.etat', ['etat' => InterpretationBulletin::niveau($lot['interpretation']->niveau_global)])@endif</td>
+                <td>@forelse ($lot['positions'] as $code => $position)<span style="display:block">{{ $code === 'UFL_2018' ? 'UFL' : $code }} <x-position :position="$position" :ressources="$ressources" /></span>@empty<span class="doux">—</span>@endforelse</td>
                 <td>{{ $lot['interpretation']?->utilisation_conseillee ?? '—' }}</td>
             </tr>
         @endforeach
@@ -82,6 +83,18 @@
         </tbody>
     </table>
     <p class="doux">Valeurs par kg de matière sèche (g pour les minéraux majeurs, mg pour les oligo-éléments, mEq pour le BACA) ; nd : non dosé.</p>
+@endif
+
+{{-- Positionnement dans la campagne (RC-3, document 04 figure 4) --}}
+@if ($positionnement !== [])
+    <h2>Où se situent vos fourrages dans la campagne ?</h2>
+    <p class="doux">Points gris : les autres lots du même type de la campagne ; bande : moitié centrale des valeurs (Q1 à Q3) ; trait pointillé : médiane ; points pleins : vos lots. Références anonymes, établies à partir de 5 lots.</p>
+    @foreach ($positionnement as $section)
+        <h3>{{ $section['type'] }}</h3>
+        @foreach ($section['graphiques'] as $g)
+            <x-positionnement :parametre="$g['libelle']" :unite="$g['unite']" :decimales="$g['decimales']" :reference="$g['reference']" :population="$g['population']" :valeurs="$g['valeurs']" :lots="$g['lots']" />
+        @endforeach
+    @endforeach
 @endif
 
 {{-- Eau et minéraux --}}

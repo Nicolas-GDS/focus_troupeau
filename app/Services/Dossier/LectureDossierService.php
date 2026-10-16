@@ -2,6 +2,7 @@
 
 namespace App\Services\Dossier;
 
+use App\Domain\Interpretation\Position;
 use App\Domain\Referentiels\Referentiels;
 use App\Models\App\User;
 use App\Models\Dossier\Action;
@@ -22,6 +23,7 @@ use App\Models\Fourrage\Interpretation;
 use App\Models\Fourrage\Prelevement;
 use App\Services\Cloisonnement\RegleStatut;
 use App\Services\Interpretation\InterpretationService;
+use App\Services\Interpretation\PositionnementService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -51,6 +53,7 @@ class LectureDossierService
         private readonly EtiquettesService $etiquettes,
         private readonly RegleStatut $regleStatut,
         private readonly Referentiels $referentiels,
+        private readonly PositionnementService $positionnement,
     ) {}
 
     public function agent(User $lecteur): bool
@@ -134,7 +137,7 @@ class LectureDossierService
     /**
      * Lots analysés lisibles (volet Fourrages E04, EF-M1-02), par campagne, la plus récente d'abord.
      *
-     * @return Collection<int|string, array<int, array{prelevement: Prelevement, analyse: Analyse, interpretation: Interpretation|null}>>
+     * @return Collection<int|string, array<int, array{prelevement: Prelevement, analyse: Analyse, interpretation: Interpretation|null, positions: array<string, Position>}>>
      */
     public function fourrages(Elevage $elevage, User $lecteur): Collection
     {
@@ -148,7 +151,7 @@ class LectureDossierService
      * Détail d'un lot (E04) : pour chaque bulletin lisible, l'interprétation montrée, les résultats classés avec leur
      * repère et leur source, les alertes retenues.
      *
-     * @return list<array{analyse: Analyse, interpretation: Interpretation|null, lignes: list<array<string, mixed>>, alertes: list<array<string, mixed>>, deconseillee: list<string>}>
+     * @return list<array{analyse: Analyse, interpretation: Interpretation|null, lignes: list<array<string, mixed>>, alertes: list<array<string, mixed>>, deconseillee: list<string>, positionnement: list<array<string, mixed>>}>
      */
     public function fourrage(Prelevement $prelevement, User $lecteur): array
     {
@@ -163,6 +166,7 @@ class LectureDossierService
                 'alertes' => $interpretation === null ? [] : array_values(array_filter($this->interpretations->lignesAlertes($interpretation),
                     fn (array $l) => $l['alerte']->retenue === true)),
                 'deconseillee' => $interpretation === null ? [] : $this->interpretations->utilisationDeconseillee($interpretation),
+                'positionnement' => $this->positionnement->graphiques($analyse),
             ];
         }
 
@@ -323,7 +327,7 @@ class LectureDossierService
     }
 
     /**
-     * @return list<array{prelevement: Prelevement, analyse: Analyse, interpretation: Interpretation|null}>
+     * @return list<array{prelevement: Prelevement, analyse: Analyse, interpretation: Interpretation|null, positions: array<string, Position>}>
      */
     private function lotsLisibles(Elevage $elevage, User $lecteur): array
     {
@@ -331,7 +335,8 @@ class LectureDossierService
         $lots = [];
 
         foreach ($this->analysesLisibles($prelevements->keys(), $lecteur) as $analyse) {
-            $lots[] = ['prelevement' => $prelevements[$analyse->prelevement_id], 'analyse' => $analyse, 'interpretation' => $this->interpretationLot($analyse, $lecteur)];
+            $lots[] = ['prelevement' => $prelevements[$analyse->prelevement_id], 'analyse' => $analyse, 'interpretation' => $this->interpretationLot($analyse, $lecteur),
+                'positions' => $this->positionnement->positionsPrincipales($analyse)];
         }
 
         return $lots;

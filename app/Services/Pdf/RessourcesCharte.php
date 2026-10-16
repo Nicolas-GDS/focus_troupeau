@@ -30,6 +30,9 @@ final class RessourcesCharte
         foreach (['critique', 'alerte', 'vigilance', 'couvert', 'information'] as $etat) {
             $images['etat-'.$etat] = $donnee('img/puces/etat-'.$etat.'.svg', 'image/svg+xml');
         }
+        foreach (['faible', 'normal', 'eleve'] as $position) {
+            $images['position-'.$position] = $donnee('img/puces/position-'.$position.'.svg', 'image/svg+xml');
+        }
 
         return [
             'css_jetons' => $jetons,

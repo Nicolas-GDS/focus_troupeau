@@ -75,6 +75,7 @@
                                         <th scope="col" class="py-1 pr-4">{{ $code === 'UFL_2018' ? 'UFL' : $code }} <span class="font-normal">{{ $synthese['unitesParametres'][$code] ?? '' }}</span></th>
                                     @endforeach
                                     <th scope="col" class="py-1 pr-4">Niveau</th>
+                                    <th scope="col" class="py-1 pr-4">Position campagne</th>
                                     <th scope="col" class="py-1">Utilisation conseillée</th>
                                 </tr>
                             </thead>
@@ -96,6 +97,7 @@
                                             </td>
                                         @endforeach
                                         <td class="py-2 pr-4">@if ($lot['interpretation']) @php($n = InterpretationBulletin::niveau($lot['interpretation']->niveau_global)) <x-pastille :etat="$n['etat']" :libelle="$n['libelle']" /> @endif</td>
+                                        <td class="py-2 pr-4">@forelse ($lot['positions'] as $code => $position)<span class="block">{{ $code === 'UFL_2018' ? 'UFL' : $code }} <x-position :position="$position" /></span>@empty<span class="text-texte-doux">—</span>@endforelse</td>
                                         <td class="py-2">{{ $lot['interpretation']?->utilisation_conseillee ?? '—' }}</td>
                                     </tr>
                                 @endforeach
@@ -103,6 +105,17 @@
                         </table>
                     </div>
                     <p class="mt-2 text-sm"><a href="{{ route('dossier.matrice', ['elevage' => $elevage->id, 'campagne' => $visite->campagne_code]) }}" class="lien">Matrice de vigilance minérale de la campagne</a></p>
+                @endif
+
+                @if ($synthese['positionnement'] !== [])
+                    <h3 class="mt-4 font-medium">Où se situent vos fourrages dans la campagne ?</h3>
+                    <p class="mt-1 text-sm text-texte-doux">Points gris : les autres lots du même type de la campagne ; bande : moitié centrale des valeurs (Q1 à Q3) ; trait pointillé : médiane ; points pleins : vos lots.</p>
+                    @foreach ($synthese['positionnement'] as $section)
+                        <h4 class="mt-3 text-sm font-semibold">{{ $section['type'] }}</h4>
+                        @foreach ($section['graphiques'] as $g)
+                            <x-positionnement :parametre="$g['libelle']" :unite="$g['unite']" :decimales="$g['decimales']" :reference="$g['reference']" :population="$g['population']" :valeurs="$g['valeurs']" :lots="$g['lots']" />
+                        @endforeach
+                    @endforeach
                 @endif
 
                 @foreach ($synthese['eau'] as $item)

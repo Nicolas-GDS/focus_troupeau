@@ -16,6 +16,14 @@
                             <a href="{{ route('dossier.fourrage', [$elevage->id, $p->id]) }}" class="lien font-medium">{{ $p->typeFourrage?->libelle ?? $p->type_fourrage_code }}@if ($p->nom_lot) « {{ $p->nom_lot }} »@endif</a>
                             <p class="text-sm text-texte-doux">Prélevé le {{ $p->date_prelevement->format('d/m/Y') }} · échantillon {{ $lot['analyse']->num_echantillon_labo }}</p>
                             @if ($i?->utilisation_conseillee) <p class="text-sm">Utilisation conseillée : {{ $i->utilisation_conseillee }}</p> @endif
+                            @if ($lot['positions'] !== [])
+                                <p class="mt-1 flex flex-wrap gap-3 text-sm">
+                                    <span class="text-texte-doux">Position dans la campagne :</span>
+                                    @foreach ($lot['positions'] as $code => $position)
+                                        <span>{{ $code === 'UFL_2018' ? 'UFL' : $code }} <x-position :position="$position" /></span>
+                                    @endforeach
+                                </p>
+                            @endif
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
                             @if ($i)

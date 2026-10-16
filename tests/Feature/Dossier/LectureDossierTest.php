@@ -135,7 +135,7 @@ it('ne liste à l\'éleveur que les bulletins publiés ; le technicien voit le b
         ->assertSee($this->analyse->num_echantillon_labo)->assertDontSee($this->brouillon->num_echantillon_labo);
     $this->get(route('dossier.fourrage', [$this->elevage->id, $this->brouillon->prelevement_id]))->assertNotFound();
     $this->get(route('dossier.fourrage', [$this->elevage->id, $this->analyse->prelevement_id]))->assertOk()
-        ->assertSee('Foin pauvre en azote.')->assertSee('Vaches taries')->assertSee('Repère :')->assertSee('lot L4');
+        ->assertSee('Foin pauvre en azote.')->assertSee('Vaches taries')->assertSee('Repère :')->assertSee('Où se situe ce lot dans la campagne ?');
 
     $this->actingAs($this->tech);
     $this->get(route('dossier.fourrages', $this->elevage->id))->assertOk()
