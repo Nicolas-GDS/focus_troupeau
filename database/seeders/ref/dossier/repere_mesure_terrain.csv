@@ -1,0 +1,38 @@
+mesure_code;espece_code;stade;borne_basse;borne_haute;reference_cle;commentaire
+PH_URINE;BOV;tarie;7.8;8.3;PRITIH_RADIGUE;Diapositive 15
+PH_URINE;BOV;prepa_velage;7.0;7.5;PRITIH_RADIGUE;Diapositive 15 – avec sels anioniques
+PH_URINE;BOV;lactation;7.8;8.25;PRITIH_RADIGUE;Diapositive 15
+PH_URINE;BOV;veau;6.0;6.5;PRITIH_RADIGUE;Diapositive 15 – veaux de moins de 4 semaines
+BRIX_URINE;BOV;tarie;4;6;PRITIH_RADIGUE;Diapositive 15
+BRIX_URINE;BOV;prepa_velage;4;6;PRITIH_RADIGUE;Diapositive 15
+BRIX_URINE;BOV;lactation;4;6;PRITIH_RADIGUE;Diapositive 15
+BRIX_URINE;BOV;veau;1;2;PRITIH_RADIGUE;Diapositive 15 – veaux de moins de 4 semaines
+DENSITE_URINE;BOV;tarie;1015;1030;PRITIH_RADIGUE;Diapositive 15
+DENSITE_URINE;BOV;prepa_velage;1015;1030;PRITIH_RADIGUE;Diapositive 15
+DENSITE_URINE;BOV;lactation;1015;1025;PRITIH_RADIGUE;Diapositive 15
+DENSITE_URINE;BOV;veau;1015;1025;PRITIH_RADIGUE;Diapositive 15 – veaux de moins de 4 semaines
+PH_BOUSE;BOV;tarie;6.5;7.0;PRITIH_RADIGUE;Diapositive 15
+PH_BOUSE;BOV;prepa_velage;6.5;6.8;PRITIH_RADIGUE;Diapositives 12 et 15
+PH_BOUSE;BOV;lactation;6.5;6.8;PRITIH_RADIGUE;Diapositive 15
+PH_BOUSE;BOV;veau;6.5;7.0;PRITIH_RADIGUE;Diapositive 15 – veaux de moins de 4 semaines
+REDOX_BOUSE;BOV;tarie;-220;-185;PRITIH_RADIGUE;Diapositive 15
+REDOX_BOUSE;BOV;prepa_velage;-220;-185;PRITIH_RADIGUE;Diapositives 12 et 15
+REDOX_BOUSE;BOV;lactation;-220;-185;PRITIH_RADIGUE;Diapositive 15
+REDOX_BOUSE;BOV;veau;-250;-200;PRITIH_RADIGUE;Diapositive 15 – veaux de moins de 4 semaines
+GLYCEMIE;BOV;tarie;55;65;PRITIH_RADIGUE;Diapositive 15
+GLYCEMIE;BOV;prepa_velage;60;70;PRITIH_RADIGUE;Diapositives 12 et 15
+GLYCEMIE;BOV;lactation;50;60;PRITIH_RADIGUE;Diapositive 15
+GLYCEMIE;BOV;veau;80;120;PRITIH_RADIGUE;Diapositive 15 – veaux de moins de 4 semaines
+BOH;BOV;tarie;;0.4;PRITIH_RADIGUE;Diapositive 15 – « moins de 0,4 »
+BOH;BOV;prepa_velage;;0.4;PRITIH_RADIGUE;Diapositives 12 et 15 – « moins de 0,4 »
+BOH;BOV;lactation;;0.9;PRITIH_RADIGUE;Diapositive 15 – « moins de 0,9 »
+UREE;BOV;tarie;100;200;PRITIH_RADIGUE;Diapositive 15 – unité mg/l (décision du 16/10/2026)
+UREE;BOV;prepa_velage;150;250;PRITIH_RADIGUE;Diapositives 12 et 15 – unité mg/l (décision du 16/10/2026)
+UREE;BOV;lactation;200;250;PRITIH_RADIGUE;Diapositive 15 – 150 à 200 en fin de lactation – unité mg/l (décision du 16/10/2026)
+NEC;BOV;tarie;2.75;3.0;PRITIH_RADIGUE;Diapositive 15
+NEC;BOV;prepa_velage;2.75;3.0;PRITIH_RADIGUE;Diapositives 15 et 27 (2,75 à 3 au vêlage)
+NEC;BOV;lactation;2.5;2.75;PRITIH_RADIGUE;Diapositive 15 – début de lactation
+TAMIS_1;BOV;;;10;GDS24_FORGENEUF2026;Diapositives 16 et 27 – moins de 10 % = bonne digestion
+RUMEN;BOV;tarie;4;4;GDS24_FORGENEUF2026;Diapositives 22 et 27 – rumen noté 4 chez les taries
+BRIX_COLOSTRUM;BOV;;22;;GDS24_FORGENEUF2026;Diapositives 24 et 27 – 22 % et plus (25 % cité dans la fiche action 4 – décision du 16/10/2026)
+PROT_VEAU;BOV;veau;6;7;GDS24_FORGENEUF2026;Diapositives 24 et 27 – veaux de 2 à 7 jours

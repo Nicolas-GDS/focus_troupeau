@@ -1,0 +1,9 @@
+code;libelle;unite;mode;ordre;description
+IVV;Intervalle vêlage-vêlage moyen;jours;valeur;10;Bilan sanitaire GDS
+MORTALITE_VEAUX_0_12M;Mortalité des veaux de 0 à 12 mois;%;taux;20;Bilan sanitaire GDS
+RETOURNEMENT;Retournements de matrice;%;taux;30;Taux = nombre de cas ÷ nombre de vêlages
+METRITE;Métrites;%;taux;40;Taux = nombre de cas ÷ nombre de vêlages
+NON_DELIVRANCE;Non-délivrances;%;taux;50;Taux = nombre de cas ÷ nombre de vêlages
+AVORTEMENT;Avortements;%;taux;60;Taux = nombre de cas ÷ nombre de vêlages
+DIARRHEE_ADULTE;Diarrhées des adultes;%;taux;70;Taux = nombre de cas ÷ nombre de vêlages
+VELAGE_DIFFICILE;Vêlages difficiles;%;taux;80;Taux = nombre de cas ÷ nombre de vêlages

@@ -1,0 +1,17 @@
+code;ordre;conditions;libelle_propose;reference_cle;commentaire
+PH_BOUSE_BAS;10;PH_BOUSE:bas;Acidose digestive probable;GDS24_FORGENEUF2026;Diapositive 12
+REDOX_BOUSE_HAUT;20;REDOX_BOUSE:haut;Fermentation digestive peu réductrice;GDS24_FORGENEUF2026;Diapositive 12
+GLYCEMIE_BASSE;30;GLYCEMIE:bas;Déficit énergétique probable;GDS24_FORGENEUF2026;Diapositive 12
+BOH_HAUT;40;BOH:haut;Mobilisation des réserves corporelles;GDS24_FORGENEUF2026;Diapositive 12
+UREE_BASSE;50;UREE:bas;Manque d'azote dans le rumen probable;GDS24_FORGENEUF2026;Diapositive 12
+GLY_BASSE_BOH_HAUT;100;GLYCEMIE<45|BOH:haut;Déficit énergétique probable;PRITIH_RADIGUE;Diapositive 16 – situation type 1
+GLY_BASSE_BOH_HAUT_UREE_BASSE;101;GLYCEMIE<45|BOH:haut|UREE:bas;Déficit énergétique avec manque d'azote probable;PRITIH_RADIGUE;Diapositive 16 – situation type 1, urée basse
+GLY_BASSE_BOH_HAUT_UREE_HAUTE;102;GLYCEMIE<45|BOH:haut|UREE:haut;Déficit énergétique avec excès de protéines probable;PRITIH_RADIGUE;Diapositive 16 – situation type 1, urée haute
+GLY_HAUTE_BOH_HAUT;110;GLYCEMIE>65|BOH:haut;Carence minérale (sodium, potassium, calcium, magnésium) ou manque d'eau probable;PRITIH_RADIGUE;Diapositive 16 – situation type 2
+GLY_HAUTE_BOH_HAUT_UREE_BASSE;111;GLYCEMIE>65|BOH:haut|UREE:bas;Carence minérale ou manque d'eau, avec manque de protéines probable;PRITIH_RADIGUE;Diapositive 16 – situation type 2, urée basse
+BRIX_URINE_HAUT;120;BRIX_URINE>6;Mauvaise digestion, excès d'énergie probable;PRITIH_RADIGUE;Diapositive 16 – situation type 3
+BRIX_URINE_HAUT_UREE_BASSE;121;BRIX_URINE>6|UREE:bas;Carence protéique, manque de tampons et de minéraux probable;PRITIH_RADIGUE;Diapositive 16 – situation type 3, urée basse
+TAMIS_BON;130;TAMIS_1<10;Bonne digestion;PRITIH_RADIGUE;Diapositive 16 – situation type 4
+TAMIS_MOYEN;131;TAMIS_1>=10|TAMIS_1<=15;Digestion moyenne;PRITIH_RADIGUE;Diapositive 16 – situation type 4 (aucune lecture de 15 à 20 % dans la source)
+TAMIS_MAUVAIS;132;TAMIS_1>20;Ration mal digérée : fibres ou grains qui passent;PRITIH_RADIGUE;Diapositive 16 – situation type 4
+GLY_BASSE_UREE_BASSE_PH_BAS;140;GLYCEMIE:bas|UREE:bas|PH_BOUSE:bas;Manque d'azote avec excès relatif de sucres probable;PRITIH_RADIGUE;Diapositives 12 et 16 (notes) – lecture de la grille PRITIH appliquée à l'élevage

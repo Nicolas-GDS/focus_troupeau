@@ -2,6 +2,15 @@
 
 namespace App\Services\Referentiels;
 
+use App\Domain\Dossier\ConditionLecture;
+use App\Domain\Dossier\LectureMesure;
+use App\Domain\Dossier\LienTroubleCause;
+use App\Domain\Dossier\RegleLecture;
+use App\Domain\Dossier\Repere;
+use App\Domain\Dossier\RepereMesureTerrain;
+use App\Domain\Dossier\RepereProfilSanguin;
+use App\Domain\Dossier\SeuilBilanSanitaire;
+use App\Domain\Dossier\TroubleCroisement;
 use App\Domain\Interpretation\LienCompatibilite;
 use App\Domain\Interpretation\PlagePlausibilite;
 use App\Domain\Interpretation\Seuil;
@@ -49,6 +58,7 @@ class ReferentielsBdd implements Referentiels
             referenceId: $l['reference_id'] === null ? null : (int) $l['reference_id'],
             statutEpistemique: StatutEpistemique::from((string) $l['statut_epistemique']),
             sens: $l['sens'],
+            valide: (bool) $l['valide'],
         ), $lignes);
     }
 
@@ -129,6 +139,128 @@ class ReferentielsBdd implements Referentiels
         ), $lignes);
     }
 
+    public function reperesMesuresTerrain(): array
+    {
+        return array_map(fn (array $l) => new RepereMesureTerrain(
+            id: (int) $l['id'],
+            mesureCode: (string) $l['mesure_code'],
+            borneBasse: self::nombre($l['borne_basse']),
+            borneHaute: self::nombre($l['borne_haute']),
+            source: self::source($l),
+            especeCode: $l['espece_code'],
+            stade: $l['stade'],
+        ), $this->lignes('ref.repere_mesure_terrain', 'reperes_mesures'));
+    }
+
+    public function reglesLectureMesures(): array
+    {
+        return array_map(fn (array $l) => new RegleLecture(
+            code: (string) $l['code'],
+            ordre: (int) $l['ordre'],
+            conditions: array_map(fn (array $c) => new ConditionLecture(
+                mesureCode: (string) $c['mesure'],
+                lecture: isset($c['lecture']) ? LectureMesure::from((string) $c['lecture']) : null,
+                operateur: $c['op'] ?? null,
+                valeur: isset($c['valeur']) ? (float) $c['valeur'] : null,
+            ), (array) json_decode((string) $l['conditions'], true, flags: JSON_THROW_ON_ERROR)),
+            libellePropose: (string) $l['libelle_propose'],
+            source: self::source($l),
+            especeCode: $l['espece_code'],
+            stade: $l['stade'],
+        ), $this->lignes('ref.grille_lecture_mesure', 'regles_lecture'));
+    }
+
+    public function reperesProfilsSanguins(): array
+    {
+        return array_map(fn (array $l) => new RepereProfilSanguin(
+            id: (int) $l['id'],
+            element: (string) $l['element'],
+            matrice: (string) $l['matrice'],
+            borneBasse: self::nombre($l['borne_basse']),
+            borneHaute: self::nombre($l['borne_haute']),
+            unite: (string) $l['unite'],
+            source: self::source($l),
+            especeCode: $l['espece_code'],
+        ), $this->lignes('ref.repere_analyse_animale', 'reperes_profils'));
+    }
+
+    public function seuilsBilanSanitaire(): array
+    {
+        return array_map(fn (array $l) => new SeuilBilanSanitaire(
+            id: (int) $l['id'],
+            indicateurCode: (string) $l['indicateur_code'],
+            s1: self::nombre($l['s1']),
+            s2: self::nombre($l['s2']),
+            sens: (string) $l['sens'],
+            source: self::source($l),
+            especeCode: $l['espece_code'],
+            systeme: $l['systeme'],
+        ), $this->lignes('ref.seuil_bilan_sanitaire', 'seuils_bilan'));
+    }
+
+    public function troublesCroisement(): array
+    {
+        /** @var list<array<string, mixed>> $lignes */
+        $lignes = $this->cache->remember(self::CLE_CACHE.'troubles_croisement', self::DUREE_CACHE, fn () => DB::table('ref.trouble_croisement')
+            ->whereNull('version_fin')
+            ->orderBy('ordre')
+            ->get()
+            ->map(fn ($ligne) => (array) $ligne)
+            ->all());
+
+        return array_map(fn (array $l) => new TroubleCroisement(
+            code: (string) $l['code'],
+            libelle: (string) $l['libelle'],
+            ordre: (int) $l['ordre'],
+            indicateursSanitaires: self::tableau($l['indicateurs_sanitaires']) ?? [],
+            troublesSanitaires: self::tableau($l['troubles_sanitaires']) ?? [],
+        ), $lignes);
+    }
+
+    public function liensTroubleCause(): array
+    {
+        return array_map(fn (array $l) => new LienTroubleCause(
+            troubleCode: (string) $l['trouble_code'],
+            familleCause: (string) $l['famille_cause'],
+            force: (int) $l['force'],
+            source: self::source($l),
+        ), $this->lignes('ref.grille_trouble_cause', 'grille_trouble_cause'));
+    }
+
+    /**
+     * Lignes actives et en vigueur d'une table de repères, mises en cache.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function lignes(string $table, string $cle): array
+    {
+        /** @var list<array<string, mixed>> */
+        return $this->cache->remember(self::CLE_CACHE.$cle, self::DUREE_CACHE, fn () => DB::table($table)
+            ->where('actif', true)
+            ->whereNull('version_fin')
+            ->orderBy('id')
+            ->get()
+            ->map(fn ($ligne) => (array) $ligne)
+            ->all());
+    }
+
+    /**
+     * @param  array<string, mixed>  $l
+     */
+    private static function source(array $l): Repere
+    {
+        return new Repere(
+            referenceId: $l['reference_id'] === null ? null : (int) $l['reference_id'],
+            statutEpistemique: StatutEpistemique::from((string) $l['statut_epistemique']),
+            valide: (bool) $l['valide'],
+        );
+    }
+
+    private static function nombre(mixed $valeur): ?float
+    {
+        return $valeur === null ? null : (float) $valeur;
+    }
+
     /**
      * Tableau PostgreSQL littéral « {A,B} » en liste PHP ; NULL reste NULL (toutes).
      *
@@ -147,7 +279,8 @@ class ReferentielsBdd implements Referentiels
 
     public function oublier(): void
     {
-        foreach (['seuils', 'plages', 'version', 'compatibilites'] as $cle) {
+        foreach (['seuils', 'plages', 'version', 'compatibilites', 'reperes_mesures', 'regles_lecture', 'reperes_profils',
+            'seuils_bilan', 'troubles_croisement', 'grille_trouble_cause'] as $cle) {
             $this->cache->forget(self::CLE_CACHE.$cle);
         }
     }

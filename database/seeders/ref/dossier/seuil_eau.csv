@@ -1,0 +1,3 @@
+parametre_code;borne_min;borne_max;classe;gravite;sens;message;reference_cle;statut_epistemique;commentaire
+EAU_FER;0;200;conforme;0;bas;Fer de l'eau conforme au repère (moins de 200 µg/l);GDS24_FORGENEUF2026;consensus_professionnel;Diapositive 11 – « conforme (seuil 200) »
+EAU_FER;200;;eleve;1;haut;Fer de l'eau au-dessus du repère de 200 µg/l : peut gêner l'absorption du cuivre et du zinc;GDS24_FORGENEUF2026;consensus_professionnel;Diapositive 11 – seuil 200 [C] – gravité 1 proposée [CP] (décision du 16/10/2026)

@@ -10,6 +10,11 @@ Le numéro de version est affiché dans le pied de page de l'application et dans
   messages, causes communes, plan d'action, contrôles, note de liaison ; profils sanguins rattachés à la visite.
 - Structures des référentiels du dossier (repères des mesures terrain et des profils sanguins, indicateurs et seuils
   du bilan sanitaire, nature « eau » de la grille) ; permissions du lot L3 (§ 2.3).
+- Référentiels du dossier (version 4) transcrits de la présentation Forgeneuf, statut [C], « repère à valider » :
+  mesures terrain et repères PRITIH par stade, lectures combinées, repères sériques, seuils S1/S2 du bilan
+  sanitaire, grille trouble × cause ; paramètres de l'eau (seul le fer a un seuil).
+- Domaine du dossier (RC-1.5, EF-M1-04, EF-M1-07, EF-M2-05) : lecture des mesures terrain, lectures combinées,
+  profils sanguins, position du bilan sanitaire, croisement trouble × cause, lecture de l'eau, synthèse de visite.
 
 ## [Non publié] — lot L2 (import et interprétation)
 

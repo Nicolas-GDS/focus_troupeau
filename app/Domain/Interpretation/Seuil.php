@@ -7,7 +7,8 @@ use App\Domain\Referentiels\StatutEpistemique;
 /**
  * Un seuil actif de la grille d'interprétation (ref.seuil_interpretation) : intervalle [borneMin ; borneMax[,
  * bornes nulles non bornées ; sens « bas » (carence, valeur faible) ou « haut » (excès, valeur élevée), qui relie
- * l'alerte aux liens de compatibilité avec les troubles sanitaires (RC-1.4).
+ * l'alerte aux liens de compatibilité avec les troubles sanitaires (RC-1.4). Un seuil non validé par le vétérinaire
+ * conseil (grille eau, lot L3) est affiché avec la mention « repère à valider » (§ 9.5).
  */
 final readonly class Seuil
 {
@@ -27,6 +28,7 @@ final readonly class Seuil
         public ?int $referenceId = null,
         public StatutEpistemique $statutEpistemique = StatutEpistemique::Publie,
         public ?string $sens = null,
+        public bool $valide = true,
     ) {}
 
     public const SENS_BAS = 'bas';

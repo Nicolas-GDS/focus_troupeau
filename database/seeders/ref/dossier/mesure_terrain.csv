@@ -1,0 +1,14 @@
+code;libelle;unite;decimales;ordre;description
+PH_BOUSE;pH des bouses;-;2;10;Bouse fraîche, pH-mètre étalonné (tampons pH 4, 7 et 10)
+REDOX_BOUSE;Redox des bouses;mV;0;20;Bouse fraîche, redox-mètre
+TAMIS_1;Tamisage des bouses : refus sur le 1er tamis;%;0;30;500 g de bouse, lavage doux au jet, part retenue sur le premier tamis
+PH_URINE;pH urinaire;-;2;40;Urine fraîche, pH-mètre
+BRIX_URINE;Brix urinaire;%;1;50;Urine fraîche, réfractomètre Brix
+DENSITE_URINE;Densité urinaire;-;0;60;Urine fraîche, réfractomètre de densité (1015 = 1,015)
+GLYCEMIE;Glycémie;mg/dl;0;70;Une goutte de sang, lecteur de glycémie
+BOH;β-hydroxybutyrate (corps cétoniques);mmol/l;1;80;Une goutte de sang, lecteur de cétonémie
+UREE;Urée sanguine;mg/l;0;90;Sang, bandelette (0,1 g/l = 100 mg/l – la note « 100 mg/dl » de la source est erronée)
+NEC;Note d'état corporel;note;2;100;Observation, grille de notation
+RUMEN;Note de remplissage du rumen;note;0;110;Observation du flanc gauche, grille de notation
+BRIX_COLOSTRUM;Brix du colostrum;%;0;120;Colostrum, réfractomètre Brix
+PROT_VEAU;Protéines totales du sérum des veaux de 2 à 7 jours;g/dl;1;130;Sérum, réfractomètre
