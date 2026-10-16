@@ -21,6 +21,8 @@ use Illuminate\Support\Carbon;
  * @property string|null $id_brevo
  * @property Carbon|null $envoye_le
  * @property string|null $erreur
+ * @property string|null $lien
+ * @property int $tentatives
  * @property Carbon $cree_le
  */
 class Notification extends Model
@@ -33,12 +35,12 @@ class Notification extends Model
 
     protected $fillable = [
         'user_id', 'elevage_id', 'canal', 'type', 'objet', 'corps', 'reference_objet',
-        'statut', 'id_brevo', 'envoye_le', 'erreur',
+        'statut', 'id_brevo', 'envoye_le', 'erreur', 'lien', 'tentatives',
     ];
 
     protected function casts(): array
     {
-        return ['envoye_le' => 'datetime'];
+        return ['envoye_le' => 'datetime', 'tentatives' => 'integer'];
     }
 
     /** @return BelongsTo<User, $this> */

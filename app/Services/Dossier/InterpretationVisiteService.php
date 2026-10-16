@@ -26,6 +26,7 @@ use App\Models\Fourrage\AnalyseAnimale;
 use App\Models\Fourrage\Interpretation;
 use App\Services\Interpretation\InterpretationService;
 use App\Services\JournalService;
+use App\Services\Notifications\NotificationsPublication;
 use DateTimeImmutable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -39,8 +40,8 @@ use Illuminate\Support\Facades\DB;
  * - circuit brouillon → valide → (visee si niveau retenu 3) → publie, refus de visa motivé (EF-M2-04) ;
  * - publication : elle publie aussi les interprétations de lots publiables et les objets validés de la visite, fige la
  *   version de la grille, archive la version publiée précédente, passe la visite en « publiee » et s'inscrit au
- *   journal ; la fiche figée est archivée en HTML et son PDF produit par un job (FicheVisiteService). La
- *   notification s'y ajoute à l'étape 6 du lot ;
+ *   journal ; la fiche figée est archivée en HTML et son PDF produit par un job (FicheVisiteService) ; l'éleveur
+ *   et le technicien sont notifiés (e-mail, SMS au niveau 3) ;
  * - une modification après publication crée la version suivante, copie de la précédente (T-06) ; la visite publiée
  *   n'accepte plus de saisie : une donnée nouvelle appelle une nouvelle visite (décision de l'étape 4).
  */
@@ -55,6 +56,7 @@ class InterpretationVisiteService
         private readonly BilanSanitaireService $bilan,
         private readonly JournalService $journal,
         private readonly FicheVisiteService $fiches,
+        private readonly NotificationsPublication $notifications,
     ) {}
 
     /** Version en cours (la plus récente non archivée). */
@@ -400,7 +402,8 @@ class InterpretationVisiteService
         DB::transaction(function () use ($interpretation, $technicien, $visite) {
             foreach ($this->interpretationsLots($visite) as ['interpretation' => $lot]) {
                 if ($lot !== null && $lot->statut !== Interpretation::STATUT_PUBLIE) {
-                    $this->interpretations->publier($lot, $technicien);
+                    // La notification de la visite couvre ses lots : pas de notification par lot
+                    $this->interpretations->publier($lot, $technicien, notifier: false);
                 }
             }
 
@@ -422,6 +425,9 @@ class InterpretationVisiteService
             GenererFichePdf::dispatch($interpretation->id)->afterCommit();
 
             $this->journaliser('publication_interpretation_visite', $technicien, $interpretation, $visite);
+
+            // EF-M8-01, EF-M8-02 : e-mails et SMS journalisés, envoyés après validation de la transaction
+            $this->notifications->visitePubliee($interpretation, $technicien);
         });
 
         return $interpretation->refresh();

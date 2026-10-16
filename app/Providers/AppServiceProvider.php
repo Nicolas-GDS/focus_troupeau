@@ -39,6 +39,9 @@ use App\Policies\ReferentielPolicy;
 use App\Policies\VisitePolicy;
 use App\Services\Import\ExtracteurBulletin;
 use App\Services\Import\ExtracteurLano;
+use App\Services\Notifications\PasserelleSms;
+use App\Services\Notifications\SmsBrevo;
+use App\Services\Notifications\SmsJournal;
 use App\Services\Pdf\RenduBrowsershot;
 use App\Services\Pdf\RenduPdf;
 use App\Services\Referentiels\ReferentielsBdd;
@@ -62,6 +65,7 @@ class AppServiceProvider extends ServiceProvider
         // Extraction des bulletins (EF-M9-01) : script LANO existant ; un export structuré la remplacera.
         $this->app->bind(ExtracteurBulletin::class, ExtracteurLano::class);
         $this->app->bind(RenduPdf::class, RenduBrowsershot::class);
+        $this->app->bind(PasserelleSms::class, fn () => config('services.brevo.pilote_sms') === 'brevo' ? new SmsBrevo : new SmsJournal);
     }
 
     public function boot(): void
