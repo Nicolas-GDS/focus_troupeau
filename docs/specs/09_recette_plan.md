@@ -89,7 +89,7 @@ Estimation indicative pour un développement interne assisté par IA, à affiner
 
 | Risque | Effet | Parade |
 |---|---|---|
-| Référentiels non validés à temps (points 1 à 6) | Calculs justes sur des repères contestables | Statut épistémique affiché ; valeurs [C] et [CP] marquées « à valider » dans l'interface technicien ; aucune publication éleveur sur un repère non validé |
+| Référentiels non validés à temps (points 1 à 6) | Calculs justes sur des repères contestables | Statut épistémique affiché ; valeurs [C] et [CP] marquées « à valider » dans l'interface technicien ; publication éleveur possible sur un repère non validé, la valeur portant alors la mention « repère à valider » à l'écran et dans le PDF (décision du 16/10/2026) |
 | Extraction PDF LANO fragile (changement de maquette du bulletin) | Imports en échec | Tests sur J0 à chaque mise à jour ; saisie manuelle de secours ; négociation d'un export structuré |
 | Saisie des stocks trop lourde pour l'éleveur | Module non utilisé | Saisie mobile minimale (nombre de balles, poids, cotes), valeurs par défaut, inventaire fait avec le technicien la première fois |
 | Confusion entre estimation et mesure | Décisions d'achat sur des stocks surestimés | Incertitude affichée, indicateurs `estime`/`mesure`, marge de sécurité majorée si estimations majoritaires |

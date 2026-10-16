@@ -70,6 +70,7 @@ Reprise du dictionnaire du document 02 (`ref.parametre`) : MS, MM, MO, MAT, CB, 
 | 15/10/2026 | T-04 redéfini (Mg bas + tétanie) pour être cohérent avec le référentiel du chapitre 11 ; extraction LANO en JSON (§ 6.1) | Lot L2, étape 3 |
 | 15/10/2026 | T-03 : pas d'alerte K à 18 g (seuil « élevé » de la grille v1 à 30 g) ; RC-1 : ordre de priorité du texte retenu contre celui de `ref.f_classer_valeur`, départage par gravité, chevauchements interdits dans E24 | Préparation du lot L2 |
 | 16/10/2026 | Lot L3 : position dans la campagne (RC-3) de E04 reportée au lot L4 ; E08 limité aux étiquettes et à l'apport journalier par élément (dose × composition), la comparaison au besoin (RC-9) reportée au lot L5 ; T-26 limité au gabarit « fiche de visite » (bilan et scénario au lot L6) ; clé étrangère `dossier.mesure_terrain.lot_animaux_id` posée au lot L5 ; repères des points ouverts 2 à 4 transcrits depuis la présentation Forgeneuf et le document 04 fournis par le chargé de mission, au statut [C] ; jeu J3 : élevage ELV-0001 fictif pseudonymisé (neuf lots), à remplacer par les lots du document 04 | Préparation du lot L3 |
+| 16/10/2026 | § 9.5 : un volet lu sur des repères [C] ou [CP] (eau, animaux, bilan sanitaire) est publiable ; chaque valeur concernée porte la mention « repère à valider » à l'écran et dans le PDF | Préparation du lot L3 |
 
 ## 10.5 Références bibliographiques
 
