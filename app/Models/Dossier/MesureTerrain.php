@@ -18,6 +18,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $date_mesure
  * @property string|null $identifiant_animal
  * @property string|null $stade
+ * @property string|null $espece_code
  * @property string $mesure_code
  * @property string $valeur
  * @property string $unite
@@ -43,7 +44,7 @@ class MesureTerrain extends Model
     protected $table = 'dossier.mesure_terrain';
 
     protected $fillable = [
-        'elevage_id', 'visite_id', 'lot_animaux_id', 'date_mesure', 'identifiant_animal', 'stade', 'mesure_code',
+        'elevage_id', 'visite_id', 'lot_animaux_id', 'date_mesure', 'identifiant_animal', 'stade', 'espece_code', 'mesure_code',
         'valeur', 'unite', 'lecture_code', 'statut', 'saisie_par', 'maj_par',
     ];
 
