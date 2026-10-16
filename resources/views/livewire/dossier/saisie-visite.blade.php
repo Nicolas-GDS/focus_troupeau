@@ -16,7 +16,7 @@
             <a href="#etape-collecter" class="lien">1. Collecter</a>
             <a href="#etape-analyser" class="lien">2. Analyser</a>
             <a href="#etape-mesurer" class="lien">3. Mesurer</a>
-            <span class="text-texte-doux">4. Croiser, 5. Agir, 6. Suivre : interprétation de visite</span>
+            <a href="{{ route('visites.interpretation', $visite->id) }}" class="lien">4. Croiser, 5. Agir, 6. Suivre : interprétation de visite</a>
         </nav>
     </section>
 

@@ -79,6 +79,7 @@ const REGISTRE_ROUTES = [
     // Lot L3 — visites (objets testés dans tests/Feature/Dossier/EcranSaisieVisiteTest.php)
     'GET visites' => ['acces' => 'roles', 'roles' => ['eleveur', 'technicien', 'veterinaire_gds', 'veterinaire', 'admin', 'admin_global']],
     'GET visites/{visite}/saisie' => ['acces' => 'objet'],
+    'GET visites/{visite}/interpretation' => ['acces' => 'objet'],
     'GET admin/referentiels/{table}' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global'], 'statut' => 404],
 ];
 

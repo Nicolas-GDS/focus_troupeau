@@ -51,7 +51,8 @@ it('présente au technicien les files de son périmètre, chacune avec son nombr
 
     $files = filesPour($this->jeu->technicien24);
 
-    expect(array_keys($files))->toBe(['a_rapprocher', 'anomalies', 'a_interpreter', 'brouillons', 'a_publier', 'conventions'])
+    // Lot L3 : files des interprétations de visite et des contrôles échus, après les conventions
+    expect(array_keys($files))->toBe(['a_rapprocher', 'anomalies', 'a_interpreter', 'brouillons', 'a_publier', 'visites_brouillon', 'visites_a_publier', 'controles_echus', 'conventions'])
         ->and($files['a_rapprocher']['total'])->toBe(1)
         ->and($files['anomalies']['total'])->toBe(1)
         ->and($files['a_interpreter']['total'])->toBe(1)
@@ -67,7 +68,7 @@ it('présente au vétérinaire conseil les seules interprétations à viser de s
 
     $files = filesPour($this->jeu->veterinaireConseil24);
 
-    expect(array_keys($files))->toBe(['a_viser'])
+    expect(array_keys($files))->toBe(['a_viser', 'visites_a_viser'])
         ->and($files['a_viser']['total'])->toBe(1)
         ->and($files['a_viser']['lignes'][0]['etat'])->toBe('critique');
 });

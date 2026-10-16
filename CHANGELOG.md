@@ -19,6 +19,10 @@ Le numéro de version est affiché dans le pied de page de l'application et dans
   étapes « collecter » (compte rendu, bilan sanitaire, événements), « analyser » (prélèvements, eau, étiquettes et
   apports journaliers) et « mesurer » (mesures terrain une ligne à la fois, lectures combinées, profils sanguins) ;
   policies du dossier, mention « repère à valider ».
+- Interprétation de visite et publication (E21, EF-M2-04 à EF-M2-07) : éléments à croiser et familles de cause
+  proposées, synthèse et niveau retenu, messages hiérarchisés, causes communes, plan d'action et contrôles, visa du
+  niveau 3, publication de la visite et de ses objets, nouvelle version (T-06), suivi du plan publié ; files de
+  travail des visites et des contrôles échus (E18, EF-M2-08).
 
 ## [Non publié] — lot L2 (import et interprétation)
 
