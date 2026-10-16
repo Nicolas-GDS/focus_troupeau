@@ -3,6 +3,14 @@
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; versions sémantiques (chapitre 6.5).
 Le numéro de version est affiché dans le pied de page de l'application et dans les PDF (ENF-EXP-03).
 
+## [Non publié] — lot L3 (dossier et publication)
+
+### Ajouté
+- Schéma `dossier` (§ 5.3) : visites, eau, mesures terrain, étiquettes, bilan sanitaire, interprétation de visite,
+  messages, causes communes, plan d'action, contrôles, note de liaison ; profils sanguins rattachés à la visite.
+- Structures des référentiels du dossier (repères des mesures terrain et des profils sanguins, indicateurs et seuils
+  du bilan sanitaire, nature « eau » de la grille) ; permissions du lot L3 (§ 2.3).
+
 ## [Non publié] — lot L2 (import et interprétation)
 
 ### Ajouté

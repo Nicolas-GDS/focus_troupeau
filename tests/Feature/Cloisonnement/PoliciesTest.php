@@ -22,19 +22,37 @@ it('attribue à chaque rôle les permissions de la matrice du § 2.3', function 
     expect($user->getAllPermissions()->pluck('name')->sort()->values()->all())->toBe($permissions);
 })->with([
     'éleveur' => ['eleveur', [
-        'bulletin.lire', 'consentement.gerer_propre', 'consentement.lire', 'convention.lire', 'elevage.lire',
-        'interpretation.lire', 'plan.ecrire', 'plan.lire', 'stock.ecrire', 'stock.lire',
+        'bilan_sanitaire.lire', 'bulletin.lire', 'consentement.gerer_propre', 'consentement.lire', 'convention.lire',
+        'eau.lire', 'elevage.lire', 'etiquette.lire', 'etiquette.rediger', 'interpretation.lire',
+        'mesure_terrain.lire', 'plan.ecrire', 'plan.lire', 'plan_action.lire', 'plan_action.marquer_fait',
+        'profil_sanguin.lire', 'stock.ecrire', 'stock.lire', 'visite.lire',
     ]],
     'technicien' => ['technicien', [
-        'bulletin.controler', 'bulletin.importer', 'bulletin.lire', 'compte.inviter', 'compte.lire', 'consentement.lire', 'convention.ecrire', 'convention.lire',
-        'elevage.ecrire', 'elevage.lire', 'interpretation.lire', 'interpretation.rediger', 'plan.ecrire', 'plan.lire', 'referentiel.lire', 'stock.ecrire', 'stock.lire',
+        'bilan_sanitaire.lire', 'bilan_sanitaire.rediger', 'bulletin.controler', 'bulletin.importer', 'bulletin.lire',
+        'compte.inviter', 'compte.lire', 'consentement.lire', 'convention.ecrire', 'convention.lire', 'eau.lire',
+        'eau.rediger', 'elevage.ecrire', 'elevage.lire', 'etiquette.lire', 'etiquette.rediger', 'etiquette.valider',
+        'interpretation.lire', 'interpretation.rediger', 'mesure_terrain.lire', 'mesure_terrain.rediger',
+        'note_liaison.rediger', 'plan.ecrire', 'plan.lire', 'plan_action.lire', 'plan_action.rediger',
+        'profil_sanguin.lire', 'profil_sanguin.rediger', 'profil_sanguin.valider', 'referentiel.lire', 'stock.ecrire',
+        'stock.lire', 'visite.lire', 'visite.rediger',
     ]],
-    'vétérinaire conseil' => ['veterinaire_gds', ['bulletin.lire', 'convention.lire', 'elevage.lire', 'interpretation.lire', 'interpretation.viser', 'plan.lire', 'referentiel.lire', 'stock.lire']],
-    'vétérinaire d\'élevage' => ['veterinaire', ['bulletin.lire', 'convention.lire', 'elevage.lire', 'interpretation.lire', 'plan.lire', 'stock.lire']],
+    'vétérinaire conseil' => ['veterinaire_gds', [
+        'bilan_sanitaire.lire', 'bulletin.lire', 'convention.lire', 'eau.lire', 'elevage.lire', 'etiquette.lire',
+        'interpretation.lire', 'interpretation.viser', 'mesure_terrain.lire', 'plan.lire', 'plan_action.lire',
+        'plan_action.valider_veterinaire', 'profil_sanguin.lire', 'profil_sanguin.rediger', 'referentiel.lire',
+        'stock.lire', 'visite.lire',
+    ]],
+    'vétérinaire d\'élevage' => ['veterinaire', [
+        'bilan_sanitaire.lire', 'bulletin.lire', 'convention.lire', 'eau.lire', 'elevage.lire', 'etiquette.lire',
+        'interpretation.lire', 'mesure_terrain.lire', 'plan.lire', 'plan_action.lire', 'profil_sanguin.lire',
+        'profil_sanguin.rediger', 'stock.lire', 'visite.lire',
+    ]],
     'administrateur' => ['admin', [
-        'bulletin.lire', 'compte.ecrire', 'compte.inviter', 'compte.lire', 'consentement.ecrire', 'consentement.lire',
-        'convention.ecrire', 'convention.lire', 'elevage.ecrire', 'elevage.lire', 'interpretation.lire', 'journal.lire',
-        'plan.lire', 'referentiel.ecrire', 'referentiel.lire', 'stock.lire',
+        'bilan_sanitaire.lire', 'bulletin.lire', 'compte.ecrire', 'compte.inviter', 'compte.lire',
+        'consentement.ecrire', 'consentement.lire', 'convention.ecrire', 'convention.lire', 'eau.lire',
+        'elevage.ecrire', 'elevage.lire', 'etiquette.lire', 'interpretation.lire', 'journal.lire',
+        'mesure_terrain.lire', 'plan.lire', 'plan_action.lire', 'profil_sanguin.lire', 'referentiel.ecrire',
+        'referentiel.lire', 'stock.lire', 'visite.lire',
     ]],
 ]);
 
