@@ -17,6 +17,6 @@ class DatabaseSeeder extends Seeder
             return;
         }
 
-        $this->call(JeuJ4Seeder::class);
+        $this->call([JeuJ4Seeder::class, JeuJ3Seeder::class]);
     }
 }

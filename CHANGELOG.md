@@ -31,6 +31,12 @@ Le numéro de version est affiché dans le pied de page de l'application et dans
   Brevo, pilote « journal » en développement) ; préférences et numéro de mobile, changement de mot de passe (E17).
 - Note de liaison vétérinaire (EF-M2-09, gabarit du document 04) : rédaction et envoi depuis E21 au vétérinaire désigné
   par consentement, PDF archivé, e-mail avec lien, écran du vétérinaire et retour, technicien prévenu.
+- Dossier élevage en lecture (E02 à E11, EF-M1-01 à EF-M1-09, EF-M2-06) : accueil de l'éleveur, synthèse de visite
+  en six étapes, fourrages et détail d'un lot, matrice minérale, eau, animaux, minéraux et aliments (étiquette
+  ajoutée par l'éleveur), bilan sanitaire, historique, plan d'action ; l'éleveur lit la dernière version publiée ;
+  composants `x-limites`, `x-message-hierarchise`, `x-valeur-repere` (§ 8.3) ; T-40 sur chaque volet.
+- Jeu d'essai J3 (§ 9.1) : `ELV-0001` et les neuf lots du prototype du document 04 ; test et procédure de recette
+  du lot (`docs/recette/L3_recette_J3.md` : première fiche de visite publiée, T-06, T-22, T-26, T-40).
 
 ### Dépendances
 - `spatie/browsershot` (prévue au § 6.1) ; dans l'image applicative : `chromium`, `nodejs`, `npm` et `puppeteer`

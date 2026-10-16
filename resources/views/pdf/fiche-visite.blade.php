@@ -28,7 +28,7 @@
     <img class="marque" src="{{ $marque }}" alt="{{ config('brand.nom') }}">
 </header>
 
-<p class="identite">{{ $libelleElevage }} ({{ $elevage->code_pseudo }}) · visite du {{ $visite->date_visite->format('d/m/Y') }}@if ($technicien) · {{ $technicien }}@endif · campagne {{ $visite->campagne_code ?? 'non déterminée' }}</p>
+<p class="identite">{{ $libelleElevage }}@if ($libelleElevage !== $elevage->code_pseudo) ({{ $elevage->code_pseudo }})@endif · visite du {{ $visite->date_visite->format('d/m/Y') }}@if ($technicien) · {{ $technicien }}@endif · campagne {{ $visite->campagne_code ?? 'non déterminée' }}</p>
 <h1>{{ $interpretation->titre ?: 'Votre visite d\'approche globale' }}</h1>
 
 {{-- L'essentiel --}}

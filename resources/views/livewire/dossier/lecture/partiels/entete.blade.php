@@ -7,7 +7,7 @@
     ];
 @endphp
 <div class="mb-6 space-y-3">
-    <p class="text-texte-doux">{{ $libelleElevage }} ({{ $elevage->code_pseudo }})</p>
+    <p class="text-texte-doux">{{ $libelleElevage }}@if ($libelleElevage !== $elevage->code_pseudo) ({{ $elevage->code_pseudo }})@endif</p>
     <nav aria-label="Volets du dossier" class="flex flex-wrap gap-1 border-b border-filet pb-2">
         @foreach ($volets as $route => $libelle)
             <a href="{{ $route === 'visites' ? route('visites') : route($route, $elevage->id) }}" class="lien-navigation"
