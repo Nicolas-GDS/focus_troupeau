@@ -15,6 +15,10 @@ Le numéro de version est affiché dans le pied de page de l'application et dans
   sanitaire, grille trouble × cause ; paramètres de l'eau (seul le fer a un seuil).
 - Domaine du dossier (RC-1.5, EF-M1-04, EF-M1-07, EF-M2-05) : lecture des mesures terrain, lectures combinées,
   profils sanguins, position du bilan sanitaire, croisement trouble × cause, lecture de l'eau, synthèse de visite.
+- Saisie d'une visite par le technicien (E03, EF-M1-04 à EF-M1-07, EF-M1-09) : liste des visites de l'élevage,
+  étapes « collecter » (compte rendu, bilan sanitaire, événements), « analyser » (prélèvements, eau, étiquettes et
+  apports journaliers) et « mesurer » (mesures terrain une ligne à la fois, lectures combinées, profils sanguins) ;
+  policies du dossier, mention « repère à valider ».
 
 ## [Non publié] — lot L2 (import et interprétation)
 

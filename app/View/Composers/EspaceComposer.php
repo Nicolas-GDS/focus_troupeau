@@ -64,6 +64,11 @@ class EspaceComposer
             $liens[] = ['libelle' => 'Mon travail', 'route' => 'travail'];
         }
 
+        // Lot L3 — visites (E03, saisie) ; l'espace éleveur du dossier vient à l'étape 7 du lot
+        if ($user->can('visite.rediger')) {
+            $liens[] = ['libelle' => 'Visites', 'route' => 'visites'];
+        }
+
         if ($user->can('bulletin.importer')) {
             $liens[] = ['libelle' => 'Import des bulletins', 'route' => 'import.bulletins'];
         }

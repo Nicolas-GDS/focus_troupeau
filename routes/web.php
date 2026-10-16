@@ -5,6 +5,8 @@ use App\Http\Controllers\BulletinPdfController;
 use App\Http\Controllers\ElevageCourantController;
 use App\Http\Controllers\NoticeRgpdController;
 use App\Http\Controllers\TravailController;
+use App\Livewire\Dossier\SaisieVisite;
+use App\Livewire\Dossier\Visites;
 use App\Livewire\Interpretation\InterpretationBulletin;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +51,11 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
 
         // E20 — Interprétation d'un bulletin (EF-M2-02 à EF-M2-04) ; analyse liée à travers les scopes (404 hors périmètre)
         Route::get('/analyses/{analyse}/interpretation', InterpretationBulletin::class)->middleware('permission:interpretation.lire')->name('analyses.interpretation');
+
+        // Lot L3 — visites de l'élevage courant et saisie d'une visite (E03, EF-M1-09) ; visite liée à travers les
+        // scopes (404 hors périmètre), chaque volet autorise ses actions côté serveur (ENF-SEC-04)
+        Route::get('/visites', Visites::class)->middleware('permission:visite.lire')->name('visites');
+        Route::get('/visites/{visite}/saisie', SaisieVisite::class)->middleware('permission:visite.lire')->name('visites.saisie');
 
         // E23 — Administration : GDS, comptes, conventions
         Route::middleware('role:admin|admin_global')->prefix('admin')->name('admin.')->group(function () {
