@@ -3,6 +3,7 @@
 use App\Http\Controllers\AiguillageController;
 use App\Http\Controllers\BulletinPdfController;
 use App\Http\Controllers\ElevageCourantController;
+use App\Http\Controllers\FicheVisiteController;
 use App\Http\Controllers\NoticeRgpdController;
 use App\Http\Controllers\TravailController;
 use App\Livewire\Dossier\Interpretation\EcranVisite;
@@ -60,6 +61,8 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
 
         // E21 — interprétation de visite et publication (EF-M2-04 à EF-M2-07)
         Route::get('/visites/{visite}/interpretation', EcranVisite::class)->middleware('permission:interpretation.lire')->name('visites.interpretation');
+        // Fiche de visite figée (EF-M2-07, EF-GEN-08) : lien signé et policy (ENF-SEC-05)
+        Route::get('/visites/{visite}/fiches/{version}/pdf', [FicheVisiteController::class, 'pdf'])->middleware('signed')->name('visites.fiche.pdf');
 
         // E23 — Administration : GDS, comptes, conventions
         Route::middleware('role:admin|admin_global')->prefix('admin')->name('admin.')->group(function () {

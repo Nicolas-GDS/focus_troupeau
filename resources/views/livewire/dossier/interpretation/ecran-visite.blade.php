@@ -127,6 +127,10 @@
         </section>
     @endif
 
+    @if ($interpretation && $interpretation->fiche_html && ! $agent)
+        <p class="carte"><a href="{{ $lienFiche($interpretation) }}" class="lien">Télécharger la fiche de visite (PDF)</a></p>
+    @endif
+
     {{-- Interprétation --}}
     <section aria-labelledby="titre-interpretation" class="space-y-4">
         <h2 id="titre-interpretation" class="text-xl font-semibold">Synthèse et messages pour l'éleveur</h2>
@@ -293,12 +297,13 @@
                     <button type="submit" class="bouton-secondaire">Refuser le visa</button>
                 </form>
             @endif
-            @if ($versions->count() > 1)
+            @if ($versions->isNotEmpty())
                 <div class="text-sm">
                     <p class="font-medium">Versions</p>
                     <ul>
                         @foreach ($versions as $v)
-                            <li>Version {{ $v->version }} — {{ Ecran::statut($v->statut)['libelle'] }}@if ($v->publie_le) , publiée le {{ $v->publie_le->format('d/m/Y') }} (grille v{{ $v->version_grille }}) @endif</li>
+                            <li wire:key="version-{{ $v->id }}">Version {{ $v->version }} — {{ Ecran::statut($v->statut)['libelle'] }}@if ($v->publie_le), publiée le {{ $v->publie_le->format('d/m/Y') }} (grille v{{ $v->version_grille }})@endif
+                                @if ($v->fiche_html) · <a href="{{ $lienFiche($v) }}" class="lien">fiche PDF</a> @endif</li>
                         @endforeach
                     </ul>
                 </div>

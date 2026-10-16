@@ -8,6 +8,7 @@ use App\Domain\Dossier\FamilleCauseProposee;
 use App\Domain\Dossier\MessagePropose;
 use App\Domain\Dossier\SyntheseVisite;
 use App\Domain\Referentiels\Referentiels;
+use App\Jobs\GenererFichePdf;
 use App\Models\App\User;
 use App\Models\Dossier\Action;
 use App\Models\Dossier\AnalyseEau;
@@ -38,7 +39,8 @@ use Illuminate\Support\Facades\DB;
  * - circuit brouillon → valide → (visee si niveau retenu 3) → publie, refus de visa motivé (EF-M2-04) ;
  * - publication : elle publie aussi les interprétations de lots publiables et les objets validés de la visite, fige la
  *   version de la grille, archive la version publiée précédente, passe la visite en « publiee » et s'inscrit au
- *   journal. La fiche figée (HTML, PDF) et la notification s'y ajoutent aux étapes 5 et 6 du lot ;
+ *   journal ; la fiche figée est archivée en HTML et son PDF produit par un job (FicheVisiteService). La
+ *   notification s'y ajoute à l'étape 6 du lot ;
  * - une modification après publication crée la version suivante, copie de la précédente (T-06) ; la visite publiée
  *   n'accepte plus de saisie : une donnée nouvelle appelle une nouvelle visite (décision de l'étape 4).
  */
@@ -52,6 +54,7 @@ class InterpretationVisiteService
         private readonly ProfilsService $profils,
         private readonly BilanSanitaireService $bilan,
         private readonly JournalService $journal,
+        private readonly FicheVisiteService $fiches,
     ) {}
 
     /** Version en cours (la plus récente non archivée). */
@@ -414,6 +417,10 @@ class InterpretationVisiteService
             ]);
             $visite->update(['statut' => Visite::STATUT_PUBLIEE]);
 
+            // Fiche figée : HTML archivé dans la transaction, PDF produit par le job après validation (EF-M2-07)
+            $this->fiches->figerHtml($interpretation);
+            GenererFichePdf::dispatch($interpretation->id)->afterCommit();
+
             $this->journaliser('publication_interpretation_visite', $technicien, $interpretation, $visite);
         });
 
@@ -438,7 +445,7 @@ class InterpretationVisiteService
 
         return DB::transaction(function () use ($publiee, $technicien, $visite) {
             $copie = $publiee->replicate(['statut', 'vise_par', 'vise_le', 'refus_visa_motif', 'refus_visa_par', 'refus_visa_le',
-                'publie_par', 'publie_le', 'fiche_html', 'fiche_pdf']);
+                'publie_par', 'publie_le', 'fiche_html', 'fiche_pdf']);   // la fiche de la version précédente reste archivée
             $copie->fill(['version' => $publiee->version + 1, 'statut' => InterpretationVisite::STATUT_BROUILLON,
                 'redige_par' => $technicien->id, 'maj_par' => $technicien->id]);
             $copie->save();

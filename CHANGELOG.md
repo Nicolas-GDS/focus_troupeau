@@ -23,6 +23,13 @@ Le numéro de version est affiché dans le pied de page de l'application et dans
   proposées, synthèse et niveau retenu, messages hiérarchisés, causes communes, plan d'action et contrôles, visa du
   niveau 3, publication de la visite et de ses objets, nouvelle version (T-06), suivi du plan publié ; files de
   travail des visites et des contrôles échus (E18, EF-M2-08).
+- Fiche de visite figée (EF-M2-07, EF-GEN-08, T-26) : HTML autonome et PDF à la charte bi-entité archivés à la
+  publication (Browsershot, Chromium), téléchargement par lien signé ; textes types des mentions de limites
+  (`ref.texte_type`, EF-M10-03).
+
+### Dépendances
+- `spatie/browsershot` (prévue au § 6.1) ; dans l'image applicative : `chromium`, `nodejs`, `npm` et `puppeteer`
+  23.11.1 (global, sans téléchargement de navigateur).
 
 ## [Non publié] — lot L2 (import et interprétation)
 

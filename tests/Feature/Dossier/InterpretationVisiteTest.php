@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Tests\Support\AnalyseEssai;
 use Tests\Support\JeuCloisonnement;
 
@@ -33,6 +34,7 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     Queue::fake();
     Notification::fake();
+    Storage::fake('local');
     $this->jeu = JeuCloisonnement::creer();
     $this->tech = $this->jeu->technicien24;
     $this->actingAs($this->tech);

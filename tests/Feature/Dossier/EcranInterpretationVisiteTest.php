@@ -12,6 +12,7 @@ use Database\Seeders\JeuJ4Seeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\Support\JeuCloisonnement;
 
@@ -22,6 +23,7 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     Queue::fake();
     Notification::fake();
+    Storage::fake('local');
     $this->jeu = JeuCloisonnement::creer();
     $this->visite = app(VisiteService::class)->creer($this->jeu->elevage24a, $this->jeu->technicien24, '2026-01-15', 'initiale');
     $this->actingAs($this->jeu->technicien24);

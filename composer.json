@@ -13,6 +13,7 @@
         "laravel/tinker": "^2.10.1",
         "livewire/livewire": "^3.6",
         "socialiteproviders/microsoft": "^4.6",
+        "spatie/browsershot": "^5.0",
         "spatie/laravel-permission": "^6.10"
     },
     "require-dev": {

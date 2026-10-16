@@ -16,6 +16,7 @@ use App\Services\ElevageCourant;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -186,6 +187,7 @@ class EcranVisite extends Component
             'peutPublier' => $interpretation !== null && Gate::allows('publier', $interpretation),
             'peutNouvelleVersion' => $interpretation !== null && Gate::allows('nouvelleVersion', $interpretation),
             'agent' => $agent,
+            'lienFiche' => fn (InterpretationVisite $v) => URL::temporarySignedRoute('visites.fiche.pdf', now()->addMinutes(30), ['visite' => $v->visite_id, 'version' => $v->version]),
             'familles' => self::familles(),
             'piliers' => self::piliers(),
         ])->layout('components.layouts.espace', ['titre' => 'Interprétation de la visite du '.$visite->date_visite->format('d/m/Y')]);

@@ -80,6 +80,7 @@ const REGISTRE_ROUTES = [
     'GET visites' => ['acces' => 'roles', 'roles' => ['eleveur', 'technicien', 'veterinaire_gds', 'veterinaire', 'admin', 'admin_global']],
     'GET visites/{visite}/saisie' => ['acces' => 'objet'],
     'GET visites/{visite}/interpretation' => ['acces' => 'objet'],
+    'GET visites/{visite}/fiches/{version}/pdf' => ['acces' => 'objet'],
     'GET admin/referentiels/{table}' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global'], 'statut' => 404],
 ];
 
