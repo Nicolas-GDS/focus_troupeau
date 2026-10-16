@@ -78,7 +78,26 @@
                         </tbody>
                     </table>
                 </div>
-                <p class="mt-2 text-xs text-texte-doux">La position du lot dans la campagne (références des élevages du GDS) sera affichée au lot L4.</p>
+            </section>
+
+            {{-- Positionnement dans la campagne (RC-3, EF-M3-01 à EF-M3-03) --}}
+            <section class="carte" aria-labelledby="position-{{ $lot['analyse']->id }}">
+                <h2 id="position-{{ $lot['analyse']->id }}" class="text-lg font-semibold">Où se situe ce lot dans la campagne ?</h2>
+                <p class="mt-1 text-sm text-texte-doux">Comparaison aux lots du même type analysés la même campagne dans les élevages qui ont accepté de contribuer aux références (sans identité) : faible sous le premier quartile, normal entre le premier et le troisième, élevé au-dessus.</p>
+                @forelse ($lot['positionnement'] as $g)
+                    <div class="mt-4" wire:key="pos-{{ $lot['analyse']->id }}-{{ $g['code'] }}">
+                        @foreach ($g['populations'] as $p)
+                            @if ($p['position']->value === 'insuffisante')
+                                <p class="text-sm"><span class="font-medium">{{ $g['libelle'] }}</span> : {{ \App\Services\Dossier\Affichage::nombre($g['valeur'], $g['decimales']) }} {{ $g['unite'] }} — référence insuffisante (n = {{ $p['reference']->n }} ; {{ $p['libelle'] }}).</p>
+                            @else
+                                <x-positionnement :parametre="$g['libelle']" :unite="$g['unite']" :decimales="$g['decimales']" :reference="$p['reference']" :population="$p['libelle']"
+                                    :valeurs="$p['valeurs']" :lots="[['libelle' => 'Ce lot', 'valeur' => $g['valeur'], 'position' => $p['position']]]" :rappels="$g['rappels']" />
+                            @endif
+                        @endforeach
+                    </div>
+                @empty
+                    <p class="mt-2 text-sm text-texte-doux">Aucune population de référence pour ce lot (campagne non déterminée ou aucun lot comparable).</p>
+                @endforelse
             </section>
         </div>
     @endforeach

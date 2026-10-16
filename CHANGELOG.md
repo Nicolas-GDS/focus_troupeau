@@ -3,6 +3,19 @@
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; versions sémantiques (chapitre 6.5).
 Le numéro de version est affiché dans le pied de page de l'application et dans les PDF (ENF-EXP-03).
 
+## [Non publié] — lot L4 (positionnement)
+
+### Ajouté
+- Populations de référence (RC-3, EF-M3-01 à EF-M3-04) : vues `valo.v_reference_population`, `v_reference_gds`,
+  `v_reference_litho`, `v_reference_bigds` (bulletins validés, consentement « références », hors exclusions et
+  anomalies, n toujours donné) ; paramètres suivis configurables ; `references.n_min` ; domaine `Positionnement`.
+- Graphiques de positionnement en SVG côté serveur (`x-positionnement`, EF-M3-03) dans E04, E03 et la fiche de
+  visite figée ; pastilles de position UFL et MAT ; rafraîchissement nocturne du contexte pédo-géologique.
+- Historique pluriannuel (RC-4, EF-M1-08, EF-M3-05) : `valo.v_historique_elevage` par lot, courbes `x-historique`
+  (MAT, UFL, Cu, Zn), variation sans classe, frise des décisions (E10) ; l'éleveur ne voit que ses lots publiés.
+- Jeu J5 (population synthétique de développement), commande `references:bilan`, procédure
+  `docs/recette/L4_recette_J0.md` (T-07 à T-09).
+
 ## [Non publié] — lot L3 (dossier et publication)
 
 ### Ajouté

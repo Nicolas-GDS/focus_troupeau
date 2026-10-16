@@ -8,8 +8,9 @@ use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
 /**
- * E10 — historique (EF-M1-08) : campagnes et visites de l'élevage, niveaux, messages et décisions du plan d'action,
- * lots analysés. Les courbes pluriannuelles par paramètre (RC-4) rejoignent ce volet au lot L4.
+ * E10 — historique (EF-M1-08, RC-4, EF-M3-05) : courbes pluriannuelles par type de fourrage (MAT, UFL, cuivre, zinc)
+ * avec la variation entre les deux dernières campagnes, sans classe ; puis, par campagne, les visites (niveau,
+ * messages), les lots analysés et la frise des décisions (actions des plans publiés, recommandations des lots).
  */
 class Historique extends Component
 {
@@ -22,6 +23,12 @@ class Historique extends Component
 
     public function render(): View
     {
-        return $this->volet('historique', 'Historique', ['campagnes' => $this->lecture()->historique($this->elevage(), $this->lecteur())]);
+        $elevage = $this->elevage();
+
+        return $this->volet('historique', 'Historique', [
+            'evolution' => $this->lecture()->evolution($elevage, $this->lecteur()),
+            'campagnes' => $this->lecture()->historique($elevage, $this->lecteur()),
+            'decisions' => $this->lecture()->decisions($elevage, $this->lecteur()),
+        ]);
     }
 }

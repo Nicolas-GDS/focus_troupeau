@@ -2,6 +2,7 @@
 
 namespace App\Services\Dossier;
 
+use App\Domain\Interpretation\Position;
 use App\Models\App\Gds;
 use App\Models\Dossier\Action;
 use App\Models\Dossier\AnalyseEau;
@@ -16,6 +17,7 @@ use App\Models\Fourrage\Interpretation;
 use App\Models\Fourrage\Prelevement;
 use App\Services\ElevageCourant;
 use App\Services\Interpretation\InterpretationService;
+use App\Services\Interpretation\PositionnementService;
 use App\Services\Pdf\RenduPdf;
 use App\Services\Pdf\RessourcesCharte;
 use Closure;
@@ -30,7 +32,7 @@ use RuntimeException;
  * À la publication, la fiche est rendue en HTML autonome (polices, logos et pictogrammes intégrés) et archivée ; le PDF
  * est produit depuis ce HTML figé (Chromium) et archivé à côté. Les deux fichiers sont sur le disque privé
  * (fiches/{gds}/{élevage}/visite-{id}-v{version}.html|pdf) ; les colonnes fiche_html et fiche_pdf portent leurs
- * chemins. Le positionnement dans la campagne (RC-3) rejoint la fiche au lot L4.
+ * chemins. Le positionnement dans la campagne (RC-3) est figé avec la fiche, à la date de publication (lot L4).
  */
 class FicheVisiteService
 {
@@ -51,6 +53,7 @@ class FicheVisiteService
         private readonly BilanSanitaireService $bilan,
         private readonly EtiquettesService $etiquettes,
         private readonly RenduPdf $rendu,
+        private readonly PositionnementService $positionnement,
     ) {}
 
     /** Rend et archive le HTML figé de la version ; renvoie son chemin (appelé à la publication). */
@@ -112,6 +115,9 @@ class FicheVisiteService
                 ->selectRaw("concat_ws(' ', prenom, nom) as nom")->value('nom'),
             'messages' => Message::query()->withoutGlobalScopes()->where('interpretation_visite_id', $interpretation->id)->orderBy('ordre')->get(),
             'lots' => $lots,
+            // Positionnement dans la campagne (RC-3, document 04 figures 3 et 4)
+            'positionnement' => $this->positionnement->graphiquesVisite(array_map(fn (array $l) => ['analyse' => $l['analyse'], 'prelevement' => $l['prelevement'],
+                'libelle' => (string) ($l['prelevement']->nom_lot ?: $l['analyse']->num_echantillon_labo)], $lots)),
             'libellesParametres' => DB::table('ref.parametre')->whereIn('code', [...self::PARAMETRES_LOTS, ...self::PARAMETRES_MATRICE])->pluck('libelle', 'code'),
             'unitesParametres' => DB::table('ref.parametre')->whereIn('code', [...self::PARAMETRES_LOTS, ...self::PARAMETRES_MATRICE])->pluck('unite', 'code'),
             'eau' => AnalyseEau::query()->withoutGlobalScopes()->where('visite_id', $visite->id)->orderBy('date_prelevement')->get()
@@ -145,7 +151,7 @@ class FicheVisiteService
      * valeurs du tableau des lots et de la matrice.
      *
      * @param  (Closure(Analyse): bool)|null  $analyseLisible
-     * @return list<array{analyse: Analyse, prelevement: Prelevement, interpretation: Interpretation|null, valeurs: array<string, array{valeur: float|null, censure: string|null, classe: string|null, gravite: int|null, decimales: int, unite: string, repere: string|null, source: array{source: string|null, statut: string, a_valider: bool}|null}>}>
+     * @return list<array{analyse: Analyse, prelevement: Prelevement, interpretation: Interpretation|null, valeurs: array<string, array{valeur: float|null, censure: string|null, classe: string|null, gravite: int|null, decimales: int, unite: string, repere: string|null, source: array{source: string|null, statut: string, a_valider: bool}|null}>, positions: array<string, Position>}>
      */
     private function lots(Visite $visite, ?Closure $analyseLisible = null): array
     {
@@ -167,7 +173,8 @@ class FicheVisiteService
                     'source' => Affichage::sourceSeuil($ligne['source'], $ligne['statut'], $ligne['a_valider'])];
             }
 
-            $lots[] = ['analyse' => $analyse, 'prelevement' => $prelevements[$analyse->prelevement_id], 'interpretation' => $interpretation, 'valeurs' => $valeurs];
+            $lots[] = ['analyse' => $analyse, 'prelevement' => $prelevements[$analyse->prelevement_id], 'interpretation' => $interpretation, 'valeurs' => $valeurs,
+                'positions' => $this->positionnement->positionsPrincipales($analyse)];
         }
 
         return $lots;

@@ -2,6 +2,9 @@
 
 namespace App\Services\Dossier;
 
+use App\Domain\Interpretation\PointHistorique;
+use App\Domain\Interpretation\Position;
+use App\Domain\Interpretation\Variation;
 use App\Domain\Referentiels\Referentiels;
 use App\Models\App\User;
 use App\Models\Dossier\Action;
@@ -22,6 +25,8 @@ use App\Models\Fourrage\Interpretation;
 use App\Models\Fourrage\Prelevement;
 use App\Services\Cloisonnement\RegleStatut;
 use App\Services\Interpretation\InterpretationService;
+use App\Services\Interpretation\PositionnementService;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -37,6 +42,9 @@ use Illuminate\Support\Facades\Gate;
  */
 class LectureDossierService
 {
+    /** Paramètres des courbes pluriannuelles (EF-M1-08 : MAT et UFL des foins, cuivre et zinc). */
+    public const PARAMETRES_EVOLUTION = ['MAT', 'UFL_2018', 'CU', 'ZN'];
+
     /** Regroupement des lots et visites dont la campagne n'est pas déterminée. */
     public const SANS_CAMPAGNE = 'non déterminée';
 
@@ -51,6 +59,7 @@ class LectureDossierService
         private readonly EtiquettesService $etiquettes,
         private readonly RegleStatut $regleStatut,
         private readonly Referentiels $referentiels,
+        private readonly PositionnementService $positionnement,
     ) {}
 
     public function agent(User $lecteur): bool
@@ -134,7 +143,7 @@ class LectureDossierService
     /**
      * Lots analysés lisibles (volet Fourrages E04, EF-M1-02), par campagne, la plus récente d'abord.
      *
-     * @return Collection<int|string, array<int, array{prelevement: Prelevement, analyse: Analyse, interpretation: Interpretation|null}>>
+     * @return Collection<int|string, array<int, array{prelevement: Prelevement, analyse: Analyse, interpretation: Interpretation|null, positions: array<string, Position>}>>
      */
     public function fourrages(Elevage $elevage, User $lecteur): Collection
     {
@@ -148,7 +157,7 @@ class LectureDossierService
      * Détail d'un lot (E04) : pour chaque bulletin lisible, l'interprétation montrée, les résultats classés avec leur
      * repère et leur source, les alertes retenues.
      *
-     * @return list<array{analyse: Analyse, interpretation: Interpretation|null, lignes: list<array<string, mixed>>, alertes: list<array<string, mixed>>, deconseillee: list<string>}>
+     * @return list<array{analyse: Analyse, interpretation: Interpretation|null, lignes: list<array<string, mixed>>, alertes: list<array<string, mixed>>, deconseillee: list<string>, positionnement: list<array<string, mixed>>}>
      */
     public function fourrage(Prelevement $prelevement, User $lecteur): array
     {
@@ -163,6 +172,7 @@ class LectureDossierService
                 'alertes' => $interpretation === null ? [] : array_values(array_filter($this->interpretations->lignesAlertes($interpretation),
                     fn (array $l) => $l['alerte']->retenue === true)),
                 'deconseillee' => $interpretation === null ? [] : $this->interpretations->utilisationDeconseillee($interpretation),
+                'positionnement' => $this->positionnement->graphiques($analyse, ! $this->agent($lecteur)),
             ];
         }
 
@@ -268,7 +278,7 @@ class LectureDossierService
      */
     public function historique(Elevage $elevage, User $lecteur): Collection
     {
-        $visites = $this->visitesLisibles($elevage, $lecteur)->map(function (Visite $visite) use ($lecteur) {
+        $visites = $this->visitesLisibles($elevage, $lecteur)->toBase()->map(function (Visite $visite) use ($lecteur) {
             $interpretation = $this->interpretationMontree($visite, $lecteur);
             $plan = $interpretation === null ? null : PlanAction::query()->where('interpretation_visite_id', $interpretation->id)->value('id');
 
@@ -292,13 +302,74 @@ class LectureDossierService
     }
 
     /**
+     * Évolution pluriannuelle (E10, RC-4, EF-M1-08) : par type de fourrage analysé, la série de chaque paramètre de
+     * PARAMETRES_EVOLUTION et sa variation entre les deux dernières campagnes (sans classe). Un lecteur externe ne voit
+     * que ses lots publiés.
+     *
+     * @return list<array{type: string, courbes: list<array{code: string, libelle: string, unite: string, decimales: int, points: list<PointHistorique>, variation: Variation|null}>}>
+     */
+    public function evolution(Elevage $elevage, User $lecteur): array
+    {
+        $types = collect($this->lotsLisibles($elevage, $lecteur))->map(fn (array $l) => $l['prelevement']->type_fourrage_code)->unique()->sort()->values();
+        $parametres = DB::table('ref.parametre')->whereIn('code', self::PARAMETRES_EVOLUTION)->get()->keyBy('code');
+        $libelles = DB::table('ref.type_fourrage')->pluck('libelle', 'code');
+        $sections = [];
+
+        foreach ($types as $type) {
+            $courbes = [];
+            foreach (self::PARAMETRES_EVOLUTION as $code) {
+                $serie = $this->positionnement->historique($elevage->id, $type, $code, ! $this->agent($lecteur));
+                if ($serie['points'] !== []) {
+                    $courbes[] = ['code' => $code, 'libelle' => (string) $parametres[$code]->libelle, 'unite' => (string) $parametres[$code]->unite,
+                        'decimales' => (int) $parametres[$code]->decimales, ...$serie];
+                }
+            }
+
+            if ($courbes !== []) {
+                $sections[] = ['type' => (string) ($libelles[$type] ?? $type), 'courbes' => $courbes];
+            }
+        }
+
+        return $sections;
+    }
+
+    /**
+     * Frise des décisions (RC-4) : actions des plans publiés, datées de la publication de la visite, et recommandations
+     * des interprétations de lots lisibles, datées de l'interprétation ; par campagne, la plus récente d'abord.
+     *
+     * @return Collection<int|string, array<int, array<mixed>>> par campagne : date (Carbon), nature (action, recommandation), texte, statut
+     */
+    public function decisions(Elevage $elevage, User $lecteur): Collection
+    {
+        $decisions = collect();
+
+        foreach ($this->interpretationsPubliees($elevage, $lecteur) as ['visite' => $visite, 'interpretation' => $interpretation]) {
+            $plan = PlanAction::query()->where('interpretation_visite_id', $interpretation->id)->value('id');
+            foreach ($plan === null ? [] : Action::query()->where('plan_action_id', $plan)->orderBy('priorite')->orderBy('ordre')->get() as $action) {
+                $decisions->push(['campagne' => $visite->campagne_code ?? self::SANS_CAMPAGNE, 'date' => $interpretation->publie_le ?? $visite->date_visite,
+                    'nature' => 'action', 'texte' => $action->titre, 'statut' => $action->statut]);
+            }
+        }
+
+        foreach ($this->lotsLisibles($elevage, $lecteur) as $lot) {
+            if ($lot['interpretation']?->recommandations) {
+                $decisions->push(['campagne' => $lot['prelevement']->campagne_code ?? self::SANS_CAMPAGNE, 'date' => $lot['interpretation']->date_interpretation,
+                    'nature' => 'recommandation', 'texte' => ($lot['prelevement']->nom_lot ?: $lot['analyse']->num_echantillon_labo).' : '.$lot['interpretation']->recommandations, 'statut' => null]);
+            }
+        }
+
+        return $decisions->sortByDesc(fn (array $d) => $d['date']->format('Ymd'))->groupBy('campagne')->sortKeysDesc()
+            ->map(fn (Collection $d) => $d->map(fn (array $x) => collect($x)->except('campagne')->all())->values()->all());
+    }
+
+    /**
      * Visites dont le plan d'action publié est lisible (E11, EF-M2-06), la plus récente d'abord.
      *
      * @return Collection<int, array{visite: Visite, interpretation: InterpretationVisite}>
      */
     public function interpretationsPubliees(Elevage $elevage, User $lecteur): Collection
     {
-        return $this->visitesLisibles($elevage, $lecteur)
+        return $this->visitesLisibles($elevage, $lecteur)->toBase()
             ->map(fn (Visite $v) => ['visite' => $v, 'interpretation' => $this->visites->publiee($v)])
             ->filter(fn (array $v) => $v['interpretation'] !== null && Gate::forUser($lecteur)->allows('view', $v['interpretation']))
             ->values();
@@ -323,7 +394,7 @@ class LectureDossierService
     }
 
     /**
-     * @return list<array{prelevement: Prelevement, analyse: Analyse, interpretation: Interpretation|null}>
+     * @return list<array{prelevement: Prelevement, analyse: Analyse, interpretation: Interpretation|null, positions: array<string, Position>}>
      */
     private function lotsLisibles(Elevage $elevage, User $lecteur): array
     {
@@ -331,7 +402,8 @@ class LectureDossierService
         $lots = [];
 
         foreach ($this->analysesLisibles($prelevements->keys(), $lecteur) as $analyse) {
-            $lots[] = ['prelevement' => $prelevements[$analyse->prelevement_id], 'analyse' => $analyse, 'interpretation' => $this->interpretationLot($analyse, $lecteur)];
+            $lots[] = ['prelevement' => $prelevements[$analyse->prelevement_id], 'analyse' => $analyse, 'interpretation' => $this->interpretationLot($analyse, $lecteur),
+                'positions' => $this->positionnement->positionsPrincipales($analyse)];
         }
 
         return $lots;

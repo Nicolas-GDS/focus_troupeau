@@ -9,6 +9,7 @@ use App\Domain\Dossier\MessagePropose;
 use App\Domain\Dossier\SyntheseVisite;
 use App\Domain\Referentiels\Referentiels;
 use App\Jobs\GenererFichePdf;
+use App\Jobs\RafraichirContextePrelevements;
 use App\Models\App\User;
 use App\Models\Dossier\Action;
 use App\Models\Dossier\AnalyseEau;
@@ -423,6 +424,7 @@ class InterpretationVisiteService
             // Fiche figée : HTML archivé dans la transaction, PDF produit par le job après validation (EF-M2-07)
             $this->fiches->figerHtml($interpretation);
             GenererFichePdf::dispatch($interpretation->id)->afterCommit();
+            RafraichirContextePrelevements::dispatch()->afterCommit();
 
             $this->journaliser('publication_interpretation_visite', $technicien, $interpretation, $visite);
 

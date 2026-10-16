@@ -135,7 +135,7 @@ it('ne liste à l\'éleveur que les bulletins publiés ; le technicien voit le b
         ->assertSee($this->analyse->num_echantillon_labo)->assertDontSee($this->brouillon->num_echantillon_labo);
     $this->get(route('dossier.fourrage', [$this->elevage->id, $this->brouillon->prelevement_id]))->assertNotFound();
     $this->get(route('dossier.fourrage', [$this->elevage->id, $this->analyse->prelevement_id]))->assertOk()
-        ->assertSee('Foin pauvre en azote.')->assertSee('Vaches taries')->assertSee('Repère :')->assertSee('lot L4');
+        ->assertSee('Foin pauvre en azote.')->assertSee('Vaches taries')->assertSee('Repère :')->assertSee('Où se situe ce lot dans la campagne ?');
 
     $this->actingAs($this->tech);
     $this->get(route('dossier.fourrages', $this->elevage->id))->assertOk()
@@ -158,7 +158,7 @@ it('montre la matrice minérale, l\'eau, les animaux, le bilan et l\'historique 
     $this->get(route('dossier.animaux', $this->elevage->id))->assertOk()->assertSee('Glycémie', false)->assertSee('15/01/2026');
     $this->get(route('dossier.sanitaire', $this->elevage->id))->assertOk()->assertSee('Événements sanitaires déclarés');
     $this->get(route('dossier.historique', $this->elevage->id))->assertOk()
-        ->assertSee('Visite du 15/01/2026')->assertSee('Blocs de sel iodé à volonté')->assertSee('lot L4');
+        ->assertSee('Visite du 15/01/2026')->assertSee('Blocs de sel iodé à volonté')->assertSee("Ce qui a changé d'une campagne à l'autre", false);
 });
 
 it('fait de l\'élevage de l\'adresse l\'élevage courant du sélecteur (EF-M0-08)', function () {

@@ -277,9 +277,15 @@ class ReferentielsBdd implements Referentiels
         return $contenu === '' ? [] : array_map(fn ($v) => trim($v, '"'), explode(',', $contenu));
     }
 
+    public function parametresSuivis(): array
+    {
+        return array_values(array_map('strval', $this->cache->remember(self::CLE_CACHE.'parametres_suivis', self::DUREE_CACHE,
+            fn () => DB::table('ref.parametre')->where('suivi_references', true)->orderBy('ordre')->orderBy('code')->pluck('code')->all())));
+    }
+
     public function oublier(): void
     {
-        foreach (['seuils', 'plages', 'version', 'compatibilites', 'reperes_mesures', 'regles_lecture', 'reperes_profils',
+        foreach (['parametres_suivis', 'seuils', 'plages', 'version', 'compatibilites', 'reperes_mesures', 'regles_lecture', 'reperes_profils',
             'seuils_bilan', 'troubles_croisement', 'grille_trouble_cause'] as $cle) {
             $this->cache->forget(self::CLE_CACHE.$cle);
         }

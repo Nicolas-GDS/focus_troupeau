@@ -30,11 +30,15 @@ it('déclare les GDS 24 et 47 avec leur couleur locale', function () {
 });
 
 it('rattache les élevages existants à leur GDS par le département (reprise § 5.2)', function () {
+    // Les vues de référence du lot L4 dépendent de fourrage.elevage.gds_id : retirées puis remises autour du rejeu.
+    $references = require database_path('migrations/2026_10_17_400100_references_positionnement.php');
     $migration = require database_path('migrations/2026_10_15_000100_schema_app.php');
+    $references->down();
     $migration->down();
 
     DB::insert("INSERT INTO fourrage.elevage (code_pseudo, departement) VALUES ('REPRISE-1', '47')");
     $migration->up();
+    $references->up();
 
     expect(DB::table('fourrage.elevage')->where('code_pseudo', 'REPRISE-1')->value('gds_id'))->toBe(47);
 });
