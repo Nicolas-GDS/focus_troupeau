@@ -18,6 +18,7 @@ use App\Services\ElevageCourant;
 use App\Services\Interpretation\InterpretationService;
 use App\Services\Pdf\RenduPdf;
 use App\Services\Pdf\RessourcesCharte;
+use Closure;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
@@ -85,16 +86,18 @@ class FicheVisiteService
     }
 
     /**
-     * Données de la fiche, dans l'ordre de lecture du prototype.
+     * Données de la fiche, dans l'ordre de lecture du prototype. Le filtre retient les bulletins lisibles par le
+     * lecteur (synthèse de visite E03) ; la fiche figée les prend tous, publiés avec la visite.
      *
+     * @param  (Closure(Analyse): bool)|null  $analyseLisible
      * @return array<string, mixed>
      */
-    public function donnees(InterpretationVisite $interpretation): array
+    public function donnees(InterpretationVisite $interpretation, ?Closure $analyseLisible = null): array
     {
         $visite = Visite::query()->withoutGlobalScopes()->with('elevage')->findOrFail($interpretation->visite_id);
         $elevage = $visite->elevage;
         $gds = Gds::query()->withoutGlobalScopes()->find($elevage->gds_id);
-        $lots = $this->lots($visite);
+        $lots = $this->lots($visite, $analyseLisible);
         $doses = array_unique(array_merge(...array_map(fn (array $l) => array_keys(array_filter($l['valeurs'], fn ($v) => $v['valeur'] !== null)), $lots) ?: [[]]));
         $plan = PlanAction::query()->withoutGlobalScopes()->where('interpretation_visite_id', $interpretation->id)->first();
 
@@ -138,11 +141,13 @@ class FicheVisiteService
     }
 
     /**
-     * Lots rattachés à la visite : interprétation en vigueur, valeurs du tableau des lots et de la matrice.
+     * Lots rattachés à la visite : interprétation publiée (à défaut, la version en cours, lue par les seuls agents),
+     * valeurs du tableau des lots et de la matrice.
      *
-     * @return list<array{analyse: Analyse, prelevement: Prelevement, interpretation: Interpretation|null, valeurs: array<string, array{valeur: float|null, censure: string|null, classe: string|null, gravite: int|null, decimales: int}>}>
+     * @param  (Closure(Analyse): bool)|null  $analyseLisible
+     * @return list<array{analyse: Analyse, prelevement: Prelevement, interpretation: Interpretation|null, valeurs: array<string, array{valeur: float|null, censure: string|null, classe: string|null, gravite: int|null, decimales: int, unite: string, repere: string|null, source: array{source: string|null, statut: string, a_valider: bool}|null}>}>
      */
-    private function lots(Visite $visite): array
+    private function lots(Visite $visite, ?Closure $analyseLisible = null): array
     {
         $prelevements = Prelevement::query()->withoutGlobalScopes()->with('typeFourrage')->where('visite_id', $visite->id)->get()->keyBy('id');
         $analyses = Analyse::query()->withoutGlobalScopes()->whereIn('prelevement_id', $prelevements->keys())
@@ -150,11 +155,16 @@ class FicheVisiteService
         $lots = [];
 
         foreach ($analyses as $analyse) {
-            $interpretation = $this->interpretations->courante($analyse);
+            if ($analyseLisible !== null && ! $analyseLisible($analyse)) {
+                continue;
+            }
+
+            $interpretation = $this->interpretations->publiee($analyse) ?? $this->interpretations->courante($analyse);
             $valeurs = [];
             foreach ($this->interpretations->lignesResultats($analyse, $interpretation?->categorie_cible_code) as $ligne) {
                 $valeurs[$ligne['code']] = ['valeur' => $ligne['valeur'], 'censure' => $ligne['censure'], 'classe' => $ligne['classe'],
-                    'gravite' => $ligne['gravite'], 'decimales' => $ligne['decimales']];
+                    'gravite' => $ligne['gravite'], 'decimales' => $ligne['decimales'], 'unite' => $ligne['unite'], 'repere' => $ligne['repere'],
+                    'source' => Affichage::sourceSeuil($ligne['source'], $ligne['statut'], $ligne['a_valider'])];
             }
 
             $lots[] = ['analyse' => $analyse, 'prelevement' => $prelevements[$analyse->prelevement_id], 'interpretation' => $interpretation, 'valeurs' => $valeurs];

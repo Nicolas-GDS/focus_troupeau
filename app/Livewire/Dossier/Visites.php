@@ -5,6 +5,7 @@ namespace App\Livewire\Dossier;
 use App\Models\App\User;
 use App\Models\Dossier\Visite;
 use App\Models\Fourrage\Elevage;
+use App\Services\Cloisonnement\RegleStatut;
 use App\Services\Dossier\VisiteService;
 use App\Services\ElevageCourant;
 use Illuminate\Contracts\View\View;
@@ -61,6 +62,9 @@ class Visites extends Component
             'peutCreer' => $elevage !== null && Gate::allows('create', [Visite::class, $elevage]),
             'peutSaisir' => fn (Visite $v) => Gate::allows('update', $v),
             'motifs' => self::motifs(),
+            'agent' => app(RegleStatut::class)->voitTousLesStatuts($this->utilisateur()),
+            // Synthèse E03 : rôles des volets du dossier (annexe 10) ; l'administrateur garde la vue de saisie
+            'lireDossier' => $this->utilisateur()->hasAnyRole(['eleveur', 'veterinaire', 'technicien', 'veterinaire_gds']),
         ])->layout('components.layouts.espace', ['titre' => 'Visites']);
     }
 

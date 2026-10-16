@@ -8,6 +8,7 @@ use App\Domain\Referentiels\Referentiels;
 use App\Models\App\User;
 use App\Models\Dossier\Visite;
 use App\Models\Fourrage\AnalyseAnimale;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -54,7 +55,18 @@ class ProfilsService
      */
     public function lignes(Visite $visite): array
     {
-        return AnalyseAnimale::query()->where('visite_id', $visite->id)->orderBy('date_prelevement')->orderBy('parametre')->get()
+        return $this->lignesDe(AnalyseAnimale::query()->where('visite_id', $visite->id)->orderBy('date_prelevement')->orderBy('parametre')->get());
+    }
+
+    /**
+     * Lignes d'un ensemble de profils déjà choisi (volet Animaux E07 : profils lisibles de l'élevage, par date).
+     *
+     * @param  Collection<int, AnalyseAnimale>  $profils
+     * @return list<array{profil: AnalyseAnimale, repere: string|null, lecture: LectureProfil|null, unite_differente: bool, source: array{source: string|null, statut: string, a_valider: bool}|null}>
+     */
+    public function lignesDe(Collection $profils): array
+    {
+        return $profils
             ->map(function (AnalyseAnimale $profil) {
                 $repere = $this->lecteur()->repere($profil->parametre, $profil->matrice, $profil->espece_code, $this->referentiels->reperesProfilsSanguins());
 

@@ -24,11 +24,16 @@ use RuntimeException;
  * priorisées (1 à 3), chacune avec un responsable, un « comment », un « quand » (date ou jalon du calendrier
  * d'élevage) et ses contrôles (mesure, cible, échéance). Sur le plan publié : l'éleveur marque « faites » ses
  * actions, le technicien saisit le résultat des contrôles ; le vétérinaire conseil valide les actions vétérinaires.
+ * En mode « publiée » (volet E11), le composant montre toujours la dernière version publiée, même pour un agent
+ * qui prépare la version suivante.
  */
 class PlanActions extends Component
 {
     #[Locked]
     public int $visiteId;
+
+    #[Locked]
+    public bool $publiee = false;
 
     /** @var array{priorite: string, responsable: string, titre: string, comment: string, quand: string, echeance: string, jalon: string} */
     public array $action = ['priorite' => '1', 'responsable' => 'eleveur', 'titre' => '', 'comment' => '', 'quand' => '', 'echeance' => '', 'jalon' => ''];
@@ -42,9 +47,10 @@ class PlanActions extends Component
     /** @var array<int, string> commentaire de l'éleveur par action */
     public array $commentaires = [];
 
-    public function mount(int $visiteId): void
+    public function mount(int $visiteId, bool $publiee = false): void
     {
         $this->visiteId = $visiteId;
+        $this->publiee = $publiee;
         $this->authorize('view', Visite::query()->findOrFail($visiteId));
     }
 
@@ -157,9 +163,15 @@ class PlanActions extends Component
     {
         $service = app(InterpretationVisiteService::class);
         $visite = Visite::query()->findOrFail($this->visiteId);
-        $courante = $service->courante($visite);
+        $courante = $this->publiee ? null : $service->courante($visite);
 
-        return $courante === null || Gate::allows('view', $courante) ? $courante : $service->publiee($visite);
+        if ($courante !== null && Gate::allows('view', $courante)) {
+            return $courante;
+        }
+
+        $publiee = $service->publiee($visite);
+
+        return $publiee !== null && Gate::allows('view', $publiee) ? $publiee : null;
     }
 
     private function interpretationAutorisee(): InterpretationVisite

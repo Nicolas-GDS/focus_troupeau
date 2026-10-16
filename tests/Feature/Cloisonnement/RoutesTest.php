@@ -21,6 +21,9 @@ use Tests\Support\JeuCloisonnement;
 |   connecte    : tout compte connecté
 |   roles       : compte connecté ayant l'un des rôles listés (sinon 403)
 |   elevage     : action portant sur un élevage passé dans la requête — 404 hors périmètre
+|   dossier     : volet du dossier /elevages/{elevage}/… (E04 à E11) — rôles de ROLES_DOSSIER, 404 hors périmètre ;
+|                 appelé ici pour chaque élevage J4 ; contenu publié / non publié testé dans
+|                 tests/Feature/Dossier/LectureDossierTest.php
 |   objet       : route portant sur un objet (signée + policy), testée avec ses objets dans le fichier de l'écran
 |
 */
@@ -85,7 +88,21 @@ const REGISTRE_ROUTES = [
     'GET notes-liaison/{note}' => ['acces' => 'objet'],
     'GET notes-liaison/{note}/pdf' => ['acces' => 'objet'],
     'GET admin/referentiels/{table}' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global'], 'statut' => 404],
+    // Lot L3, étape 7 — dossier en lecture (E03 à E11, annexe 10) ; objets testés dans tests/Feature/Dossier/LectureDossierTest.php
+    'GET elevages/{elevage}/visites/{visite}' => ['acces' => 'objet'],
+    'GET elevages/{elevage}/fourrages' => ['acces' => 'dossier'],
+    'GET elevages/{elevage}/fourrages/{prelevement}' => ['acces' => 'objet'],
+    'GET elevages/{elevage}/mineraux-matrice' => ['acces' => 'dossier'],
+    'GET elevages/{elevage}/eau' => ['acces' => 'dossier'],
+    'GET elevages/{elevage}/animaux' => ['acces' => 'dossier'],
+    'GET elevages/{elevage}/aliments' => ['acces' => 'dossier'],
+    'GET elevages/{elevage}/sanitaire' => ['acces' => 'dossier'],
+    'GET elevages/{elevage}/historique' => ['acces' => 'dossier'],
+    'GET elevages/{elevage}/plan-action' => ['acces' => 'dossier'],
 ];
+
+/** Rôles des volets du dossier (annexe 10 : éleveur, technicien, vétérinaire ; vétérinaire conseil pour E07, E11, E21). */
+const ROLES_DOSSIER = ['eleveur', 'veterinaire', 'technicien', 'veterinaire_gds'];
 
 /**
  * Routes de cadriciel hors registre : leur sécurité relève de chaque composant qui les utilise.
@@ -150,7 +167,7 @@ it('déclare chaque route de l\'application dans le registre de cloisonnement', 
 
 it('protège chaque route de l\'espace : un visiteur est renvoyé vers la connexion', function (string $cle) {
     appeler($cle)->assertRedirect(route('login'));
-})->with(fn () => array_keys(array_filter(REGISTRE_ROUTES, fn ($r) => in_array($r['acces'], ['connecte', 'roles', 'elevage', 'objet'], true))));
+})->with(fn () => array_keys(array_filter(REGISTRE_ROUTES, fn ($r) => in_array($r['acces'], ['connecte', 'roles', 'elevage', 'dossier', 'objet'], true))));
 
 it('renvoie un compte connecté vers son espace depuis les pages de connexion', function (string $cle) {
     $jeu = JeuCloisonnement::creer();
@@ -196,6 +213,32 @@ it('n\'affiche aucun élevage hors du périmètre, sur aucune page (aucun accès
         foreach ($horsPerimetre as $code => $elevage) {
             expect(str_contains($page, $code))->toBeFalse("{$profil} → {$cle} affiche {$code}")
                 ->and(str_contains($page, $elevage['raison_sociale']))->toBeFalse("{$profil} → {$cle} affiche {$elevage['raison_sociale']}");
+        }
+    }
+})->with(array_keys(PERIMETRES_J4));
+
+it('ouvre chaque volet du dossier aux seuls rôles prévus et à aucun élevage hors périmètre (E04 à E11)', function (string $profil) {
+    $jeu = JeuCloisonnement::creer();
+    $user = $jeu->{$profil};
+    $this->actingAs($user);
+    $elevages = ['J4-24A' => $jeu->elevage24a, 'J4-24B' => $jeu->elevage24b, 'J4-47' => $jeu->elevage47];
+    $horsPerimetre = collect(JeuJ4Seeder::ELEVAGES)->except(PERIMETRES_J4[$profil]);
+
+    foreach (array_keys(array_filter(REGISTRE_ROUTES, fn ($r) => $r['acces'] === 'dossier')) as $cle) {
+        foreach ($elevages as $code => $elevage) {
+            $url = '/'.str_replace('{elevage}', $elevage->id, explode(' ', $cle, 2)[1]);
+            $dansPerimetre = in_array($code, PERIMETRES_J4[$profil], true);
+            $attendu = ! $dansPerimetre ? 404 : ($user->hasAnyRole(ROLES_DOSSIER) ? 200 : 403);
+            $reponse = $this->get($url);
+
+            expect($reponse->status())->toBe($attendu, "{$profil} → {$cle} ({$code})");
+
+            if ($attendu === 200) {
+                foreach ($horsPerimetre as $autre => $donnees) {
+                    expect(str_contains((string) $reponse->getContent(), $autre))->toBeFalse("{$profil} → {$cle} affiche {$autre}")
+                        ->and(str_contains((string) $reponse->getContent(), $donnees['raison_sociale']))->toBeFalse("{$profil} → {$cle} affiche {$donnees['raison_sociale']}");
+                }
+            }
         }
     }
 })->with(array_keys(PERIMETRES_J4));

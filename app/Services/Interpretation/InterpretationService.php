@@ -58,6 +58,18 @@ class InterpretationService
     }
 
     /**
+     * Dernière version publiée d'une analyse : celle que lisent l'éleveur et le vétérinaire d'élevage (§ 2.3).
+     */
+    public function publiee(Analyse $analyse): ?Interpretation
+    {
+        return Interpretation::query()->withoutGlobalScopes()
+            ->where('analyse_id', $analyse->id)
+            ->where('statut', Interpretation::STATUT_PUBLIE)
+            ->orderByDesc('version')
+            ->first();
+    }
+
+    /**
      * Crée le brouillon d'un bulletin contrôlé (EF-M2-02) : alertes automatiques de la grille active, niveau proposé.
      * La catégorie cible reprend, à défaut, la destination du prélèvement.
      */
@@ -320,7 +332,7 @@ class InterpretationService
      * Résultats du bulletin, chacun avec sa classe, son repère et sa source (EF-M2-02, EF-GEN-02, EF-GEN-03),
      * classés pour la catégorie cible donnée.
      *
-     * @return list<array{code: string, libelle: string, valeur: float|null, censure: string|null, unite: string, decimales: int, calcule: bool, anomalie: bool, classe: string|null, gravite: int|null, repere: string|null, source: string|null, statut: StatutEpistemique|null}>
+     * @return list<array{code: string, libelle: string, valeur: float|null, censure: string|null, unite: string, decimales: int, calcule: bool, anomalie: bool, classe: string|null, gravite: int|null, repere: string|null, source: string|null, statut: StatutEpistemique|null, a_valider: bool}>
      */
     public function lignesResultats(Analyse $analyse, ?string $categorieCible): array
     {
@@ -364,6 +376,7 @@ class InterpretationService
                 'repere' => $seuil === null ? null : self::repere($seuil->borneMin, $seuil->borneMax, (string) $r->unite),
                 'source' => $seuil?->referenceId === null ? null : ($sources[$seuil->referenceId] ?? null),
                 'statut' => $seuil?->statutEpistemique,
+                'a_valider' => $seuil !== null && ! $seuil->valide,
             ];
         }
 

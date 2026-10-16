@@ -3,6 +3,8 @@
     @if (! $elevage)
         <p class="carte text-texte-doux">Aucun élevage n'est accessible.</p>
     @else
+        @if ($lireDossier) @include('livewire.dossier.lecture.partiels.entete', ['courant' => 'visites']) @endif
+
         <section class="carte" aria-labelledby="titre-elevage">
             <h2 id="titre-elevage" class="text-lg font-semibold">{{ $libelleElevage }} ({{ $elevage->code_pseudo }})</h2>
             <p class="mt-1 text-sm text-texte-doux">Visites d'approche globale : une date, un technicien, un motif, des prélèvements, des mesures et des observations.</p>
@@ -51,7 +53,8 @@
                             </div>
                             <div class="flex items-center gap-3">
                                 <x-pastille :etat="$statut['etat']" :libelle="$statut['libelle']" />
-                                <a href="{{ route('visites.saisie', $visite->id) }}" class="lien">{{ $peutSaisir($visite) ? 'Saisir' : 'Consulter' }}</a>
+                                @if ($lireDossier) <a href="{{ route('dossier.visite', [$elevage->id, $visite->id]) }}" class="lien">Synthèse</a> @endif
+                                @if ($agent) <a href="{{ route('visites.saisie', $visite->id) }}" class="lien">{{ $peutSaisir($visite) ? 'Saisir' : 'Consulter la saisie' }}</a> @endif
                             </div>
                         </li>
                     @endforeach

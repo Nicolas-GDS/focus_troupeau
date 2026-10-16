@@ -3,6 +3,7 @@
 namespace App\Services\Dossier;
 
 use App\Domain\Dossier\Repere;
+use App\Domain\Referentiels\StatutEpistemique;
 use App\Services\Interpretation\InterpretationService;
 use Illuminate\Support\Facades\DB;
 
@@ -45,6 +46,16 @@ final class Affichage
             'statut' => $repere->statutEpistemique->libelle().' ['.$repere->statutEpistemique->codeSpecifications().']',
             'a_valider' => $repere->aValider(),
         ];
+    }
+
+    /**
+     * Source d'un seuil de la grille (ligne de résultat d'un bulletin), prête à afficher ; null sans seuil.
+     *
+     * @return array{source: string|null, statut: string, a_valider: bool}|null
+     */
+    public static function sourceSeuil(?string $source, ?StatutEpistemique $statut, bool $aValider): ?array
+    {
+        return $statut === null ? null : ['source' => $source, 'statut' => $statut->libelle().' ['.$statut->codeSpecifications().']', 'a_valider' => $aValider];
     }
 
     /**

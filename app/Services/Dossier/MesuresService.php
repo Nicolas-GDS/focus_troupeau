@@ -10,6 +10,7 @@ use App\Domain\Referentiels\Referentiels;
 use App\Models\App\User;
 use App\Models\Dossier\MesureTerrain;
 use App\Models\Dossier\Visite;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -84,10 +85,20 @@ class MesuresService
      */
     public function groupes(Visite $visite): array
     {
+        return $this->groupesDe(MesureTerrain::query()->where('visite_id', $visite->id)->orderBy('date_mesure')->orderBy('id')->get());
+    }
+
+    /**
+     * Groupes d'un ensemble de mesures déjà choisi (volet Animaux E07 : mesures lisibles de l'élevage, par date).
+     *
+     * @param  Collection<int, MesureTerrain>  $lignes
+     * @return list<array{espece: string|null, stade: string|null, libelle: string, mesures: list<array<string, mixed>>, lectures: list<array{libelle: string, source: array{source: string|null, statut: string, a_valider: bool}}>}>
+     */
+    public function groupesDe(Collection $lignes): array
+    {
         $reperes = $this->referentiels->reperesMesuresTerrain();
         $regles = $this->referentiels->reglesLectureMesures();
         $refs = DB::table('ref.mesure_terrain')->orderBy('ordre')->get()->keyBy('code');
-        $lignes = MesureTerrain::query()->where('visite_id', $visite->id)->orderBy('date_mesure')->orderBy('id')->get();
         $groupes = [];
 
         foreach ($lignes->groupBy(fn (MesureTerrain $m) => ($m->espece_code ?? '').'|'.($m->stade ?? '')) as $cle => $mesuresGroupe) {

@@ -31,6 +31,9 @@ class EtiquetteAliment extends Model
 
     public const NATURES = ['mineral', 'bolus', 'seau', 'sel', 'concentre', 'autre'];
 
+    /** Libellés des natures (affichage). */
+    public const LIBELLES_NATURES = ['mineral' => 'Minéral', 'bolus' => 'Bolus', 'seau' => 'Seau à lécher', 'sel' => 'Sel', 'concentre' => 'Aliment concentré', 'autre' => 'Autre'];
+
     public const STATUT_SAISIE = 'saisie';
 
     public const STATUT_VALIDEE = 'validee';
