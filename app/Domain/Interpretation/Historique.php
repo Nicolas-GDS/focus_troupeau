@@ -22,6 +22,35 @@ final class Historique
     }
 
     /**
+     * Points de la série à partir des valeurs des lots, par campagne : médiane des lots du même type (interpolation
+     * linéaire, comme percentile_cont(0,5)).
+     *
+     * @param  array<string, list<float>>  $valeursParCampagne
+     * @return list<PointHistorique>
+     */
+    public function points(array $valeursParCampagne): array
+    {
+        $points = [];
+
+        foreach ($valeursParCampagne as $campagne => $valeurs) {
+            if ($valeurs !== []) {
+                $points[] = new PointHistorique((string) $campagne, self::mediane($valeurs), count($valeurs));
+            }
+        }
+
+        return $this->serie($points);
+    }
+
+    /** @param  non-empty-list<float>  $valeurs */
+    public static function mediane(array $valeurs): float
+    {
+        sort($valeurs);
+        $milieu = intdiv(count($valeurs), 2);
+
+        return count($valeurs) % 2 === 1 ? $valeurs[$milieu] : ($valeurs[$milieu - 1] + $valeurs[$milieu]) / 2;
+    }
+
+    /**
      * @param  list<PointHistorique>  $points
      */
     public function variation(array $points): ?Variation

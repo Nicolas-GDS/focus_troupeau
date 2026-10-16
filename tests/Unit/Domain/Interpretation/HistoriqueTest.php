@@ -30,3 +30,9 @@ it('rapporte une baisse d\'une valeur négative à sa valeur absolue (BPR)', fun
 
     expect($v->ecart)->toBe(-10.0)->and($v->pourcentage)->toBe(-25.0);
 });
+
+it('calcule la médiane des lots de chaque campagne, comme percentile_cont(0,5)', function () {
+    $points = (new Historique)->points(['2025-2026' => [74.0, 60.0], '2024-2025' => [55.0], '2023-2024' => [70.0, 50.0, 90.0]]);
+
+    expect(array_map(fn ($p) => [$p->campagne, $p->valeur, $p->n], $points))->toBe([['2023-2024', 70.0, 3], ['2024-2025', 55.0, 1], ['2025-2026', 67.0, 2]]);
+});

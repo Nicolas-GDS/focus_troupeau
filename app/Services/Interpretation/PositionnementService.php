@@ -151,23 +151,24 @@ class PositionnementService
      *
      * @return list<PointHistorique>
      */
-    public function rappels(Prelevement $prelevement, string $parametre): array
+    public function rappels(Prelevement $prelevement, string $parametre, bool $publiesSeulement = false): array
     {
         if ($prelevement->campagne_code === null) {
             return [];
         }
 
-        return array_values(array_filter($this->historique($prelevement->elevage_id, $prelevement->type_fourrage_code, $parametre)['points'],
+        return array_values(array_filter($this->historique($prelevement->elevage_id, $prelevement->type_fourrage_code, $parametre, $publiesSeulement)['points'],
             fn (PointHistorique $p) => strcmp($p->campagne, (string) $prelevement->campagne_code) < 0));
     }
 
     /**
      * Graphiques de positionnement d'un bulletin (E04, EF-M3-01 à EF-M3-03) : pour chaque paramètre suivi et dosé, ses
-     * populations dans l'ordre de RC-3, chacune avec sa position, ses points et son libellé.
+     * populations dans l'ordre de RC-3, chacune avec sa position, ses points et son libellé ; rappel des campagnes
+     * précédentes limité aux lots publiés pour un lecteur externe.
      *
      * @return list<array{code: string, libelle: string, unite: string, decimales: int, valeur: float, rappels: list<PointHistorique>, populations: list<array{reference: ReferenceQuartiles, position: Position, valeurs: list<float>, libelle: string}>}>
      */
-    public function graphiques(Analyse $analyse): array
+    public function graphiques(Analyse $analyse, bool $publiesSeulement = false): array
     {
         $prelevement = Prelevement::query()->withoutGlobalScopes()->findOrFail($analyse->prelevement_id);
         $parametres = DB::table('ref.parametre')->whereIn('code', $this->referentiels->parametresSuivis())->get()->keyBy('code');
@@ -178,7 +179,7 @@ class PositionnementService
             'unite' => (string) $parametres[$ligne['code']]->unite,
             'decimales' => (int) $parametres[$ligne['code']]->decimales,
             'valeur' => $ligne['valeur'],
-            'rappels' => $this->rappels($prelevement, $ligne['code']),
+            'rappels' => $this->rappels($prelevement, $ligne['code'], $publiesSeulement),
             'populations' => array_map(fn (array $p) => [
                 ...$p,
                 'valeurs' => $this->valeursPopulation($prelevement, $ligne['code'], $p['reference']->population),
@@ -254,17 +255,20 @@ class PositionnementService
 
     /**
      * Série pluriannuelle d'un élevage pour un type de fourrage et un paramètre, et variation entre les deux dernières
-     * campagnes (RC-4).
+     * campagnes (RC-4). Pour un lecteur externe (éleveur, vétérinaire d'élevage), seuls les lots publiés comptent.
      *
      * @return array{points: list<PointHistorique>, variation: Variation|null}
      */
-    public function historique(string $elevageId, string $typeFourrage, string $parametre): array
+    public function historique(string $elevageId, string $typeFourrage, string $parametre, bool $publiesSeulement = false): array
     {
-        $points = DB::table('valo.v_historique_elevage')
+        $valeurs = DB::table('valo.v_historique_elevage')
             ->where(['elevage_id' => $elevageId, 'type_fourrage_code' => $typeFourrage, 'parametre_code' => $parametre])
-            ->get()->map(fn ($l) => new PointHistorique((string) $l->campagne_code, (float) $l->mediane, (int) $l->n))->values()->all();
+            ->when($publiesSeulement, fn ($q) => $q->where('publie', true))
+            ->get()->groupBy('campagne_code')
+            ->map(fn ($lignes) => $lignes->map(fn ($l) => (float) $l->valeur)->values()->all())->all();
+        $points = $this->historique->points($valeurs);
 
-        return ['points' => $this->historique->serie($points), 'variation' => $this->historique->variation($points)];
+        return ['points' => $points, 'variation' => $this->historique->variation($points)];
     }
 
     private function quartiles(string $population, ?object $ligne): ?ReferenceQuartiles

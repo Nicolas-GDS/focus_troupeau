@@ -158,7 +158,7 @@ it('montre la matrice minérale, l\'eau, les animaux, le bilan et l\'historique 
     $this->get(route('dossier.animaux', $this->elevage->id))->assertOk()->assertSee('Glycémie', false)->assertSee('15/01/2026');
     $this->get(route('dossier.sanitaire', $this->elevage->id))->assertOk()->assertSee('Événements sanitaires déclarés');
     $this->get(route('dossier.historique', $this->elevage->id))->assertOk()
-        ->assertSee('Visite du 15/01/2026')->assertSee('Blocs de sel iodé à volonté')->assertSee('lot L4');
+        ->assertSee('Visite du 15/01/2026')->assertSee('Blocs de sel iodé à volonté')->assertSee("Ce qui a changé d'une campagne à l'autre", false);
 });
 
 it('fait de l\'élevage de l\'adresse l\'élevage courant du sélecteur (EF-M0-08)', function () {
