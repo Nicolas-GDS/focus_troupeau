@@ -437,7 +437,7 @@ CREATE TABLE plan.levier_ligne (
 | `valo.v_reference_gds` | Quartiles par campagne × GDS × type de fourrage × paramètre, n toujours donné (RC-3, population départementale ; lot L4) |
 | `valo.v_reference_litho` | Idem restreinte à la classe lithologique du prélèvement (RC-3 ; lot L4) |
 | `valo.v_reference_bigds` | Quartiles par type de fourrage et campagne sur les deux GDS (RC-3, repli) |
-| `valo.v_historique_elevage` | Série par élevage × type × paramètre × campagne (RC-4) |
+| `valo.v_historique_elevage` | Lots valides par élevage × type × paramètre × campagne, avec l'indicateur de publication (RC-4 ; médiane par le domaine, lot L4) |
 | `valo.v_resultat_large` | Existante ; étendue aux paramètres calculés (ratios RC-1) |
 | `valo.v_couverture_lot` | Dernier calcul RC-9 par lot d'animaux et phase (matérialisé dans `plan.bilan.detail`) |
 | `valo.v_pilotage` | Indicateurs EF-M10-04 |
