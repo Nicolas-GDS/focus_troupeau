@@ -11,8 +11,10 @@ use App\Models\Plan\Ration;
 use App\Models\Plan\RationComposant;
 use App\Models\Stock\Inventaire;
 use App\Models\Stock\LotStock;
+use App\Services\Cloisonnement\RegleStatut;
 use App\Services\Dossier\SaisieRefusee;
 use App\Services\ElevageCourant;
+use App\Services\Troupeau\AnalyseRationService;
 use App\Services\Troupeau\TroupeauService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -24,7 +26,8 @@ use Livewire\Component;
 
 /**
  * E13 — troupeau : lots d'animaux, phases, rations (EF-M5-01 à EF-M5-06) pour l'inventaire courant de l'élevage (ou un
- * inventaire choisi) ; besoins par les deux voies (RC-8) ; copie d'un inventaire précédent. Saisie conçue pour le
+ * inventaire choisi) ; besoins par les deux voies (RC-8) ; apports, couverture et contrôles par phase (RC-9,
+ * EF-M5-03) ; affectation fourrage → lot d'animaux (EF-M5-05) ; copie d'un inventaire précédent. Saisie conçue pour le
  * téléphone ; chaque action est autorisée côté serveur (PlanPolicy, ENF-SEC-04).
  */
 class Troupeau extends Component
@@ -154,17 +157,27 @@ class Troupeau extends Component
         $this->executer(fn () => $service->copierDepuis($source, $cible), 'Lots, phases et rations copiés de l\'inventaire du '.$source->date_inventaire->format('d/m/Y').'.');
     }
 
-    public function render(TroupeauService $service): View
+    public function render(TroupeauService $service, AnalyseRationService $analyse): View
     {
         $elevage = $this->elevage();
         $inventaire = $this->inventaireChoisi();
+        $besoins = $inventaire === null ? null : $service->besoins($inventaire);
+        $externe = ! app(RegleStatut::class)->voitTousLesStatuts($this->lecteur());
+        $analyses = [];
+        foreach ($besoins['lots'] ?? [] as $ligne) {
+            foreach ($ligne['phases'] as $p) {
+                $analyses[$p['phase']->id] = $analyse->analyser($p['phase'], $ligne['lot'], $externe);
+            }
+        }
 
         return view('livewire.troupeau.troupeau', [
             'elevage' => $elevage,
             'libelleElevage' => ElevageCourant::libelle(app(ElevageCourant::class)->accessibles()->firstWhere('id', $elevage->id) ?? $elevage),
             'inventaireCourant' => $inventaire,
             'inventaires' => Inventaire::query()->where('elevage_id', $elevage->id)->orderByDesc('date_inventaire')->get(),
-            'besoins' => $inventaire === null ? null : $service->besoins($inventaire),
+            'besoins' => $besoins,
+            'analyses' => $analyses,
+            'affectation' => $inventaire === null ? [] : $analyse->affectation($inventaire, $externe),
             'peutSaisir' => $inventaire !== null && Gate::allows('create', [LotAnimaux::class, $elevage]) && $inventaire->statut === Inventaire::STATUT_COURANT,
             'categories' => DB::table('ref.categorie_animale as c')->leftJoin('ref.coefficient_ugb as u', 'u.code', '=', 'c.coefficient_ugb_code')
                 ->orderBy('c.espece_code')->orderBy('c.libelle')->get(['c.code', 'c.libelle', 'u.coefficient']),

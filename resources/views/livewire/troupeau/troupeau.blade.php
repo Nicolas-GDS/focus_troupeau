@@ -93,6 +93,7 @@
                                 @if ($ration->composants->isEmpty()) <li class="text-texte-doux">Ration à décrire.</li> @endif
                             </ul>
                             <p class="mt-2 text-xs text-texte-doux">Distribution : {{ $distributionsProposees[$ration->mode_distribution] ?? 'non précisée' }} · pertes {{ $pct($ration->pertes_distribution_pct) }}</p>
+                            @if ($ration->composants->isNotEmpty()) @include('livewire.troupeau.partiels.couverture', ['analyse' => $analyses[$phase->id]]) @endif
 
                             @if ($peutSaisir)
                                 <details class="mt-2">
@@ -166,6 +167,27 @@
         @endforeach
 
         @if ($besoins['lots'] === []) <p class="carte text-texte-doux">Aucun lot d'animaux pour cet inventaire.</p> @endif
+
+        {{-- Affectation fourrage → lot d'animaux (EF-M5-05) --}}
+        @if ($affectation !== [])
+            <section class="carte" aria-labelledby="titre-affectation">
+                <h2 id="titre-affectation" class="text-lg font-semibold">Qui mange quoi</h2>
+                <ul class="mt-2 space-y-3 text-sm">
+                    @foreach ($affectation as $a)
+                        <li wire:key="affectation-{{ $a['lot']->id }}">
+                            <p class="font-medium">{{ $a['lot']->libelle }}</p>
+                            @if ($a['conseillee']) <p class="text-texte-doux">Utilisation conseillée : {{ $a['conseillee'] }}</p> @endif
+                            <ul class="mt-1 space-y-1 pl-3">
+                                @foreach ($a['consommateurs'] as $c)
+                                    <li>{{ $c['lot']->libelle }} ({{ $stades[$c['phase']->stade] ?? $c['phase']->stade }}, du {{ $c['phase']->date_debut->format('d/m/Y') }} au {{ $c['phase']->date_fin->format('d/m/Y') }}) : {{ Affichage::nombre($c['t_ms_jour'], 3) }} t MS/j
+                                        @if ($c['deconseille']) <x-pastille etat="vigilance" libelle="Lot déconseillé pour cette catégorie" /> @endif</li>
+                                @endforeach
+                            </ul>
+                        </li>
+                    @endforeach
+                </ul>
+            </section>
+        @endif
 
         @if ($peutSaisir)
             <section class="carte" aria-labelledby="titre-nouveau-lot">
