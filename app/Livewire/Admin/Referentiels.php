@@ -25,7 +25,10 @@ use RuntimeException;
  */
 class Referentiels extends Component
 {
-    public const TABLES = ['seuils' => 'Grille de seuils', 'plages' => 'Plages de plausibilité'];
+    public const TABLES = ['seuils' => 'Grille de seuils', 'plages' => 'Plages de plausibilité', 'parametres' => 'Paramètres par défaut', 'textes' => 'Textes types'];
+
+    /** Tables éditées par un composant dédié (lot L7). */
+    public const COMPOSANTS = ['parametres' => 'admin.parametres-defaut', 'textes' => 'admin.textes-types'];
 
     #[Locked]
     public string $table = 'seuils';
@@ -52,7 +55,7 @@ class Referentiels extends Component
 
     public function mount(string $table): void
     {
-        abort_unless(array_key_exists($table, self::TABLES), 404);
+        abort_unless(array_key_exists($table, self::TABLES) && ! array_key_exists($table, self::COMPOSANTS), 404);
         $this->authorize('viewAny', VersionReferentiel::class);
 
         $this->table = $table;

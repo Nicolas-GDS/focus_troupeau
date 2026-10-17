@@ -16,6 +16,7 @@ use Database\Seeders\JeuJ3Seeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use Tests\Support\RenduChromium;
 
 // Recette du lot L3 sur J3 (§ 9.1, § 9.3 : « première fiche de visite publiée ») : les neuf lots d'ELV-0001 du
 // document 04, les constats du prototype retrouvés par la grille, le circuit complet jusqu'à la fiche publiée
@@ -157,8 +158,7 @@ it('T-26 sur J3 : rend la fiche des neuf lots en PDF avec Chromium en moins de 1
 
     interpreterLotsJ3();
     $iv = publierVisiteJ3();
-    $debut = microtime(true);
-    $pdf = (new RenduBrowsershot)->pdf((string) Storage::disk('local')->get((string) $iv->fiche_html), app(FicheVisiteService::class)->piedDePage($iv));
+    [$pdf, $duree] = RenduChromium::mesurer(fn () => (new RenduBrowsershot)->pdf((string) Storage::disk('local')->get((string) $iv->fiche_html), app(FicheVisiteService::class)->piedDePage($iv)));
 
-    expect($pdf)->toStartWith('%PDF')->and(microtime(true) - $debut)->toBeLessThan(10.0);
+    expect($pdf)->toStartWith('%PDF')->and(RenduChromium::dansLeSeuil($duree))->toBeTrue("Rendu en {$duree} s (seuil de T-26 : 10 s)");
 });

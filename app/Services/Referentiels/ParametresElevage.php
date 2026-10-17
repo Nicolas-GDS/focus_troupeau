@@ -100,15 +100,20 @@ class ParametresElevage
 
     private function controler(string $unite, float $valeur): void
     {
-        $valide = match (true) {
-            $unite === 'fraction' => $valeur >= 0 && $valeur < 1,
-            str_starts_with($unite, '%') => $valeur > 0 && $valeur <= 100,
-            default => $valeur >= 0,
-        };
-        if (! $valide) {
-            throw new SaisieRefusee($unite === 'fraction' ? 'Saisir une fraction entre 0 et 1 (par exemple 0,05 pour 5 %).'
-                : (str_starts_with($unite, '%') ? 'Saisir un pourcentage entre 0 et 100.' : 'Saisir une valeur positive.'));
+        $erreur = self::erreurValeur($unite, $valeur);
+        if ($erreur !== null) {
+            throw new SaisieRefusee($erreur);
         }
+    }
+
+    /** Bornes d'une valeur selon son unité : fraction dans [0 ; 1[, pourcentage dans ]0 ; 100], sinon positive. */
+    public static function erreurValeur(string $unite, float $valeur): ?string
+    {
+        return match (true) {
+            $unite === 'fraction' => $valeur >= 0 && $valeur < 1 ? null : 'Saisir une fraction entre 0 et 1 (par exemple 0,05 pour 5 %).',
+            str_starts_with($unite, '%') => $valeur > 0 && $valeur <= 100 ? null : 'Saisir un pourcentage entre 0 et 100.',
+            default => $valeur >= 0 ? null : 'Saisir une valeur positive.',
+        };
     }
 
     /** @return list<object{cle: string, valeur: string, unite: string, libelle: string, source: string|null, statut_epistemique: string}> références en vigueur (valeur du GDS, à défaut nationale) */
