@@ -5,7 +5,8 @@
         'code_postal' => 'Code postal', 'telephone' => 'Téléphone', 'courriel' => 'E-mail', 'num_client_labo' => 'N° client laboratoire'];
 @endphp
 <div class="space-y-6">
-    <p class="text-texte-doux"><a href="{{ route('elevages') }}" class="lien">élevages</a> · {{ $elevage->code_pseudo }} · GDS {{ $elevage->gds_id }}</p>
+    <p class="text-texte-doux"><a href="{{ route('elevages') }}" class="lien">élevages</a> · {{ $elevage->code_pseudo }} · GDS {{ $elevage->gds_id }}
+        @if ($peutExporter) · <a href="{{ route('export.rationnement', $elevage->id) }}" class="lien">export rationnement (CSV)</a> · <a href="{{ route('export.donnees', $elevage->id) }}" class="lien">données de l'élevage (ZIP)</a> @endif</p>
     @if (session('status')) <p class="rounded-md border border-etat-couvert bg-etat-couvert-fond p-3 text-sm" role="status">{{ session('status') }}</p> @endif
 
     <section class="carte" aria-labelledby="titre-identite">
@@ -92,4 +93,16 @@
             <button type="button" wire:click="accorderReferences" class="bouton-secondaire mt-2">Enregistrer le consentement « références »</button>
         @endif
     </section>
+
+    @if ($peutAnonymiser)
+        <section class="carte" aria-labelledby="titre-anonymisation">
+            <h2 id="titre-anonymisation" class="text-lg font-semibold">Anonymisation (demande RGPD)</h2>
+            <p class="text-sm text-texte-doux">Irréversible : l'identité et les coordonnées sont effacées, les comptes éleveurs anonymisés et désactivés, la convention résiliée ; les données pseudonymisées restent. Exporter d'abord les données si l'éleveur les demande.</p>
+            @error('anonymisation') <p class="mt-2 text-sm text-etat-critique" role="alert">{{ $message }}</p> @enderror
+            <form wire:submit="anonymiser" class="mt-2 flex flex-wrap items-end gap-2">
+                <div class="grow"><label for="motif-anon" class="etiquette">Demande (date, canal)</label><input id="motif-anon" type="text" wire:model="motifAnonymisation" class="champ w-full"></div>
+                <button type="submit" wire:confirm="Anonymiser définitivement cet élevage ?" class="bouton-secondaire">Anonymiser</button>
+            </form>
+        </section>
+    @endif
 </div>

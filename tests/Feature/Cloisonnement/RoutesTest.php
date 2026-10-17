@@ -73,6 +73,9 @@ const REGISTRE_ROUTES = [
     'GET elevages' => ['acces' => 'roles', 'roles' => ['technicien', 'admin', 'admin_global']],
     'GET elevages/{elevage}/fiche' => ['acces' => 'objet'],
     'GET import/sagema' => ['acces' => 'roles', 'roles' => ['technicien']],
+    // exports de l'élevage ; testés dans tests/Feature/Administration/ExportsTest.php
+    'GET elevages/{elevage}/export/rationnement.csv' => ['acces' => 'objet'],
+    'GET elevages/{elevage}/export/donnees.zip' => ['acces' => 'objet'],
 
     // Lot L2 — E19 et PDF des bulletins (objets testés dans tests/Feature/Import/EcranImportBulletinsTest.php)
     'GET import/bulletins' => ['acces' => 'roles', 'roles' => ['technicien']],

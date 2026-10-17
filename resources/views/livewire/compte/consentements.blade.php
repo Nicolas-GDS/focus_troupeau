@@ -7,6 +7,7 @@
         @php($veterinaires = $cs->filter(fn ($c) => $c->type === 'veterinaire' && ! $c->revoque_le))
         <section wire:key="el-{{ $e->id }}" class="carte" aria-labelledby="titre-{{ $e->id }}">
             <h2 id="titre-{{ $e->id }}" class="text-lg font-semibold">{{ $libelles[$e->id] }}</h2>
+            <p class="text-sm"><a href="{{ route('export.donnees', $e->id) }}" class="lien">Télécharger les données de l'élevage (ZIP)</a> <span class="text-xs text-texte-doux">— fiches, bulletins et données, au titre de la portabilité (RGPD)</span></p>
             @error('elevage-'.$e->id) <p class="mt-2 text-sm text-etat-critique" role="alert">{{ $message }}</p> @enderror
 
             <h3 class="mt-3 font-semibold">Références départementales</h3>

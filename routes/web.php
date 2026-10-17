@@ -4,6 +4,7 @@ use App\Http\Controllers\AiguillageController;
 use App\Http\Controllers\AutonomiePdfController;
 use App\Http\Controllers\BulletinPdfController;
 use App\Http\Controllers\ElevageCourantController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\FicheVisiteController;
 use App\Http\Controllers\NoteLiaisonController;
 use App\Http\Controllers\NoticeRgpdController;
@@ -125,6 +126,12 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
             Route::get('/scenarios/{scenario}/pdf', [AutonomiePdfController::class, 'scenario'])->name('scenarios.pdf');
             // E16 — paramètres de l'élevage (EF-M4-07, D10)
             Route::get('/parametres', ParametresElevageEcran::class)->name('parametres');
+        });
+
+        // EF-M9-04, EF-M9-05 — exports de l'élevage (rationnement, portabilité RGPD)
+        Route::middleware('permission:donnees.exporter')->prefix('elevages/{elevage}/export')->name('export.')->group(function () {
+            Route::get('/rationnement.csv', [ExportController::class, 'rationnement'])->name('rationnement');
+            Route::get('/donnees.zip', [ExportController::class, 'donnees'])->name('donnees');
         });
 
         // E23 — élevages : création, identité, convention, invitation des éleveurs (EF-M0-02 ; technicien, administrateur)

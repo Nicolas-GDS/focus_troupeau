@@ -7,6 +7,7 @@ use App\Models\App\Consentement;
 use App\Models\App\Convention;
 use App\Models\App\User;
 use App\Models\Fourrage\Elevage;
+use App\Services\Administration\AnonymisationService;
 use App\Services\Administration\ComptesService;
 use App\Services\Administration\ConsentementsService;
 use App\Services\Administration\ConventionsService;
@@ -107,6 +108,14 @@ class Fiche extends Component
         $this->executer(fn () => $service->accorder($elevage, Consentement::TYPE_REFERENCES, null, $this->admin()), 'Consentement « références » enregistré.', 'consentement');
     }
 
+    public string $motifAnonymisation = '';
+
+    public function anonymiser(AnonymisationService $service): void
+    {
+        abort_unless($this->admin()->can('elevage.anonymiser'), 403);
+        $this->executer(fn () => $service->anonymiser($this->elevage(), $this->motifAnonymisation, $this->admin()), 'Élevage anonymisé.', 'anonymisation');
+    }
+
     public function render(): View
     {
         $elevage = $this->elevage();
@@ -119,6 +128,8 @@ class Fiche extends Component
             'consentements' => Consentement::query()->where('elevage_id', $elevage->id)->with('veterinaire')->orderByDesc('accorde_le')->get(),
             'peutGererConsentements' => $admin->can('consentement.ecrire'),
             'peutCreerConvention' => $admin->can('convention.ecrire'),
+            'peutExporter' => $admin->can('donnees.exporter'),
+            'peutAnonymiser' => $admin->can('elevage.anonymiser'),
             'especes' => ElevagesService::ESPECES,
         ])->layout('components.layouts.espace', ['titre' => 'Élevage '.$elevage->code_pseudo]);
     }
