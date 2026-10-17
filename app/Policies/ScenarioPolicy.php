@@ -27,6 +27,16 @@ class ScenarioPolicy
         return $user->can('plan.lire') && $this->perimetre->couvreElevage($user, $this->contexte($objet)['elevage']);
     }
 
+    public function viewAny(User $user): bool
+    {
+        return $user->can('plan.lire');
+    }
+
+    public function create(User $user, Elevage $elevage): bool
+    {
+        return $this->elevages->ecrirePlan($user, $elevage);
+    }
+
     public function update(User $user, Scenario|LevierLigne $objet): bool
     {
         $c = $this->contexte($objet);
