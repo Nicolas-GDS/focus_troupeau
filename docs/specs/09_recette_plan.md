@@ -5,7 +5,7 @@
 | Jeu | Contenu | Usage |
 |---|---|---|
 | J0 — Campagne 2025-2026 | Les 59 bulletins réels chargés par `03_chargement_campagne_2025-2026.sql` (données nominatives : environnement de recette uniquement, accès restreint) | Import, classement, positionnement, anomalie HA25-42515 |
-| J1 — Élevage allaitant synthétique | Décrit ci-dessous ; reproduit dans `calculs/test_calculs.py` | Stocks, besoins, couverture, projection, leviers, incertitude |
+| J1 — Élevage allaitant synthétique | Décrit ci-dessous ; reproduit dans `calculs/test_calculs.py` ; seeder `JeuJ1Seeder` (lot L5) | Stocks, besoins, couverture, projection, leviers, incertitude |
 | J2 — Élevage ovin synthétique | 300 brebis, foin et seau « bovins » à 300 mg Cu/kg | Maximum réglementaire cuivre (niveau 3), SMS |
 | J3 — ELV-0001 (pseudonymisé) | Les neuf lots du prototype de fiche (document 04, figures 2 et 3 : MS, UFL 2018, PDI, BPR, MAT, minéraux, BACA ; numéros d'échantillon fictifs), avec ses messages et son plan d'action ; seeder `JeuJ3Seeder` | Fiche de visite complète, PDF, positionnement |
 | J5 — Population de référence synthétique | Élevages fictifs consentants du GDS 24 (et quelques lots du GDS 47) portant des lots `valide` de la campagne 2025-2026 autour des types de J3 (dont plus de cinq foins de prairie permanente), valeurs synthétiques ; développement uniquement (décision du 16/10/2026) | Positionnement et historique en développement ; J0 en recette |
@@ -86,7 +86,7 @@ Estimation indicative pour un développement interne assisté par IA, à affiner
 | 12 | Nom définitif (Focus Troupeau / Mise au point) | L1 (jetons) | Conseil d'administration |
 | 14 | Consentements « références » des élevages de J0 : à enregistrer avant la recette du positionnement (sans consentement actif, aucun lot n'entre dans les références) | L4 | Chargé de mission |
 | 15 | Couches `sig` (BRGM, RRP) et localisation des prélèvements ou des sièges : nécessaires à la population lithologique ; sans elles, seules les populations départementale et bi-GDS sont affichées | L4 | Chargé de mission |
-| 16 | Calculateur HTML d'autonomie fourragère et exemples de fichiers `gds-autonomie-fourragere-v1` à verser au dépôt pour l'import T-28 | L5 | Chargé de mission |
+| 16 | Calculateur HTML d'autonomie fourragère : versé au dépôt (`docs/calculateur/`) ; il n'a pas de bouton d'export, la saisie se copie depuis le stockage local du navigateur (clé `gds-autonomie-fourragere-v1`) — ajouter un bouton « Exporter » au calculateur ? Croquis de cubage du document 05 : images PNG à verser | L5 | Chargé de mission |
 | 13 | Béliers : la catégorie `BOUC_MALE` (« mâles caprins / ovins ») est rattachée à l'espèce caprine ; aucun seuil Ca/P (urolithiase) ne s'applique aux béliers depuis la correction de la grille v3 — créer une catégorie ovine dédiée et son seuil ? | L2 / E24 | Comité technique |
 
 ## 9.5 Risques
