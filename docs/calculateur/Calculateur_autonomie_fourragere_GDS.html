@@ -1,0 +1,724 @@
+<title>Autonomie fourragère GDS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
+
+<style>
+:root{
+  --ground:#F7FAFC; --surface:#FFFFFF; --surface-2:#EFF5F9; --ink:#231F20; --ink-2:#4A5568;
+  --ink-3:#6B7A8C; --line:#DCE5EC; --line-2:#C3D2DD;
+  --bleu:#0083CA; --bleu-24:#006BA0; --or-47:#B36C08; --violet:#9D3293; --vert:#3E9A35;
+  --ciel:#E6F4FB; --creme:#FDF3E3;
+  --ok:#2E7D32; --ok-bg:#EFF8EF; --warn:#B45309; --warn-bg:#FFF8EC; --crit:#B91C1C; --crit-bg:#FDF1F1;
+  --sh:0 1px 2px rgba(35,31,32,.05), 0 1px 12px rgba(0,107,160,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#12181D; --surface:#1A2228; --surface-2:#212B33; --ink:#E8EFF4; --ink-2:#B4C3CE;
+    --ink-3:#8699A7; --line:#2C3941; --line-2:#3C4C57;
+    --bleu:#46ACE0; --bleu-24:#5FBDEC; --or-47:#E8A33C; --violet:#CF7FC7; --vert:#6FCF7A;
+    --ciel:#16303D; --creme:#332A19;
+    --ok:#6FCF7A; --ok-bg:#16291A; --warn:#E8A33C; --warn-bg:#2E2413; --crit:#F08A85; --crit-bg:#2E1919;
+    --sh:0 1px 2px rgba(0,0,0,.35), 0 1px 14px rgba(0,0,0,.25);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#12181D; --surface:#1A2228; --surface-2:#212B33; --ink:#E8EFF4; --ink-2:#B4C3CE;
+  --ink-3:#8699A7; --line:#2C3941; --line-2:#3C4C57;
+  --bleu:#46ACE0; --bleu-24:#5FBDEC; --or-47:#E8A33C; --violet:#CF7FC7; --vert:#6FCF7A;
+  --ciel:#16303D; --creme:#332A19;
+  --ok:#6FCF7A; --ok-bg:#16291A; --warn:#E8A33C; --warn-bg:#2E2413; --crit:#F08A85; --crit-bg:#2E1919;
+  --sh:0 1px 2px rgba(0,0,0,.35), 0 1px 14px rgba(0,0,0,.25);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"Source Serif 4", Cambria, Georgia, serif; font-size:15px; line-height:1.55;
+  -webkit-text-size-adjust:100%;
+}
+.wrap{max-width:1080px; margin:0 auto; padding-inline:16px; padding-block:0 64px}
+h1,h2,h3,h4,.ui{font-family:"Outfit", "Aptos Display", Calibri, system-ui, sans-serif}
+a{color:var(--bleu-24)}
+
+/* ---------- bandeau ---------- */
+.masthead{border-bottom:3px solid var(--bleu); background:var(--surface)}
+.masthead .in{max-width:1080px; margin:0 auto; padding:18px 16px 14px; display:flex; flex-wrap:wrap; gap:14px; align-items:flex-end; justify-content:space-between}
+.marque{display:flex; align-items:center; gap:10px}
+.arcs{display:flex; gap:3px; align-items:flex-end}
+.arcs i{display:block; width:7px; border-radius:4px 4px 0 0}
+.arcs i:nth-child(1){height:22px; background:var(--bleu)}
+.arcs i:nth-child(2){height:16px; background:var(--violet)}
+.arcs i:nth-child(3){height:11px; background:var(--vert)}
+.arcs i:nth-child(4){height:7px; background:var(--ink-3)}
+.marque b{font-family:"Outfit",sans-serif; font-size:17px; font-weight:800; letter-spacing:.01em}
+.marque span{display:block; font-size:11.5px; color:var(--ink-3); font-family:"Outfit",sans-serif; letter-spacing:.06em; text-transform:uppercase}
+.tag{font-style:italic; color:var(--violet); font-size:13px}
+h1{font-size:clamp(22px,3.4vw,30px); font-weight:800; margin:14px 0 2px; color:var(--bleu-24); letter-spacing:-.01em; text-wrap:balance}
+.sous{color:var(--ink-2); margin:0 0 6px; max-width:62ch}
+
+/* ---------- barre de résultats ---------- */
+.sticky{position:sticky; top:env(safe-area-inset-top,0px); z-index:20; background:var(--surface); border-bottom:1px solid var(--line); box-shadow:var(--sh)}
+.kpis{max-width:1080px; margin:0 auto; padding:10px 16px; display:grid; gap:10px; grid-template-columns:repeat(4,1fr)}
+.kpi{border-left:3px solid var(--line-2); padding:2px 0 2px 10px}
+.kpi .k{font-family:"Outfit",sans-serif; font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); font-weight:600}
+.kpi .v{font-family:"Outfit",sans-serif; font-size:clamp(17px,2.6vw,25px); font-weight:700; line-height:1.15; font-variant-numeric:tabular-nums}
+.kpi .u{font-size:12px; color:var(--ink-3); font-family:"Outfit",sans-serif}
+.kpi.ok{border-left-color:var(--ok)} .kpi.ok .v{color:var(--ok)}
+.kpi.warn{border-left-color:var(--warn)} .kpi.warn .v{color:var(--warn)}
+.kpi.crit{border-left-color:var(--crit)} .kpi.crit .v{color:var(--crit)}
+.kpi.neutre{border-left-color:var(--bleu)} .kpi.neutre .v{color:var(--bleu-24)}
+@media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr)}}
+
+/* ---------- cadres ---------- */
+section{margin-top:26px}
+.cadre-t{display:flex; align-items:baseline; gap:10px; margin:0 0 4px}
+.num{font-family:"Outfit",sans-serif; font-weight:800; font-size:12px; color:#fff; background:var(--bleu-24); border-radius:3px; padding:2px 7px; letter-spacing:.04em}
+h2{font-size:18px; font-weight:700; margin:0; color:var(--ink)}
+.aide{color:var(--ink-3); font-size:13.5px; margin:2px 0 12px; max-width:78ch}
+.card{background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:14px; box-shadow:var(--sh)}
+
+/* ---------- tableaux de saisie ---------- */
+.tw{overflow-x:auto}
+table{border-collapse:collapse; width:100%; min-width:640px}
+th{font-family:"Outfit",sans-serif; font-size:11px; font-weight:600; letter-spacing:.05em; text-transform:uppercase;
+   color:var(--ink-3); text-align:left; padding:0 6px 6px; border-bottom:1px solid var(--line-2); white-space:nowrap}
+td{padding:4px 4px; border-bottom:1px solid var(--line); vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+td.num-out{font-family:"Outfit",sans-serif; font-variant-numeric:tabular-nums; font-weight:600; text-align:right; white-space:nowrap}
+td.calc{color:var(--ink-2); font-family:"Outfit",sans-serif; font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap}
+input,select{
+  font:inherit; font-family:"Outfit",sans-serif; font-size:14px; color:var(--ink);
+  background:var(--surface-2); border:1px solid var(--line-2); border-radius:4px; padding:5px 7px; width:100%;
+}
+input[type=number]{font-variant-numeric:tabular-nums; text-align:right}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--bleu); outline-offset:1px}
+.w-xs{width:56px} .w-s{width:76px} .w-m{width:132px}
+.hint{display:block}
+.btn{font-family:"Outfit",sans-serif; font-size:13px; font-weight:600; background:var(--surface-2); color:var(--bleu-24);
+  border:1px solid var(--line-2); border-radius:4px; padding:6px 11px; cursor:pointer}
+.btn:hover{border-color:var(--bleu); background:var(--ciel)}
+.btn-x{border:0; background:none; color:var(--ink-3); cursor:pointer; font-size:17px; line-height:1; padding:2px 5px}
+.btn-x:hover{color:var(--crit)}
+.rowbtns{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+.grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:12px}
+label.f{display:block}
+label.f .lab{font-family:"Outfit",sans-serif; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3); font-weight:600; display:block; margin-bottom:3px}
+.hint{font-size:12px; color:var(--ink-3); margin-top:3px; font-family:"Outfit",sans-serif}
+
+/* ---------- encadrés ---------- */
+.note{border-left:3px solid var(--bleu); background:var(--ciel); padding:9px 12px; border-radius:0 4px 4px 0; font-size:13.5px; margin:12px 0}
+.note.alerte{border-left-color:var(--crit); background:var(--crit-bg)}
+.note.vig{border-left-color:var(--warn); background:var(--warn-bg)}
+.note.ok{border-left-color:var(--ok); background:var(--ok-bg)}
+.note b{font-family:"Outfit",sans-serif}
+
+/* ---------- onglets ---------- */
+.tabs{display:flex; gap:2px; margin-bottom:12px; border-bottom:1px solid var(--line-2); flex-wrap:wrap}
+.tab{font-family:"Outfit",sans-serif; font-size:13.5px; font-weight:600; background:none; border:0; border-bottom:2px solid transparent;
+  color:var(--ink-3); padding:7px 12px; cursor:pointer}
+.tab[aria-selected="true"]{color:var(--bleu-24); border-bottom-color:var(--bleu)}
+
+/* ---------- synthèse ---------- */
+.bilan{display:grid; grid-template-columns:1fr auto; gap:0 18px}
+.bilan dt{padding:7px 0; border-bottom:1px solid var(--line); color:var(--ink-2)}
+.bilan dd{margin:0; padding:7px 0; border-bottom:1px solid var(--line); text-align:right;
+  font-family:"Outfit",sans-serif; font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap}
+.bilan .fort dt,.bilan .fort dd{font-weight:700; color:var(--ink); border-bottom:2px solid var(--line-2)}
+.jauge{height:9px; border-radius:5px; background:var(--surface-2); overflow:hidden; margin:12px 0 6px; border:1px solid var(--line)}
+.jauge i{display:block; height:100%; background:var(--bleu); transition:width .3s ease}
+.jauge-l{display:flex; justify-content:space-between; font-family:"Outfit",sans-serif; font-size:11.5px; color:var(--ink-3)}
+
+/* ---------- pied ---------- */
+footer{margin-top:40px; padding-top:16px; border-top:1px solid var(--line); font-size:12.5px; color:var(--ink-3)}
+footer h3{font-size:13px; margin:14px 0 5px; color:var(--ink-2)}
+footer ul{margin:0; padding-left:18px} footer li{margin-bottom:3px}
+.ent{display:flex; gap:18px; flex-wrap:wrap; margin-top:12px; font-family:"Outfit",sans-serif; font-size:12px}
+.ent div{border-left:3px solid var(--bleu-24); padding-left:9px}
+.ent div:last-child{border-left-color:var(--or-47)}
+.badge{display:inline-block; font-family:"Outfit",sans-serif; font-size:10.5px; font-weight:700; letter-spacing:.06em;
+  text-transform:uppercase; padding:2px 7px; border-radius:3px; background:var(--surface-2); color:var(--ink-3); border:1px solid var(--line-2)}
+@media print{
+  .sticky{position:static; box-shadow:none} .btn,.btn-x,.tabs{display:none}
+  body{background:#fff} .card{break-inside:avoid; box-shadow:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="masthead">
+  <div class="in">
+    <div class="marque">
+      <div class="arcs" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div>
+        <b>GDS 24 · GDS 47</b>
+        <span>Dordogne · Lot-et-Garonne</span>
+      </div>
+    </div>
+    <div class="tag">L'action sanitaire ensemble</div>
+  </div>
+</div>
+
+<div class="sticky">
+  <div class="kpis">
+    <div class="kpi neutre"><div class="k">Stock utile</div><div class="v" id="kStock">—</div><div class="u">tonnes de MS</div></div>
+    <div class="kpi neutre"><div class="k">Besoins de la période</div><div class="v" id="kBesoin">—</div><div class="u">tonnes de MS</div></div>
+    <div class="kpi" id="kpiCouv"><div class="k">Taux de couverture</div><div class="v" id="kCouv">—</div><div class="u" id="kCouvU">—</div></div>
+    <div class="kpi" id="kpiAuto"><div class="k">Autonomie</div><div class="v" id="kAuto">—</div><div class="u" id="kAutoU">jours</div></div>
+  </div>
+</div>
+
+<div class="wrap">
+  <h1>Calculateur d'autonomie fourragère</h1>
+  <p class="sous">Bilan fourrager d'un élevage bovin, à partir du relevé de la fiche terrain. Densités, coefficients UGB et poids de balles issus du classeur <i>Bilan fourrager</i> 2020 de l'Institut de l'Élevage. <span class="badge">Usage interne GDS</span></p>
+  <div class="note"><b>Exemple chargé.</b> La page s'ouvre sur un élevage allaitant fictif de 60 vêlages, pour montrer le fonctionnement. Remplacez les valeurs par celles de votre relevé — le bouton « Vider » en bas efface tout.</div>
+
+  <!-- 1 — PÉRIODE -->
+  <section>
+    <div class="cadre-t"><span class="num">1</span><h2>Période de référence</h2></div>
+    <p class="aide">Du jour du bilan à la prochaine récolte de même nature. Repères : 160 jours minimum en plaine, 200 en montagne, plus 30 jours à demi-ration pour la transition de mise à l'herbe et 30 à 100 jours de complémentation estivale selon l'année (FRGDS Auvergne-Rhône-Alpes / Institut de l'Élevage, 2019).</p>
+    <div class="card">
+      <div class="grid2">
+        <label class="f"><span class="lab">Exploitation</span><input id="fExpl" type="text" placeholder="Nom de l'élevage"></label>
+        <label class="f"><span class="lab">Date du bilan</span><input id="fDate" type="date"></label>
+        <label class="f"><span class="lab">Durée de la période (jours)</span><input id="fJours" type="number" min="1" step="1" value="160"></label>
+        <label class="f"><span class="lab">Marge de sécurité (% des besoins)</span><input id="fMarge" type="number" min="0" max="60" step="1" value="15">
+          <span class="hint">15 % par défaut ≈ 24 jours sur 160. Porter à 25 % en année sèche ou si les stocks ne sont ni pesés ni carottés.</span></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 — SILOS -->
+  <section>
+    <div class="cadre-t"><span class="num">2</span><h2>Silos d'ensilage</h2></div>
+    <p class="aide">Volume = (L1 + ½ L2) × largeur × hauteur, la largeur étant mesurée jusqu'au milieu de la pente sur les côtés sans mur. La densité est calculée par les équations de l'Institut de l'Élevage ; saisissez une densité mesurée par carottage si vous en avez une, elle est deux fois plus précise.</p>
+    <div class="card">
+      <div class="tw"><table>
+        <thead><tr>
+          <th>Désignation</th><th>Fourrage / ouvrage</th><th>L1 m</th><th>L2 m</th><th>Larg. m</th><th>Haut. m</th>
+          <th>MS %</th><th>Amidon %</th><th>Densité</th><th>Volume m³</th><th>Pertes %</th><th>t MS utiles</th><th></th>
+        </tr></thead>
+        <tbody id="tSilos"></tbody>
+      </table></div>
+      <div class="rowbtns"><button class="btn" id="addSilo" type="button">+ Ajouter un silo</button></div>
+      <div class="note vig"><b>Silo fermé depuis moins de trois semaines ?</b> Le tas n'a pas fini de se tasser : déduire 5 % du volume à 10 jours et 3 % à 20 jours si la MS dépasse 26 %, environ le double en dessous de 22 % (Institut de l'Élevage).</div>
+    </div>
+  </section>
+
+  <!-- 3 — BALLES -->
+  <section>
+    <div class="cadre-t"><span class="num">3</span><h2>Balles, bottes et vrac</h2></div>
+    <p class="aide">Pesez six balles au hasard, prises sur des parcelles différentes. L'erreur d'estimation à vue atteint 11 à 20 % et les conseillers ne font pas mieux que les éleveurs (Blazek et al., 2017). Pour le foin en vrac, saisissez le volume en m³ et une densité de 80 à 100 kg bruts/m³.</p>
+    <div class="card">
+      <div class="tw"><table>
+        <thead><tr>
+          <th>Fourrage</th><th>Nombre (ou m³)</th><th>Poids unitaire kg brut</th><th>MS %</th><th>Stockage</th><th>Pertes %</th><th>t MS utiles</th><th></th>
+        </tr></thead>
+        <tbody id="tBalles"></tbody>
+      </table></div>
+      <div class="rowbtns"><button class="btn" id="addBalle" type="button">+ Ajouter une ligne</button></div>
+    </div>
+  </section>
+
+  <!-- 4 — CHEPTEL -->
+  <section>
+    <div class="cadre-t"><span class="num">4</span><h2>Cheptel et besoins</h2></div>
+    <p class="aide">Deux voies de calcul. La voie UGB applique le moteur de l'Institut de l'Élevage : 13 kg de MS par UGB et par jour, soit 4,75 t MS par UGB et par an. La voie ration affecte à chaque lot son ingestion journalière et permet de travailler les ajustements. Un écart supérieur à 10 % entre les deux signale une hypothèse à revoir.</p>
+    <div class="card">
+      <div class="tabs" role="tablist">
+        <button class="tab" role="tab" id="tabUGB" aria-selected="true" aria-controls="pUGB" type="button">Voie UGB</button>
+        <button class="tab" role="tab" id="tabRation" aria-selected="false" aria-controls="pRation" type="button">Voie ration</button>
+      </div>
+
+      <div id="pUGB" role="tabpanel" aria-labelledby="tabUGB">
+        <div class="tw"><table>
+          <thead><tr><th>Catégorie</th><th>Coefficient UGB</th><th>Effectif</th><th>UGB</th><th>kg MS/jour</th><th>t MS période</th><th></th></tr></thead>
+          <tbody id="tUGB"></tbody>
+        </table></div>
+        <div class="rowbtns"><button class="btn" id="addUGB" type="button">+ Ajouter une catégorie</button></div>
+      </div>
+
+      <div id="pRation" role="tabpanel" aria-labelledby="tabRation" hidden>
+        <div class="tw"><table>
+          <thead><tr><th>Lot</th><th>Effectif</th><th>Ingestion kg MS/jour</th><th>Jours</th><th>t MS</th><th></th></tr></thead>
+          <tbody id="tRation"></tbody>
+        </table></div>
+        <div class="rowbtns"><button class="btn" id="addRation" type="button">+ Ajouter un lot</button></div>
+        <div class="note"><b>Repères d'ingestion (kg MS/jour).</b> Vache laitière en production 16 à 22 · tarie 10 à 14 · vache allaitante suitée 13 à 16 · allaitante tarie 10 à 14 · génisse 0-1 an 4 · 1-2 ans 8 · plus de 2 ans 12 · jeune bovin 9 à 12. Sources : Institut de l'Élevage 2020, Chambre d'agriculture des Pays de la Loire 2026, Chambre d'agriculture de Bretagne 2025.</div>
+      </div>
+
+      <div class="grid2" style="margin-top:14px">
+        <label class="f"><span class="lab">Pertes à la distribution</span>
+          <select id="fDistrib">
+            <option value="0.04">Auge ou râtelier à cône — 4 %</option>
+            <option value="0.061">Râtelier à anneau — 6 %</option>
+            <option value="0.114">Remorque distributrice — 11 %</option>
+            <option value="0.13" selected>Déroulé au sol ou râtelier berceau — 13 %</option>
+            <option value="0.20">Anneau sans panneau — 20 %</option>
+            <option value="0">Aucune (déjà comptée dans la ration)</option>
+          </select>
+          <span class="hint">Buskirk et al., 2003, sur 160 vaches allaitantes. Passer du berceau au cône fait gagner 11 points de fourrage distribué.</span>
+        </label>
+        <div class="note ok" style="margin:0"><b>Le levier le moins coûteux.</b> Sur 100 t MS de foin, onze points de pertes à la distribution représentent 11 tonnes de MS, soit près de trois semaines d'hivernage pour 60 vaches allaitantes. Aucun achat de fourrage n'a ce rapport coût/efficacité.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 — BILAN -->
+  <section>
+    <div class="cadre-t"><span class="num">5</span><h2>Bilan</h2></div>
+    <div class="card">
+      <dl class="bilan">
+        <dt>A · Stock utile total</dt><dd><span id="bA">—</span> t MS</dd>
+        <dt>B · Besoins bruts de la période</dt><dd><span id="bB0">—</span> t MS</dd>
+        <dt>B′ · Besoins après pertes à la distribution</dt><dd><span id="bB">—</span> t MS</dd>
+        <dt>C · Stock de sécurité</dt><dd><span id="bC">—</span> t MS</dd>
+        <div class="fort" style="display:contents"><dt>D · Bilan (A − B′ − C)</dt><dd><span id="bD">—</span> t MS</dd></div>
+        <dt>E · Taux de couverture</dt><dd><span id="bE">—</span> %</dd>
+        <dt>F · Besoin journalier du troupeau</dt><dd><span id="bF">—</span> t MS/j</dd>
+        <div class="fort" style="display:contents"><dt>G · Autonomie</dt><dd><span id="bG">—</span> jours</dd></div>
+        <dt>H · Date de fin de stock</dt><dd id="bH">—</dd>
+        <dt>Stock utile par UGB <span class="hint" style="display:inline">— cible actuelle 2,5 à 3 t MS/UGB</span></dt><dd><span id="bUGB">—</span> t MS/UGB</dd>
+        <dt>Écart entre voie UGB et voie ration</dt><dd id="bEcart">—</dd>
+      </dl>
+      <div class="jauge" role="img" aria-label="Taux de couverture des besoins"><i id="jauge" style="width:0%"></i></div>
+      <div class="jauge-l"><span>0 %</span><span>80 % — seuil d'achat extérieur</span><span>100 % et plus</span></div>
+      <div class="note" id="verdict"></div>
+    </div>
+  </section>
+
+  <!-- 6 — AJUSTEMENTS -->
+  <section>
+    <div class="cadre-t"><span class="num">6</span><h2>Ajustements et coûts</h2></div>
+    <p class="aide">Chaque levier se traduit en tonnes de MS gagnées et en euros. Le choix du levier se fait sur les deux à la fois : sur un cas-type charolais de 50 vêlages, l'achat de foin coûte 11 % de l'EBE quand l'implantation de luzerne en coûte 5 % (Inosys – Réseaux d'élevage Grand Est, 2020).</p>
+    <div class="card">
+      <div class="note alerte"><b>Un kilo de concentré ne remplace pas un kilo de matière sèche de fourrage.</b> Il en remplace 0,70 sur une base d'ensilage de maïs, 0,53 sur ensilage d'herbe et 0,44 sur foin (Faverdin et al., INRA). Raisonner en équivalence 1 pour 1 revient à sous-estimer le déficit de près de moitié.</div>
+      <div class="tw"><table>
+        <thead><tr><th>Levier</th><th>Quantité</th><th>Unité</th><th>Paramètre</th><th>Gain t MS</th><th>Coût €</th><th></th></tr></thead>
+        <tbody id="tLev"></tbody>
+      </table></div>
+      <div class="rowbtns"><button class="btn" id="addLev" type="button">+ Ajouter un levier</button></div>
+      <dl class="bilan" style="margin-top:16px">
+        <dt>Gain total des ajustements</dt><dd><span id="aGain">—</span> t MS</dd>
+        <div class="fort" style="display:contents"><dt>Bilan après ajustements</dt><dd><span id="aBilan">—</span> t MS</dd></div>
+        <div class="fort" style="display:contents"><dt>Autonomie après ajustements</dt><dd><span id="aAuto">—</span> jours</dd></div>
+        <dt>Taux de couverture après ajustements</dt><dd><span id="aCouv">—</span> %</dd>
+        <dt>Coût total</dt><dd><span id="aCout">—</span> €</dd>
+        <dt>Coût par UGB</dt><dd><span id="aCoutUGB">—</span> €/UGB</dd>
+      </dl>
+    </div>
+  </section>
+
+  <div class="rowbtns" style="margin-top:22px">
+    <button class="btn" id="btnPrint" type="button">Imprimer ou enregistrer en PDF</button>
+    <button class="btn" id="btnCopy" type="button">Copier la synthèse</button>
+    <button class="btn" id="btnExample" type="button">Recharger l'exemple</button>
+    <button class="btn" id="btnClear" type="button">Vider</button>
+    <button class="btn" id="btnTheme" type="button">Thème clair / sombre</button>
+  </div>
+
+  <footer>
+    <h3>Ce que ce calculateur ne dit pas</h3>
+    <ul>
+      <li>Rien de la qualité : un stock suffisant en tonnes de MS peut être déficitaire en énergie, en azote ou en oligo-éléments. Sur la campagne 2025-2026 du GDS 24, 93 % des lots analysés étaient sous le seuil de carence en cuivre.</li>
+      <li>Rien de l'affectation des lots : savoir qu'il reste 180 t MS ne dit pas lequel donner aux vaches en préparation au vêlage.</li>
+      <li>Rien des récoltes à venir, qui relèvent du suivi de pousse et des jours d'avance au pâturage.</li>
+      <li>Le résultat est un encadrement, pas un chiffre : sur un stock non pesé ni carotté, une fourchette de ± 15 % est réaliste, soit trois semaines d'hivernage pour 80 UGB.</li>
+    </ul>
+    <h3>Sources des valeurs par défaut</h3>
+    <ul>
+      <li><b>Densités et coefficients UGB</b> — Institut de l'Élevage, classeur <i>Bilan fourrager</i>, version 2020 : maïs couloir D = (929 − 17,5 MS + 7,9 A + 44 H) × MS/100 ; maïs taupinière D = (874 − 14,5 MS + 4,2 A + 48 H) × MS/100 ; herbe brins courts D = 30 H + 2 MS + 60 ; brins longs D = 27 H + 1,8 MS + 54 ; sorgho plante entière = maïs + 20 %. Besoin : 13 kg MS/UGB/jour.</li>
+      <li><b>Poids de balles</b> — Institut de l'Élevage, fiche « Calcul du bilan fourrager : comment estimer les stocks ? » (poids bruts).</li>
+      <li><b>Pertes de conservation</b> — Institut de l'Élevage et Chambre d'agriculture de Bretagne (5 % en bonnes conditions, 10 à 15 % si le tas chauffe) ; Borreani et al., <i>Journal of Dairy Science</i>, 2018.</li>
+      <li><b>Pertes au stockage des balles</b> — Huhnke, Oklahoma State University, BAE-1716, 2017.</li>
+      <li><b>Pertes à la distribution</b> — Buskirk et al., <i>Journal of Animal Science</i>, 2003.</li>
+      <li><b>Taux de substitution</b> — Faverdin, Dulphy, Coulon, Vérité, Garel, Rouel et Marquis, <i>INRA Productions Animales</i>.</li>
+      <li><b>Durées d'hivernage</b> — Capitain, Goron et Bonetti, FRGDS Auvergne-Rhône-Alpes avec l'Institut de l'Élevage, 2019.</li>
+      <li><b>Prix indicatifs</b> — barèmes Alysé / Chambres d'agriculture 21 et 89 (avril 2025), FDSEA 57 (juillet 2025), PEREL / Chambre d'agriculture des Pays de la Loire (mars 2026), cotations La Dépêche – Le Petit Meunier (septembre 2026). <b>À réactualiser à chaque campagne.</b></li>
+    </ul>
+    <div class="ent">
+      <div><b>GDS 24</b> — Dordogne<br>Périgueux · contact@gds24.fr</div>
+      <div><b>GDS 47</b> — Lot-et-Garonne<br>Agen · contact@gds47.fr</div>
+    </div>
+    <p style="margin-top:12px">Version 1.0 · 21 septembre 2026 · Méthode détaillée dans la fiche pratique « Évaluer les stocks fourragers et calculer l'autonomie ». Membres du réseau GDS France.</p>
+  </footer>
+</div>
+
+<script>
+"use strict";
+const $ = (s, r) => (r || document).querySelector(s);
+const nf = (v, d) => (isFinite(v) ? v.toLocaleString("fr-FR", { minimumFractionDigits: d, maximumFractionDigits: d }) : "—");
+const num = (el) => { const v = parseFloat(String(el.value).replace(",", ".")); return isFinite(v) ? v : 0; };
+
+/* ---- équations de densité (Institut de l'Élevage, bilan fourrager 2020) ---- */
+const DENS = {
+  mais_couloir:  (H, MS, A) => (929 - 17.5 * MS + 7.9 * A + 44 * H) * MS / 100,
+  mais_taupe:    (H, MS, A) => (874 - 14.5 * MS + 4.2 * A + 48 * H) * MS / 100,
+  sorgho_couloir:(H, MS, A) => 1.2 * (929 - 17.5 * MS + 7.9 * A + 44 * H) * MS / 100,
+  sorgho_taupe:  (H, MS, A) => 1.2 * (874 - 14.5 * MS + 4.2 * A + 48 * H) * MS / 100,
+  herbe_courts:  (H, MS) => 30 * H + 2 * MS + 60,
+  herbe_longs:   (H, MS) => 27 * H + 1.8 * MS + 54,
+  herbe_couloir: (H, MS) => 16 * H + 5 * MS + 34,
+  herbe_taupe:   (H, MS) => 7 * H + 3.7 * MS + 74,
+};
+const SILO_OPTS = [
+  ["mais_couloir", "Maïs — silo couloir"], ["mais_taupe", "Maïs — taupinière"],
+  ["herbe_courts", "Herbe — brins courts"], ["herbe_longs", "Herbe — brins longs"],
+  ["herbe_couloir", "Herbe — couloir (à défaut)"], ["herbe_taupe", "Herbe — taupinière (à défaut)"],
+  ["sorgho_couloir", "Sorgho PE — couloir"], ["sorgho_taupe", "Sorgho PE — taupinière"],
+];
+const STOCKAGE = [
+  ["2", "Bâtiment fermé — 2 %"], ["3", "Sous toit — 3 %"], ["4", "Bâché surélevé — 4 %"],
+  ["8", "Bâché au sol — 8 %"], ["10", "Exposé surélevé — 10 %"], ["15", "Exposé au sol — 15 %"],
+];
+const CAT_UGB = [
+  ["Vache laitière", 1.02], ["Vache allaitante", 0.90], ["Génisse < 1 an", 0.30],
+  ["Génisse 1 – 2 ans", 0.60], ["Génisse > 2 ans", 0.80], ["Mâle 1 – 2 ans", 0.60],
+  ["Taurillon", 0.80], ["Taureau reproducteur (hors référentiel Idele)", 1.00], ["Brebis", 0.15], ["Chèvre", 0.20],
+];
+const LEVIERS = [
+  { id: "foin", nom: "Achat de foin", unite: "t MS", param: "Prix €/t MS", pdef: 170, gain: (q) => q, cout: (q, p) => q * p },
+  { id: "enrub", nom: "Achat d'enrubannage", unite: "t MS", param: "Prix €/t MS", pdef: 190, gain: (q) => q, cout: (q, p) => q * p },
+  { id: "paille", nom: "Achat de paille alimentaire", unite: "t MS", param: "Prix €/t MS", pdef: 75, gain: (q) => q, cout: (q, p) => q * p },
+  { id: "cmais", nom: "Concentré sur base maïs — substitution 0,70", unite: "t MS", param: "Prix €/t MS", pdef: 290, gain: (q) => q * 0.70, cout: (q, p) => q * p },
+  { id: "cherbe", nom: "Concentré sur base ensilage d'herbe — 0,53", unite: "t MS", param: "Prix €/t MS", pdef: 290, gain: (q) => q * 0.53, cout: (q, p) => q * p },
+  { id: "cfoin", nom: "Concentré sur base foin — substitution 0,44", unite: "t MS", param: "Prix €/t MS", pdef: 290, gain: (q) => q * 0.44, cout: (q, p) => q * p },
+  { id: "decap", nom: "Décapitalisation (UGB retirés)", unite: "UGB", param: "Perte de produit €/UGB", pdef: 900, gain: (q, p, ctx) => q * 13 * ctx.jours / 1000, cout: (q, p) => q * p },
+  { id: "genisse", nom: "Génisses de renouvellement supprimées", unite: "têtes", param: "t MS par génisse", pdef: 6, gain: (q, p) => q * p, cout: () => 0 },
+  { id: "pature", nom: "Pâturage allongé ou dérobée", unite: "jours gagnés", param: "Coût € total", pdef: 0, gain: (q, p, ctx) => q * ctx.besoinJour, cout: (q, p) => p },
+  { id: "ratelier", nom: "Passage à un râtelier moins gaspilleur", unite: "sans objet", param: "Nouveau taux de pertes %", pdef: 4, gain: (q, p, ctx) => Math.max(0, ctx.besoinBrut * (1 / (1 - ctx.distrib) - 1 / (1 - p / 100))), cout: () => 0 },
+  { id: "autre", nom: "Autre (saisie libre)", unite: "t MS", param: "Coût € total", pdef: 0, gain: (q) => q, cout: (q, p) => p },
+];
+
+/* ---------- construction des lignes ---------- */
+let uid = 0;
+const mk = (html) => { const tr = document.createElement("tr"); tr.innerHTML = html; tr.id = "r" + (++uid); return tr; };
+const sel = (opts, v) => opts.map((o) => `<option value="${o[0]}"${String(o[0]) === String(v) ? " selected" : ""}>${o[1]}</option>`).join("");
+const del = `<td style="text-align:right"><button class="btn-x" type="button" aria-label="Supprimer la ligne">×</button></td>`;
+
+function rowSilo(d) {
+  d = d || {};
+  const tr = mk(`
+    <td><input class="w-m" type="text" value="${d.nom || ''}" placeholder="Silo 1"></td>
+    <td><select>${sel(SILO_OPTS, d.type || "mais_couloir")}</select></td>
+    <td><input class="w-xs" type="number" step="0.1" min="0" value="${d.l1 ?? ""}"></td>
+    <td><input class="w-xs" type="number" step="0.1" min="0" value="${d.l2 ?? ""}"></td>
+    <td><input class="w-xs" type="number" step="0.1" min="0" value="${d.larg ?? ""}"></td>
+    <td><input class="w-xs" type="number" step="0.1" min="0" value="${d.haut ?? ""}"></td>
+    <td><input class="w-xs" type="number" step="0.5" min="0" max="100" value="${d.ms ?? 32}"></td>
+    <td><input class="w-xs" type="number" step="1" min="0" max="60" value="${d.am ?? 28}"></td>
+    <td><input class="w-s" type="number" step="1" min="0" value="${d.dens ?? ""}" placeholder="auto"></td>
+    <td class="calc" data-o="vol">—</td>
+    <td><input class="w-xs" type="number" step="1" min="0" max="50" value="${d.pertes ?? 5}"></td>
+    <td class="num-out" data-o="t">—</td>${del}`);
+  return tr;
+}
+function rowBalle(d) {
+  d = d || {};
+  const tr = mk(`
+    <td><input class="w-m" type="text" value="${d.nom || ''}" placeholder="Foin balles rondes Ø 1,50 m"></td>
+    <td><input class="w-s" type="number" step="1" min="0" value="${d.n ?? ""}"></td>
+    <td><input class="w-s" type="number" step="1" min="0" value="${d.p ?? ""}"></td>
+    <td><input class="w-xs" type="number" step="1" min="0" max="100" value="${d.ms ?? 85}"></td>
+    <td><select>${sel(STOCKAGE, d.st || "3")}</select></td>
+    <td><input class="w-xs" type="number" step="1" min="0" max="60" value="${d.pertes ?? 3}"></td>
+    <td class="num-out" data-o="t">—</td>${del}`);
+  const st = tr.querySelector("select"), pe = tr.querySelectorAll("input")[4];
+  st.addEventListener("change", () => { pe.value = st.value; calc(); });
+  return tr;
+}
+function rowUGB(d) {
+  d = d || {};
+  const tr = mk(`
+    <td><select>${sel(CAT_UGB.map((c) => [c[0], c[0]]), d.cat || "Vache allaitante")}</select></td>
+    <td><input class="w-xs" type="number" step="0.01" min="0" value="${d.coef ?? 0.9}"></td>
+    <td><input class="w-s" type="number" step="1" min="0" value="${d.n ?? ""}"></td>
+    <td class="calc" data-o="ugb">—</td><td class="calc" data-o="kg">—</td><td class="num-out" data-o="t">—</td>${del}`);
+  const s = tr.querySelector("select"), co = tr.querySelector("input");
+  s.addEventListener("change", () => { const f = CAT_UGB.find((c) => c[0] === s.value); if (f) co.value = f[1]; calc(); });
+  return tr;
+}
+function rowRation(d) {
+  d = d || {};
+  return mk(`
+    <td><input class="w-m" type="text" value="${d.nom || ''}" placeholder="Vaches suitées"></td>
+    <td><input class="w-s" type="number" step="1" min="0" value="${d.n ?? ""}"></td>
+    <td><input class="w-s" type="number" step="0.1" min="0" value="${d.kg ?? ""}"></td>
+    <td><input class="w-s" type="number" step="1" min="0" value="${d.j ?? ""}" placeholder="période"></td>
+    <td class="num-out" data-o="t">—</td>${del}`);
+}
+function rowLev(d) {
+  d = d || {};
+  const L = LEVIERS.find((x) => x.id === (d.type || "foin"));
+  const tr = mk(`
+    <td><select>${sel(LEVIERS.map((x) => [x.id, x.nom]), d.type || "foin")}</select></td>
+    <td><input class="w-s" type="number" step="0.1" min="0" value="${d.q ?? ""}"></td>
+    <td class="calc" data-o="u">${L.unite}</td>
+    <td><input class="w-s" type="number" step="0.01" min="0" value="${d.p ?? L.pdef}" title="Paramètre"><span class="hint" data-o="pl">${L.param}</span></td>
+    <td class="num-out" data-o="g">—</td><td class="num-out" data-o="c">—</td>${del}`);
+  const s = tr.querySelector("select");
+  s.addEventListener("change", () => {
+    const N = LEVIERS.find((x) => x.id === s.value);
+    tr.querySelector('[data-o="u"]').textContent = N.unite;
+    tr.querySelector('[data-o="pl"]').textContent = N.param;
+    tr.querySelectorAll("input")[1].value = N.pdef;
+    calc();
+  });
+  return tr;
+}
+
+const BODIES = { tSilos: rowSilo, tBalles: rowBalle, tUGB: rowUGB, tRation: rowRation, tLev: rowLev };
+function addRow(body, data) { const tb = $("#" + body); tb.appendChild(BODIES[body](data)); calc(); }
+document.addEventListener("click", (e) => {
+  const b = e.target.closest(".btn-x");
+  if (b) { b.closest("tr").remove(); calc(); }
+});
+$("#addSilo").onclick = () => addRow("tSilos");
+$("#addBalle").onclick = () => addRow("tBalles");
+$("#addUGB").onclick = () => addRow("tUGB");
+$("#addRation").onclick = () => addRow("tRation");
+$("#addLev").onclick = () => addRow("tLev");
+
+/* ---------- onglets ---------- */
+function showTab(which) {
+  const u = which === "ugb";
+  $("#tabUGB").setAttribute("aria-selected", u); $("#tabRation").setAttribute("aria-selected", !u);
+  $("#pUGB").hidden = !u; $("#pRation").hidden = u;
+  calc();
+}
+$("#tabUGB").onclick = () => showTab("ugb");
+$("#tabRation").onclick = () => showTab("ration");
+
+/* ---------- calcul ---------- */
+function calc() {
+  const jours = Math.max(1, num($("#fJours")));
+  const marge = num($("#fMarge")) / 100;
+  const distrib = parseFloat($("#fDistrib").value) || 0;
+
+  // silos
+  let stock = 0;
+  $("#tSilos").querySelectorAll("tr").forEach((tr) => {
+    const i = tr.querySelectorAll("input"), type = tr.querySelector("select").value;
+    const l1 = num(i[1]), l2 = num(i[2]), la = num(i[3]), h = num(i[4]), ms = num(i[5]), am = num(i[6]);
+    const vol = (l1 + 0.5 * l2) * la * h;
+    const f = DENS[type];
+    let d = num(i[7]);
+    if (!d) { d = f.length >= 3 ? f(h, ms, am) : f(h, ms); d = Math.max(0, d); }
+    const t = vol * d / 1000 * (1 - num(i[8]) / 100);
+    tr.querySelector('[data-o="vol"]').textContent = vol ? nf(vol, 0) : "—";
+    if (!num(i[7])) i[7].placeholder = d ? Math.round(d) : "auto";
+    tr.querySelector('[data-o="t"]').textContent = t ? nf(t, 1) : "—";
+    stock += t;
+  });
+  // balles
+  $("#tBalles").querySelectorAll("tr").forEach((tr) => {
+    const i = tr.querySelectorAll("input");
+    const t = num(i[1]) * num(i[2]) * num(i[3]) / 100 * (1 - num(i[4]) / 100) / 1000;
+    tr.querySelector('[data-o="t"]').textContent = t ? nf(t, 1) : "—";
+    stock += t;
+  });
+
+  // besoins
+  let ugbTot = 0, besoinUGB = 0;
+  $("#tUGB").querySelectorAll("tr").forEach((tr) => {
+    const i = tr.querySelectorAll("input");
+    const ugb = num(i[0]) * num(i[1]);
+    const kg = ugb * 13, t = kg * jours / 1000;
+    tr.querySelector('[data-o="ugb"]').textContent = ugb ? nf(ugb, 1) : "—";
+    tr.querySelector('[data-o="kg"]').textContent = kg ? nf(kg, 0) : "—";
+    tr.querySelector('[data-o="t"]').textContent = t ? nf(t, 1) : "—";
+    ugbTot += ugb; besoinUGB += t;
+  });
+  let besoinRation = 0;
+  $("#tRation").querySelectorAll("tr").forEach((tr) => {
+    const i = tr.querySelectorAll("input");
+    const j = num(i[3]) || jours;
+    const t = num(i[1]) * num(i[2]) * j / 1000;
+    tr.querySelector('[data-o="t"]').textContent = t ? nf(t, 1) : "—";
+    besoinRation += t;
+  });
+  const voieUGB = $("#tabUGB").getAttribute("aria-selected") === "true";
+  const besoinBrut = voieUGB ? besoinUGB : besoinRation;
+  const besoin = besoinBrut / (1 - distrib);
+  const secu = besoin * marge;
+  const bilan = stock - besoin - secu;
+  const couv = besoin > 0 ? stock / besoin * 100 : 0;
+  const besoinJour = besoin / jours;
+  const autonomie = besoinJour > 0 ? stock / besoinJour : 0;
+
+  // leviers
+  const ctx = { jours, besoinJour, besoinBrut, distrib };
+  let gain = 0, cout = 0;
+  $("#tLev").querySelectorAll("tr").forEach((tr) => {
+    const L = LEVIERS.find((x) => x.id === tr.querySelector("select").value);
+    const i = tr.querySelectorAll("input");
+    const q = num(i[0]), p = num(i[1]);
+    const g = Math.max(0, L.gain(q, p, ctx) || 0);
+    const cst = Math.max(0, L.cout(q, p, ctx) || 0);
+    tr.querySelector('[data-o="g"]').textContent = g ? nf(g, 1) : "—";
+    tr.querySelector('[data-o="c"]').textContent = cst ? nf(cst, 0) : "—";
+    gain += g; cout += cst;
+  });
+  const stock2 = stock + gain;
+  const bilan2 = stock2 - besoin - secu;
+  const auto2 = besoinJour > 0 ? stock2 / besoinJour : 0;
+  const couv2 = besoin > 0 ? stock2 / besoin * 100 : 0;
+
+  // affichage
+  $("#kStock").textContent = nf(stock, 1);
+  $("#kBesoin").textContent = nf(besoin, 1);
+  $("#kCouv").textContent = besoin ? nf(couv, 0) : "—";
+  $("#kCouvU").textContent = besoin ? "% des besoins" : "—";
+  $("#kAuto").textContent = besoinJour ? nf(autonomie, 0) : "—";
+  $("#kAutoU").textContent = besoinJour ? "jours sur " + nf(jours, 0) : "jours";
+
+  const cls = (el, c) => { el.className = "kpi " + c; };
+  cls($("#kpiCouv"), !besoin ? "" : couv >= 100 ? "ok" : couv >= 80 ? "warn" : "crit");
+  cls($("#kpiAuto"), !besoinJour ? "" : autonomie >= jours ? "ok" : autonomie >= jours * 0.8 ? "warn" : "crit");
+
+  $("#bA").textContent = nf(stock, 1);
+  $("#bB0").textContent = nf(besoinBrut, 1);
+  $("#bB").textContent = nf(besoin, 1);
+  $("#bC").textContent = nf(secu, 1);
+  $("#bD").textContent = (bilan > 0 ? "+" : "") + nf(bilan, 1);
+  $("#bE").textContent = besoin ? nf(couv, 0) : "—";
+  $("#bF").textContent = nf(besoinJour, 2);
+  $("#bG").textContent = besoinJour ? nf(autonomie, 0) : "—";
+  $("#bUGB").textContent = ugbTot ? nf(stock / ugbTot, 2) : "—";
+
+  const d0 = $("#fDate").value ? new Date($("#fDate").value) : null;
+  if (d0 && besoinJour) { const d1 = new Date(d0.getTime() + autonomie * 86400000); $("#bH").textContent = d1.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" }); }
+  else $("#bH").textContent = "—";
+
+  if (besoinUGB > 0 && besoinRation > 0) {
+    const e = Math.abs(besoinUGB - besoinRation) / besoinUGB * 100;
+    $("#bEcart").textContent = nf(e, 0) + " %" + (e > 10 ? " — à revoir" : " — cohérent");
+  } else $("#bEcart").textContent = "une seule voie renseignée";
+
+  $("#jauge").style.width = Math.max(0, Math.min(100, couv)) + "%";
+  $("#jauge").style.background = couv >= 100 ? "var(--ok)" : couv >= 80 ? "var(--warn)" : "var(--crit)";
+
+  const v = $("#verdict");
+  if (!besoin || !stock) { v.className = "note"; v.innerHTML = "<b>Renseignez les stocks et le cheptel</b> pour obtenir le bilan."; }
+  else if (couv >= 100) { v.className = "note ok"; v.innerHTML = `<b>Situation saine.</b> Le stock couvre les besoins et la marge de sécurité, avec un excédent de ${nf(bilan, 1)} t MS. Cette marge peut servir à engraisser, à sécuriser l'année suivante ou à vendre du fourrage.`; }
+  else if (couv >= 80) { v.className = "note vig"; v.innerHTML = `<b>Déficit modéré : ${nf(-bilan, 1)} t MS.</b> À ce niveau de couverture, l'ajustement de ration suffit généralement. Commencez par les pertes à la distribution avant d'envisager un achat.`; }
+  else { v.className = "note alerte"; v.innerHTML = `<b>Déficit marqué : ${nf(-bilan, 1)} t MS, soit ${nf(Math.max(0, jours - autonomie), 0)} jours à couvrir.</b> En dessous de 80 % de couverture, l'achat extérieur devient nécessaire. Plus la décision est prise tôt, plus les options sont nombreuses et moins les mesures sont brutales.`; }
+
+  $("#aGain").textContent = nf(gain, 1);
+  $("#aBilan").textContent = (bilan2 > 0 ? "+" : "") + nf(bilan2, 1);
+  $("#aAuto").textContent = besoinJour ? nf(auto2, 0) : "—";
+  $("#aCouv").textContent = besoin ? nf(couv2, 0) : "—";
+  $("#aCout").textContent = nf(cout, 0);
+  $("#aCoutUGB").textContent = ugbTot ? nf(cout / ugbTot, 0) : "—";
+
+  save();
+}
+document.addEventListener("input", (e) => { if (e.target.closest("input,select")) calc(); });
+document.addEventListener("change", (e) => { if (e.target.matches("#fDistrib,#fDate")) calc(); });
+
+/* ---------- persistance locale (confort, par navigateur) ---------- */
+const KEY = "gds-autonomie-fourragere-v1";
+function collect() {
+  const rows = (id, keys) => [...$("#" + id).querySelectorAll("tr")].map((tr) => {
+    const o = {}; const f = [...tr.querySelectorAll("input,select")];
+    keys.forEach((k, n) => { o[k] = f[n] ? f[n].value : ""; }); return o;
+  });
+  return {
+    expl: $("#fExpl").value, date: $("#fDate").value, jours: $("#fJours").value, marge: $("#fMarge").value, distrib: $("#fDistrib").value,
+    voie: $("#tabUGB").getAttribute("aria-selected"),
+    silos: rows("tSilos", ["nom", "type", "l1", "l2", "larg", "haut", "ms", "am", "dens", "pertes"]),
+    balles: rows("tBalles", ["nom", "n", "p", "ms", "st", "pertes"]),
+    ugb: rows("tUGB", ["cat", "coef", "n"]),
+    ration: rows("tRation", ["nom", "n", "kg", "j"]),
+    lev: rows("tLev", ["type", "q", "p"]),
+  };
+}
+function save() { try { localStorage.setItem(KEY, JSON.stringify(collect())); } catch (e) { /* stockage indisponible */ } }
+function load(d) {
+  $("#fExpl").value = d.expl || ""; $("#fDate").value = d.date || "";
+  $("#fJours").value = d.jours || 160; $("#fMarge").value = d.marge || 15;
+  $("#fDistrib").value = d.distrib || "0.13";
+  ["tSilos", "tBalles", "tUGB", "tRation", "tLev"].forEach((b) => { $("#" + b).innerHTML = ""; });
+  (d.silos || []).forEach((x) => $("#tSilos").appendChild(rowSilo(x)));
+  (d.balles || []).forEach((x) => $("#tBalles").appendChild(rowBalle(x)));
+  (d.ugb || []).forEach((x) => $("#tUGB").appendChild(rowUGB(x)));
+  (d.ration || []).forEach((x) => $("#tRation").appendChild(rowRation(x)));
+  (d.lev || []).forEach((x) => $("#tLev").appendChild(rowLev(x)));
+  showTab(d.voie === "false" ? "ration" : "ugb");
+}
+
+/* ---------- exemple ---------- */
+const EXEMPLE = {
+  expl: "EARL exemple — naisseur-engraisseur (24)", date: new Date().toISOString().slice(0, 10),
+  jours: "160", marge: "15", distrib: "0.13", voie: "true",
+  silos: [
+    { nom: "Maïs — silo couloir", type: "mais_couloir", l1: "18", l2: "6", larg: "8", haut: "2.4", ms: "33", am: "30", dens: "", pertes: "5" },
+    { nom: "Herbe — taupinière", type: "herbe_longs", l1: "12", l2: "5", larg: "6", haut: "1.6", ms: "28", am: "28", dens: "", pertes: "8" },
+  ],
+  balles: [
+    { nom: "Foin prairie permanente Ø 1,50 m — sous toit", n: "260", p: "275", ms: "85", st: "3", pertes: "3" },
+    { nom: "Enrubannage Ø 1,20 m — 50 % MS, bâché au sol", n: "90", p: "440", ms: "50", st: "8", pertes: "8" },
+    { nom: "Paille alimentaire Ø 1,50 m — sous toit", n: "70", p: "185", ms: "90", st: "3", pertes: "3" },
+  ],
+  ugb: [
+    { cat: "Vache allaitante", coef: "0.9", n: "60" },
+    { cat: "Génisse < 1 an", coef: "0.3", n: "22" },
+    { cat: "Génisse 1 – 2 ans", coef: "0.6", n: "18" },
+    { cat: "Génisse > 2 ans", coef: "0.8", n: "12" },
+    { cat: "Taurillon", coef: "0.8", n: "14" },
+    { cat: "Taureau reproducteur (hors référentiel Idele)", coef: "1", n: "3" },
+  ],
+  ration: [
+    { nom: "Vaches suitées", n: "60", kg: "13", j: "160" },
+    { nom: "Génisses < 1 an", n: "22", kg: "4", j: "160" },
+    { nom: "Génisses 1 – 2 ans", n: "18", kg: "8", j: "160" },
+    { nom: "Génisses > 2 ans", n: "12", kg: "10", j: "160" },
+    { nom: "Taurillons à l'engrais", n: "14", kg: "9", j: "160" },
+    { nom: "Taureaux reproducteurs", n: "3", kg: "12", j: "160" },
+  ],
+  lev: [
+    { type: "ratelier", q: "0", p: "4" },
+    { type: "cfoin", q: "0", p: "290" },
+    { type: "foin", q: "0", p: "170" },
+  ],
+};
+
+/* ---------- actions ---------- */
+$("#btnExample").onclick = () => { load(JSON.parse(JSON.stringify(EXEMPLE))); calc(); };
+$("#btnClear").onclick = () => {
+  load({ expl: "", date: "", jours: "160", marge: "15", distrib: "0.13", voie: "true", silos: [{}], balles: [{}], ugb: [{}], ration: [{}], lev: [{}] });
+  calc();
+};
+$("#btnPrint").onclick = () => window.print();
+$("#btnCopy").onclick = async () => {
+  const g = (id) => ($("#" + id).textContent || "").trim();
+  const txt = [
+    "BILAN FOURRAGER — " + ($("#fExpl").value || "élevage non nommé"),
+    "Période : " + $("#fJours").value + " jours · bilan du " + ($("#fDate").value || "—"),
+    "",
+    "Stock utile .................. " + g("bA") + " t MS",
+    "Besoins (après pertes) ....... " + g("bB") + " t MS",
+    "Stock de sécurité ............ " + g("bC") + " t MS",
+    "BILAN ........................ " + g("bD") + " t MS",
+    "Taux de couverture ........... " + g("bE") + " %",
+    "AUTONOMIE .................... " + g("bG") + " jours (fin de stock : " + g("bH") + ")",
+    "Stock par UGB ................ " + g("bUGB") + " t MS/UGB",
+    "",
+    "Après ajustements : bilan " + g("aBilan") + " t MS · autonomie " + g("aAuto") + " jours · coût " + g("aCout") + " €",
+    "",
+    "Calculateur GDS 24 / GDS 47 — équations Institut de l'Élevage, bilan fourrager 2020.",
+  ].join("\n");
+  try { await navigator.clipboard.writeText(txt); $("#btnCopy").textContent = "Synthèse copiée"; setTimeout(() => ($("#btnCopy").textContent = "Copier la synthèse"), 2200); }
+  catch (e) { window.prompt("Copiez la synthèse :", txt); }
+};
+$("#btnTheme").onclick = () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const dark = cur ? cur === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.setAttribute("data-theme", dark ? "light" : "dark");
+};
+
+/* ---------- démarrage ---------- */
+let start = null;
+try { const raw = localStorage.getItem(KEY); if (raw) start = JSON.parse(raw); } catch (e) { start = null; }
+load(start && (start.silos || []).length ? start : JSON.parse(JSON.stringify(EXEMPLE)));
+calc();
+</script>

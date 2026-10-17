@@ -66,7 +66,7 @@ it('prépare le brouillon : niveau proposé et messages issus des lots et de l\'
 
     expect($iv->version)->toBe(1)
         ->and($iv->niveau_propose)->toBe(2)
-        ->and($iv->version_grille)->toBe('4')
+        ->and($iv->version_grille)->toBe('5')
         ->and($messages->pluck('origine')->unique()->values()->all())->toBe(['lot', 'eau'])
         ->and($messages->first()?->gravite)->toBe(2)
         ->and($messages->last()?->pilier)->toBe('hydratation')
@@ -172,7 +172,7 @@ it('T-06 : version 2 copiée de la version 1, publication qui archive la version
 
     expect($v1->refresh()->statut)->toBe(InterpretationVisite::STATUT_ARCHIVE)
         ->and($v2->refresh()->statut)->toBe(InterpretationVisite::STATUT_PUBLIE)
-        ->and($v1->version_grille)->toBe('4')
+        ->and($v1->version_grille)->toBe('5')
         ->and(Gate::forUser($this->tech)->allows('view', $v1))->toBeTrue()
         ->and(Gate::forUser($this->jeu->eleveur24a)->allows('view', $v1))->toBeFalse()
         ->and(Gate::forUser($this->tech)->allows('update', $this->visite->refresh()))->toBeFalse();

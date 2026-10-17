@@ -30,7 +30,7 @@ it('charge les référentiels du dossier en version 4, au statut [C] et à valid
         ->and(DB::table('ref.seuil_bilan_sanitaire')->count())->toBe(7)
         ->and(DB::table('ref.grille_trouble_cause')->count())->toBe(30)
         ->and(DB::table('ref.mesure_terrain')->count())->toBe(13)
-        ->and($this->ref->versionGrilleCourante())->toBe('4');
+        ->and($this->ref->versionGrilleCourante())->toBe('5');
 
     foreach ($this->ref->reperesMesuresTerrain() as $repere) {
         expect($repere->source->statutEpistemique)->toBe(StatutEpistemique::ConsensusProfessionnel)

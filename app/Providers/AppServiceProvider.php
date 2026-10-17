@@ -20,9 +20,17 @@ use App\Models\Fourrage\Analyse;
 use App\Models\Fourrage\AnalyseAnimale;
 use App\Models\Fourrage\Elevage;
 use App\Models\Fourrage\Interpretation;
+use App\Models\Plan\LotAnimaux;
+use App\Models\Plan\Phase;
+use App\Models\Plan\Ration;
+use App\Models\Plan\RationComposant;
 use App\Models\Ref\PlagePlausibilite;
 use App\Models\Ref\SeuilInterpretation;
 use App\Models\Ref\VersionReferentiel;
+use App\Models\Stock\Inventaire;
+use App\Models\Stock\LotStock;
+use App\Models\Stock\Mouvement;
+use App\Models\Stock\PeriodePhase;
 use App\Policies\ActionPolicy;
 use App\Policies\AnalyseAnimalePolicy;
 use App\Policies\AnalyseEauPolicy;
@@ -37,7 +45,9 @@ use App\Policies\InterpretationPolicy;
 use App\Policies\InterpretationVisitePolicy;
 use App\Policies\MesureTerrainPolicy;
 use App\Policies\NoteLiaisonPolicy;
+use App\Policies\PlanPolicy;
 use App\Policies\ReferentielPolicy;
+use App\Policies\StockPolicy;
 use App\Policies\VisitePolicy;
 use App\Services\Import\ExtracteurBulletin;
 use App\Services\Import\ExtracteurLano;
@@ -99,6 +109,13 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Action::class, ActionPolicy::class);
         Gate::policy(Controle::class, ActionPolicy::class);
         Gate::policy(NoteLiaison::class, NoteLiaisonPolicy::class);
+        // Lot L5 — stocks et troupeau (§ 2.3)
+        foreach ([Inventaire::class, LotStock::class, Mouvement::class, PeriodePhase::class] as $modele) {
+            Gate::policy($modele, StockPolicy::class);
+        }
+        foreach ([LotAnimaux::class, Phase::class, Ration::class, RationComposant::class] as $modele) {
+            Gate::policy($modele, PlanPolicy::class);
+        }
         // E24 — Référentiels versionnés
         Gate::policy(VersionReferentiel::class, ReferentielPolicy::class);
         Gate::policy(SeuilInterpretation::class, ReferentielPolicy::class);

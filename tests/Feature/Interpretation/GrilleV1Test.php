@@ -116,7 +116,7 @@ it('calcule les ratios d\'un bulletin réel avant classement (Ca/P de la grille)
 
 it('lit la version de grille, les paramètres par défaut et les correspondances des référentiels', function () {
     // version 4 : référentiels du dossier (lot L3, étape 2)
-    expect(referentiels()->versionGrilleCourante())->toBe('4')
+    expect(referentiels()->versionGrilleCourante())->toBe('5')
         ->and(referentiels()->parametre('interpretation.fenetre_evenements_mois'))->toBe(12.0)
         ->and(referentiels()->parametre('cle.inconnue'))->toBeNull()
         ->and(referentiels()->familleDuType('ENRUB_LUZ'))->toBe('ENRUB')
