@@ -1,12 +1,17 @@
 <?php
 
 use App\Http\Controllers\AiguillageController;
+use App\Http\Controllers\AutonomiePdfController;
 use App\Http\Controllers\BulletinPdfController;
 use App\Http\Controllers\ElevageCourantController;
 use App\Http\Controllers\FicheVisiteController;
 use App\Http\Controllers\NoteLiaisonController;
 use App\Http\Controllers\NoticeRgpdController;
 use App\Http\Controllers\TravailController;
+use App\Livewire\Autonomie\Approvisionnement;
+use App\Livewire\Autonomie\Bilan as AutonomieBilan;
+use App\Livewire\Autonomie\Parametres as ParametresElevageEcran;
+use App\Livewire\Autonomie\ScenarioEcran;
 use App\Livewire\Dossier\Interpretation\EcranVisite;
 use App\Livewire\Dossier\Lecture\Accueil;
 use App\Livewire\Dossier\Lecture\Aliments;
@@ -106,6 +111,15 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
             Route::get('/stocks/{inventaire}', SaisieInventaire::class)->name('stocks.inventaire');
             // E13 — troupeau : lots d'animaux, phases, rations (EF-M5)
             Route::get('/troupeau', Troupeau::class)->name('troupeau');
+            // E14 — autonomie, bilan et projection (EF-M6)
+            Route::get('/autonomie', AutonomieBilan::class)->name('autonomie');
+            Route::get('/autonomie/pdf', [AutonomiePdfController::class, 'bilan'])->name('autonomie.pdf');
+            // E15 — approvisionnement : proposition initiale, scénarios, comparaison (EF-M7)
+            Route::get('/approvisionnement', Approvisionnement::class)->name('approvisionnement');
+            Route::get('/scenarios/{scenario}', ScenarioEcran::class)->name('scenarios.voir');
+            Route::get('/scenarios/{scenario}/pdf', [AutonomiePdfController::class, 'scenario'])->name('scenarios.pdf');
+            // E16 — paramètres de l'élevage (EF-M4-07, D10)
+            Route::get('/parametres', ParametresElevageEcran::class)->name('parametres');
         });
 
         // E23 — Administration : GDS, comptes, conventions

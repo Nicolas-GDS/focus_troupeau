@@ -263,7 +263,7 @@ class SaisieInventaire extends Component
         $cles = $this->lot['forme'] === 'silo' ? StocksService::PERTES_SILO : StocksService::PERTES_BALLES;
 
         return collect($cles)->mapWithKeys(fn (string $cle) => [$cle => [
-            'libelle' => (string) ($libelles[$cle] ?? $cle), 'defaut' => $service->pertesDefaut($cle, $elevage->gds_id),
+            'libelle' => (string) ($libelles[$cle] ?? $cle), 'defaut' => $service->pertesDefaut($cle, $elevage->gds_id, $elevage->id),
         ]])->all();
     }
 

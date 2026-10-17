@@ -18,18 +18,21 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     (new JeuJ1Seeder)->run();
     $this->elevage = Elevage::query()->withoutGlobalScopes()->where('code_pseudo', JeuJ1Seeder::CODE)->sole();
-    $this->inventaire = Inventaire::query()->withoutGlobalScopes()->where('elevage_id', $this->elevage->id)->sole();
+    $this->inventaire = Inventaire::query()->withoutGlobalScopes()->where('elevage_id', $this->elevage->id)->where('statut', Inventaire::STATUT_COURANT)->sole();
     $this->eleveur = User::query()->where('email', JeuJ1Seeder::ELEVEUR)->sole();
 });
 
-it('charge J1 : stock utile 205,94 t MS hors silo, silo de RC-5 à 111,98 t MS, rejouable (§ 9.1)', function () {
+it('charge J1 : stock utile 205,94 t MS, silo de RC-5 à 111,98 t MS dans un inventaire clos, rejouable (§ 9.1)', function () {
     (new JeuJ1Seeder)->run();
     $lots = LotStock::query()->withoutGlobalScopes()->where('inventaire_id', $this->inventaire->id)->pluck('stock_utile_t_ms', 'libelle')->map(fn ($v) => (float) $v);
+    $clos = Inventaire::query()->withoutGlobalScopes()->where('elevage_id', $this->elevage->id)->where('statut', Inventaire::STATUT_CLOS)->sole();
+    $silo = (float) LotStock::query()->withoutGlobalScopes()->where('inventaire_id', $clos->id)->sole()->stock_utile_t_ms;
 
-    expect(round($lots->except('Maïs ensilage — silo couloir')->sum(), 2))->toBe(205.94)
-        ->and($lots['Maïs ensilage — silo couloir'])->toEqualWithDelta(528 * 676.5 * 0.33 / 1000 * 0.95, 1e-6)
+    expect(round($lots->sum(), 2))->toBe(205.94)
+        ->and($lots->keys()->all())->not->toContain('Maïs ensilage — silo couloir')
+        ->and($silo)->toEqualWithDelta(528 * 676.5 * 0.33 / 1000 * 0.95, 1e-6)
         ->and($lots['Foin 2025'])->toEqualWithDelta(40.0, 1e-9)
-        ->and(Inventaire::query()->withoutGlobalScopes()->where('elevage_id', $this->elevage->id)->count())->toBe(1)
+        ->and(Inventaire::query()->withoutGlobalScopes()->where('elevage_id', $this->elevage->id)->count())->toBe(2)
         ->and([$this->inventaire->date_debut->diffInDays($this->inventaire->date_fin) + 1, (float) $this->inventaire->marge_securite])->toBe([151.0, 0.15]);
 });
 
@@ -40,7 +43,7 @@ it('calcule le besoin prélevé de J1 : 222,16 t MS (RC-8, § 9.1)', function ()
         ->and($besoins['ration_t_ms'])->toEqualWithDelta(193.28, 1e-6);
 });
 
-it('retrouve les apports de la ration des vaches de T-13 ; la paille non analysée laisse la couverture des génisses non calculée', function () {
+it('retrouve les apports de la ration des vaches de T-13 (foin et enrubannage pris par famille) ; la paille non analysée laisse la couverture des génisses non calculée', function () {
     $this->actingAs($this->eleveur);
     $analyse = app(AnalyseRationService::class);
     $vaches = LotAnimaux::query()->where('libelle', 'Vaches allaitantes')->sole();
@@ -52,7 +55,7 @@ it('retrouve les apports de la ration des vaches de T-13 ; la paille non analys�
         ->and($a['complet'])->toBeTrue()
         ->and($ufl->apport)->toEqualWithDelta(4 * 0.67 + 7 * 0.80 + 0.88, 1e-6)
         ->and(collect($a['controles'])->firstWhere('code', 'CA_P')->valeur)->toEqualWithDelta((4 * 7.3 + 7 * 9.6 + 0.88 * 10 + 0.1 * 80) / (4 * 2.2 + 7 * 2.5 + 0.88 * 8 + 0.1 * 120), 1e-6)
-        ->and($analyse->analyser($genisses->phases()->sole(), $genisses, true)['inconnus'])->toBe(['Foin 2026', 'Paille']);
+        ->and($analyse->analyser($genisses->phases()->sole(), $genisses, true)['inconnus'])->toBe(['Paille et coproduits fibreux']);
 });
 
 it('ouvre à l\'éleveur de J1 la saisie de ses stocks et de son troupeau (E12, E13)', function () {

@@ -2,7 +2,7 @@
 
 namespace App\Services\Stocks;
 
-use App\Domain\Referentiels\Referentiels;
+use App\Domain\Autonomie\Incertitude;
 use App\Domain\Stocks\Balles;
 use App\Domain\Stocks\DensiteHorsDomaine;
 use App\Domain\Stocks\EquationDensite;
@@ -13,6 +13,7 @@ use App\Models\Stock\Inventaire;
 use App\Models\Stock\LotStock;
 use App\Models\Stock\Mouvement;
 use App\Services\Dossier\SaisieRefusee;
+use App\Services\Referentiels\ParametresElevage;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -37,9 +38,10 @@ class StocksService
     private const MS_DEFAUT = ['FOIN' => 'ms.defaut.foin', 'PAILLE' => 'ms.defaut.paille'];
 
     public function __construct(
-        private readonly Referentiels $referentiels,
+        private readonly ParametresElevage $parametresElevage,
         private readonly Silo $silo = new Silo,
         private readonly Balles $balles = new Balles,
+        private readonly Incertitude $incertitudeDomaine = new Incertitude,
     ) {}
 
     /**
@@ -51,7 +53,7 @@ class StocksService
             throw new SaisieRefusee('Un inventaire est déjà en cours pour cet élevage : clore l\'inventaire courant avant d\'en créer un nouveau.');
         }
 
-        $marge = $this->parametre($donnees['annee_seche'] ? 'securite.marge_annee_seche' : 'securite.marge', $elevage->gds_id);
+        $marge = $this->parametre($donnees['annee_seche'] ? 'securite.marge_annee_seche' : 'securite.marge', $elevage->gds_id, $elevage->id);
 
         return Inventaire::query()->create([...$donnees, 'elevage_id' => $elevage->id, 'marge_securite' => $marge]);
     }
@@ -72,7 +74,7 @@ class StocksService
     public function enregistrerLot(Inventaire $inventaire, array $donnees, ?LotStock $lot = null, bool $publiesSeulement = false): LotStock
     {
         $donnees = $this->completer($inventaire, $donnees, $publiesSeulement);
-        $resultats = $this->calculer($inventaire, $donnees);
+        $resultats = [...$this->calculer($inventaire, $donnees), 'incertitude_rel' => $this->incertitude($inventaire, $donnees)];
 
         return DB::transaction(function () use ($inventaire, $donnees, $resultats, $lot) {
             $attributs = [...$donnees, ...$resultats, 'inventaire_id' => $inventaire->id, 'elevage_id' => $inventaire->elevage_id];
@@ -165,10 +167,10 @@ class StocksService
         })->sortBy('famille')->values()->all();
     }
 
-    /** Valeur par défaut d'une clé de pertes (fraction). */
-    public function pertesDefaut(string $cle, ?int $gdsId = null): float
+    /** Valeur par défaut d'une clé de pertes (fraction), celle de l'élevage si elle a été modifiée (E16). */
+    public function pertesDefaut(string $cle, ?int $gdsId = null, ?string $elevageId = null): float
     {
-        return $this->parametre($cle, $gdsId);
+        return $this->parametre($cle, $gdsId, $elevageId);
     }
 
     /**
@@ -221,7 +223,7 @@ class StocksService
             if (isset($donnees['ms_pct'])) {
                 $donnees['ms_origine'] = 'saisie';
             } elseif (isset(self::MS_DEFAUT[$donnees['famille_code']])) {
-                $donnees['ms_pct'] = $this->parametre(self::MS_DEFAUT[$donnees['famille_code']], $gdsId);
+                $donnees['ms_pct'] = $this->parametre(self::MS_DEFAUT[$donnees['famille_code']], $gdsId, $inventaire->elevage_id);
                 $donnees['ms_origine'] = 'defaut';
             } else {
                 throw new SaisieRefusee('Saisir la matière sèche ou relier le lot à une analyse : pas de valeur par défaut pour cette famille de fourrage.');
@@ -232,14 +234,14 @@ class StocksService
         if (! in_array($donnees['mode_stockage'] ?? null, $admises, true)) {
             throw new SaisieRefusee('Choisir le mode de conservation ou de stockage du lot.');
         }
-        $donnees['pertes_defaut_pct'] = $this->parametre((string) $donnees['mode_stockage'], $gdsId);
+        $donnees['pertes_defaut_pct'] = $this->parametre((string) $donnees['mode_stockage'], $gdsId, $inventaire->elevage_id);
         $donnees['pertes_pct'] ??= $donnees['pertes_defaut_pct'];
 
         if ($donnees['forme'] === 'vrac' && empty($donnees['poids_brut_kg'])) {
             if ($donnees['famille_code'] !== 'FOIN') {
                 throw new SaisieRefusee('Saisir la densité du vrac en kg brut par m³.');
             }
-            $donnees['poids_brut_kg'] = $this->parametre('densite.foin_vrac_kg_m3', $gdsId);
+            $donnees['poids_brut_kg'] = $this->parametre('densite.foin_vrac_kg_m3', $gdsId, $inventaire->elevage_id);
         }
 
         return $donnees;
@@ -290,6 +292,38 @@ class StocksService
         ];
     }
 
+    /**
+     * Incertitude relative du stock utile d'un lot (RC-14) : composition quadratique des erreurs de volume, de densité
+     * ou de poids, de MS et de pertes ; cas absents du tableau de RC-14 tranchés le 17/10/2026 ([CP]).
+     *
+     * @param  array<string, mixed>  $d
+     */
+    public function incertitude(Inventaire $inventaire, array $d): float
+    {
+        $gds = (int) DB::table('fourrage.elevage')->where('id', $inventaire->elevage_id)->value('gds_id');
+        $e = fn (string $cle) => $this->parametre('incertitude.'.$cle, $gds);
+        $ms = (float) $d['ms_pct'];
+        $ensilage = in_array($d['famille_code'], ['ENRUB', 'ENSIL_HERBE', 'ENSIL_MAIS', 'ENSIL_AUTRE'], true);
+        $points = match ($d['ms_origine']) {
+            'analyse' => $e('ms_analyse_points'),
+            'defaut' => $e('ms_defaut_points'),
+            default => $ensilage ? $e('ms_ensilage_points') : $e('ms_saisie_points'),
+        };
+        $facteurs = [$this->incertitudeDomaine->ms($points, $ms), $e('pertes_relatif') * (float) $d['pertes_pct']];
+
+        if ($d['forme'] === 'silo') {
+            $facteurs[] = $d['ouvrage'] === 'taupiniere' ? $e('volume_taupiniere') : $e('volume_couloir');
+            $facteurs[] = $e('densite_'.($d['methode_densite'] === 'equation' ? 'equation' : $d['methode_densite']));
+        } elseif ($d['forme'] === 'vrac') {
+            $facteurs[] = $e('vrac_volume');
+            $facteurs[] = $e('vrac_densite');
+        } else {
+            $facteurs[] = ! empty($d['poids_mesure']) ? $e('poids_mesure') : $e('poids_estime');
+        }
+
+        return $this->incertitudeDomaine->lot($facteurs);
+    }
+
     private function msAnalysee(int $prelevementId, bool $publiesSeulement): ?float
     {
         $analyses = $this->analysesUtilisables(DB::table('fourrage.analyse')->where('prelevement_id', $prelevementId), $publiesSeulement)->select('id');
@@ -307,8 +341,9 @@ class StocksService
                 ->whereColumn('fourrage.interpretation.analyse_id', 'fourrage.analyse.id')->where('fourrage.interpretation.statut', 'publie')));
     }
 
-    private function parametre(string $cle, ?int $gdsId): float
+    /** Paramètre du référentiel ; avec l'élevage, sa valeur propre pour une clé modifiable (E16, D10). */
+    private function parametre(string $cle, ?int $gdsId, ?string $elevageId = null): float
     {
-        return $this->referentiels->parametre($cle, $gdsId) ?? throw new SaisieRefusee("Valeur par défaut absente : {$cle}.");
+        return $this->parametresElevage->valeur($cle, $elevageId, $gdsId) ?? throw new SaisieRefusee("Valeur par défaut absente : {$cle}.");
     }
 }

@@ -17,10 +17,11 @@ doivent être verts avant la recette.
 
 | Écran | Attendu |
 |---|---|
-| Stocks → inventaire du 01/11/2026 | Période de 151 jours, marge de sécurité 15 % ; stock utile : silo de maïs 111,98 t MS (vérification de RC-5, non consommé), foin 2025 40,0, foin 2026 98,94, enrubannage 42,56, paille 24,44 — soit **205,94 t MS hors silo** |
+| Stocks → inventaire du 01/11/2026 | Période de 151 jours, marge de sécurité 15 % ; stock utile : foin 2025 40,0, foin 2026 98,94, enrubannage 42,56, paille 24,44 — soit **205,94 t MS** |
+| Stocks → inventaire clos du 01/10/2026 | Silo de maïs 111,98 t MS (vérification de RC-5 ; « non consommé » au § 9.1, donc hors du bilan) |
 | Troupeau | Voie ration 193,3 t MS ; **prélevé sur les stocks 222,2 t MS** (pertes à la distribution 13 %) ; voie UGB 212,0 t MS et écart des deux voies |
 | Troupeau → vaches allaitantes | 11,98 kg MS ingérés ; apports de T-13 ; couverture lue sur les repères des vaches allaitantes en lactation (« repère à valider ») ; contrôles Ca/P et PDI/UFL |
-| Troupeau → génisses | « Apports inconnus pour : Foin 2026, Paille » : ces lots ne sont pas analysés, la couverture n'est pas calculée |
+| Troupeau → génisses | « Apports inconnus pour : Paille et coproduits fibreux » : la paille n'est pas analysée, la couverture n'est pas calculée |
 
 Écart connu avec le texte du § 9.1 : la couverture « UFL 96 % (limite), PDI couvert, cuivre 23 mg/kg MS » y est lue
 sur les besoins d'essai de `calculs/` (9,5 UFL et 800 g PDI par jour, cuivre 10 mg/kg MS) ; l'application la lit sur

@@ -26,17 +26,20 @@ use RuntimeException;
  * § 9.1, saisis par les services de l'application (mêmes calculs que l'écran).
  *
  * - Silo de maïs (L1 30 m, L2 6 m, largeur 8 m, hauteur 2 m, MS 33 %, amidon 30 %) : présent pour vérifier RC-5 ;
- *   le § 9.1 le dit « non consommé dans l'exemple » (il n'entre dans aucune ration).
+ *   le § 9.1 le dit « non consommé dans l'exemple » : il est saisi dans un inventaire antérieur, clos, pour ne pas
+ *   entrer dans le stock utile du bilan (T-14).
  * - Foin 2025 : « 40 t MS utiles (lot déjà calculé) » — reproduit par 160 balles de 300 kg à 85 % de MS et les pertes
- *   qui ramènent ce lot à 40 t MS ; analysé avec les teneurs du foin de T-13 (calculs/).
- * - Foin 2026 (400 balles de 300 kg, MS par défaut 85 %), enrubannage 2026 (150 balles de 650 kg, MS 45 % de
- *   l'analyse, teneurs de T-13), paille (100 balles de 280 kg, MS par défaut 90 %), tous sous toit (3 %).
+ *   qui ramènent ce lot à 40 t MS. Foin 2025 et foin 2026 (400 balles de 300 kg, MS 85 %) analysés avec les teneurs
+ *   du foin de T-13 (calculs/) ; enrubannage 2026 (150 balles de 650 kg, MS 45 % de l'analyse, teneurs de T-13),
+ *   paille (100 balles de 280 kg, MS par défaut 90 %, non analysée), tous sous toit (3 %). Dates de récolte de T-14
+ *   (ordre de consommation dans la famille : le foin 2025 d'abord).
  * - Correcteur azoté et minéral décrits par étiquette, aux teneurs de T-13 (valeurs d'essai de calculs/).
- * - 100 vaches allaitantes en lactation (foin 2025 4 kg MS, enrubannage 7, correcteur 0,88, minéral 0,1) et 30
- *   génisses de 1 à 2 ans (foin 2026 5 kg MS, paille 1), distribution par déroulé au sol (13 %).
+ * - 100 vaches allaitantes en lactation (foin 4 kg MS, enrubannage 7, correcteur 0,88, minéral 0,1) et 30 génisses
+ *   de 1 à 2 ans (foin 5 kg MS, paille 1), fourrages pris par famille de stock comme en T-14, distribution par
+ *   déroulé au sol (13 %).
  *
- * Attendus du § 9.1 vérifiables au lot L5 : stock utile 205,94 t MS hors silo ; besoin prélevé 222,16 t MS. Les
- * suivants (sécurité, bilan, autonomie, ruptures) relèvent du lot L6. Agents de J4 ; éleveur propre. Interdit en
+ * Attendus du § 9.1 : stock utile 205,94 t MS hors silo ; besoin prélevé 222,16 t MS ; sécurité 33,32 ; bilan
+ * −49,54 ; autonomie 139 jours ; rupture de l'enrubannage le 23/12/2026 ; foin 2025 épuisé le 03/01/2027. Agents de J4 ; éleveur propre. Interdit en
  * production, rejouable.
  */
 class JeuJ1Seeder extends Seeder
@@ -75,9 +78,10 @@ class JeuJ1Seeder extends Seeder
             $eleveur->elevages()->syncWithoutDetaching([$elevage->id => ['role' => ElevageAcces::ROLE_ELEVEUR]]);
 
             $stocks = app(StocksService::class);
+            $this->silo($elevage);
             $inventaire = $stocks->creerInventaire($elevage, ['date_inventaire' => '2026-11-01', 'type' => 'fin_recolte', 'date_debut' => '2026-11-01', 'date_fin' => '2027-03-31', 'annee_seche' => false]);
-            $lots = $this->stocks($elevage, $inventaire, $technicien);
-            $this->troupeau($elevage, $inventaire, $lots);
+            $this->stocks($elevage, $inventaire, $technicien);
+            $this->troupeau($elevage, $inventaire);
         });
     }
 
@@ -89,24 +93,33 @@ class JeuJ1Seeder extends Seeder
             ['libelle' => $libelle, 'forme' => 'balle_ronde', 'famille_code' => $famille, 'nombre' => $n, 'poids_brut_kg' => $poids, 'mode_stockage' => 'pertes.stockage.sous_toit', ...$sup]);
 
         return [
-            'silo' => $stocks->enregistrerLot($inventaire, [
-                'libelle' => 'Maïs ensilage — silo couloir', 'forme' => 'silo', 'famille_code' => 'ENSIL_MAIS', 'ouvrage' => 'couloir',
-                'l1_m' => 30, 'l2_m' => 6, 'largeur_m' => 8, 'hauteur_m' => 2, 'ms_pct' => 33, 'amidon_pct' => 30,
-                'methode_densite' => 'equation', 'equation_code' => 'mais_couloir', 'mode_stockage' => 'pertes.conservation.silo_bien_conduit',
-                'commentaire' => 'Non consommé dans l\'exemple J1 (vérification de RC-5, § 9.1).',
-            ]),
-            'foin2025' => $balles('Foin 2025', 'FOIN', 160, 300, ['type_fourrage_code' => 'FOIN_PP', 'pertes_pct' => 1 - 40 / 40.8,
+            'foin2025' => $balles('Foin 2025', 'FOIN', 160, 300, ['type_fourrage_code' => 'FOIN_PP', 'pertes_pct' => 1 - 40 / 40.8, 'date_recolte' => '2025-06-10',
                 'prelevement_id' => $this->analyse($elevage, 'FOIN_PP', 'Foin 2025', self::TENEURS['foin'], $technicien),
                 'commentaire' => 'Lot de 40 t MS utiles déjà calculé (§ 9.1), reproduit par 160 balles de 300 kg à 85 % de MS.']),
-            'foin2026' => $balles('Foin 2026', 'FOIN', 400, 300),
-            'enrub' => $balles('Enrubannage 2026', 'ENRUB', 150, 650, ['type_fourrage_code' => 'ENRUB_HERBE',
+            'foin2026' => $balles('Foin 2026', 'FOIN', 400, 300, ['type_fourrage_code' => 'FOIN_PP', 'date_recolte' => '2026-06-15',
+                'prelevement_id' => $this->analyse($elevage, 'FOIN_PP', 'Foin 2026', self::TENEURS['foin'], $technicien, 'J1-FOIN26')]),
+            'enrub' => $balles('Enrubannage 2026', 'ENRUB', 150, 650, ['type_fourrage_code' => 'ENRUB_HERBE', 'date_recolte' => '2026-05-15',
                 'prelevement_id' => $this->analyse($elevage, 'ENRUB_HERBE', 'Enrubannage 2026', self::TENEURS['enrub'], $technicien)]),
-            'paille' => $balles('Paille', 'PAILLE', 100, 280),
+            'paille' => $balles('Paille', 'PAILLE', 100, 280, ['date_recolte' => '2026-07-20']),
         ];
     }
 
-    /** @param array<string, LotStock> $lots */
-    private function troupeau(Elevage $elevage, Inventaire $inventaire, array $lots): void
+    /** Silo de maïs de RC-5, dans un inventaire antérieur clos : hors du bilan de J1 (« non consommé », § 9.1). */
+    private function silo(Elevage $elevage): void
+    {
+        $stocks = app(StocksService::class);
+        $inventaire = $stocks->creerInventaire($elevage, ['date_inventaire' => '2026-10-01', 'type' => 'fin_recolte', 'date_debut' => '2026-10-01', 'date_fin' => '2026-10-31', 'annee_seche' => false,
+            'commentaire' => 'Inventaire du silo de maïs de J1 (vérification de RC-5, § 9.1).']);
+        $stocks->enregistrerLot($inventaire, [
+            'libelle' => 'Maïs ensilage — silo couloir', 'forme' => 'silo', 'famille_code' => 'ENSIL_MAIS', 'ouvrage' => 'couloir',
+            'l1_m' => 30, 'l2_m' => 6, 'largeur_m' => 8, 'hauteur_m' => 2, 'ms_pct' => 33, 'amidon_pct' => 30,
+            'methode_densite' => 'equation', 'equation_code' => 'mais_couloir', 'mode_stockage' => 'pertes.conservation.silo_bien_conduit',
+            'commentaire' => 'Non consommé dans l\'exemple J1 (vérification de RC-5, § 9.1).',
+        ]);
+        $stocks->clore($inventaire);
+    }
+
+    private function troupeau(Elevage $elevage, Inventaire $inventaire): void
     {
         $etiquettes = app(EtiquettesService::class);
         $correcteur = $etiquettes->creer($elevage, null, ['nature' => 'concentre', 'libelle_eleveur' => 'Correcteur azoté', 'ms_pct' => 88], [
@@ -120,15 +133,15 @@ class JeuJ1Seeder extends Seeder
         $troupeau = app(TroupeauService::class);
         $vaches = $troupeau->creerLot($elevage, $inventaire, ['libelle' => 'Vaches allaitantes', 'categorie_code' => 'VA']);
         $ration = $troupeau->ajouterPhase($vaches, 'lactation', '2026-11-01', '2027-03-31', 100)->ration;
-        $troupeau->ajouterComposant($ration, ['source' => 'lot_stock', 'lot_stock_id' => $lots['foin2025']->id, 'kg_ms' => 4.0]);
-        $troupeau->ajouterComposant($ration, ['source' => 'lot_stock', 'lot_stock_id' => $lots['enrub']->id, 'kg_ms' => 7.0]);
+        $troupeau->ajouterComposant($ration, ['source' => 'famille_stock', 'famille_code' => 'FOIN', 'kg_ms' => 4.0]);
+        $troupeau->ajouterComposant($ration, ['source' => 'famille_stock', 'famille_code' => 'ENRUB', 'kg_ms' => 7.0]);
         $troupeau->ajouterComposant($ration, ['source' => 'etiquette', 'etiquette_id' => $correcteur->id, 'kg_ms' => 0.88]);
         $troupeau->ajouterComposant($ration, ['source' => 'etiquette', 'etiquette_id' => $mineral->id, 'kg_ms' => 0.1]);
 
         $genisses = $troupeau->creerLot($elevage, $inventaire, ['libelle' => 'Génisses 1-2 ans', 'categorie_code' => 'GEN']);
         $ration = $troupeau->ajouterPhase($genisses, 'croissance', '2026-11-01', '2027-03-31', 30)->ration;
-        $troupeau->ajouterComposant($ration, ['source' => 'lot_stock', 'lot_stock_id' => $lots['foin2026']->id, 'kg_ms' => 5.0]);
-        $troupeau->ajouterComposant($ration, ['source' => 'lot_stock', 'lot_stock_id' => $lots['paille']->id, 'kg_ms' => 1.0]);
+        $troupeau->ajouterComposant($ration, ['source' => 'famille_stock', 'famille_code' => 'FOIN', 'kg_ms' => 5.0]);
+        $troupeau->ajouterComposant($ration, ['source' => 'famille_stock', 'famille_code' => 'PAILLE', 'kg_ms' => 1.0]);
     }
 
     /**
@@ -136,14 +149,14 @@ class JeuJ1Seeder extends Seeder
      *
      * @param  array<string, float|int>  $teneurs
      */
-    private function analyse(Elevage $elevage, string $type, string $nom, array $teneurs, User $technicien): int
+    private function analyse(Elevage $elevage, string $type, string $nom, array $teneurs, User $technicien, ?string $echantillon = null): int
     {
         $prelevement = Prelevement::query()->withoutGlobalScopes()->create([
             'elevage_id' => $elevage->id, 'campagne_code' => '2025-2026', 'date_prelevement' => '2026-06-15', 'type_fourrage_code' => $type, 'nom_lot' => $nom,
         ]);
         $analyse = Analyse::query()->withoutGlobalScopes()->create([
             'prelevement_id' => $prelevement->id, 'laboratoire_id' => (int) DB::table('ref.laboratoire')->where('code', 'LANO')->value('id'),
-            'num_echantillon_labo' => 'J1-'.$type, 'statut' => Analyse::STATUT_RECU,
+            'num_echantillon_labo' => $echantillon ?? 'J1-'.$type, 'statut' => Analyse::STATUT_RECU,
         ]);
         $unites = DB::table('ref.parametre')->whereIn('code', array_keys($teneurs))->pluck('unite', 'code');
         foreach ($teneurs as $code => $valeur) {

@@ -52,6 +52,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $stock_utile_t_ms
  * @property string|null $incertitude_rel
  * @property string|null $commentaire
+ * @property int|null $scenario_ligne_id lot « achat » créé par un scénario retenu (lot L6)
  */
 class LotStock extends Model
 {
@@ -76,7 +77,7 @@ class LotStock extends Model
         'priorite_consommation', 'ouvrage', 'equation_code', 'l1_m', 'l2_m', 'largeur_m', 'hauteur_m', 'nb_mesures_hauteur',
         'date_fermeture', 'amidon_pct', 'grain_pct', 'methode_densite', 'densite_kg_ms_m3', 'nombre', 'poids_brut_kg', 'poids_mesure',
         'volume_m3', 'mode_stockage', 'ms_pct', 'ms_origine', 'pertes_pct', 'pertes_defaut_pct', 'volume_calc_m3', 'densite_calc',
-        'stock_brut_t_ms', 'stock_utile_t_ms', 'incertitude_rel', 'commentaire',
+        'stock_brut_t_ms', 'stock_utile_t_ms', 'incertitude_rel', 'commentaire', 'scenario_ligne_id',
     ];
 
     protected $attributes = ['poids_mesure' => false];

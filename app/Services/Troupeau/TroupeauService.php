@@ -2,7 +2,6 @@
 
 namespace App\Services\Troupeau;
 
-use App\Domain\Referentiels\Referentiels;
 use App\Domain\Troupeau\Besoins;
 use App\Models\Dossier\EtiquetteAliment;
 use App\Models\Fourrage\Elevage;
@@ -13,6 +12,7 @@ use App\Models\Plan\RationComposant;
 use App\Models\Stock\Inventaire;
 use App\Models\Stock\LotStock;
 use App\Services\Dossier\SaisieRefusee;
+use App\Services\Referentiels\ParametresElevage;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -36,7 +36,7 @@ class TroupeauService
     public const SOURCES_STOCK = ['lot_stock', 'famille_stock'];
 
     public function __construct(
-        private readonly Referentiels $referentiels,
+        private readonly ParametresElevage $parametresElevage,
         private readonly Besoins $besoins = new Besoins,
     ) {}
 
@@ -307,6 +307,6 @@ class TroupeauService
     {
         $gds = (int) DB::table('fourrage.elevage')->where('id', $elevageId)->value('gds_id');
 
-        return $this->referentiels->parametre($cle, $gds) ?? throw new SaisieRefusee("Valeur par défaut absente : {$cle}.");
+        return $this->parametresElevage->valeur($cle, $elevageId, $gds) ?? throw new SaisieRefusee("Valeur par défaut absente : {$cle}.");
     }
 }

@@ -78,8 +78,8 @@ Estimation indicative pour un développement interne assisté par IA, à affiner
 | 4 | Seuils S1/S2 du bilan sanitaire et grille trouble × cause (NBVC) : droits d'usage et source à citer | L3 | Chargé de mission |
 | 5 | Chargement des tables INRAE-CIRAD-AFZ (licence d'utilisation des Feedtables pour un usage applicatif) — au lot L5, tables créées vides, concentrés décrits par leur composition saisie (décision du 17/10/2026) | L5 | Chargé de mission |
 | 6 | Besoins journaliers INRA 2018 par catégorie et stade : périmètre de la table à charger ; remplacement des repères [C] des vaches allaitantes — au lot L5, seuls les repères de RC-9 sont chargés, « repère à valider » (décision du 17/10/2026) | L5 | Vétérinaire conseil, technicien référent |
-| 7 | Référence complète de Faverdin et al. (taux de substitution) | L6 | Chargé de mission |
-| 8 | Prix indicatifs GDS des fourrages et concentrés (source et fréquence de révision) | L6 | Comité technique |
+| 7 | Référence complète de Faverdin et al. (taux de substitution) — au lot L6, taux chargés au statut [NV], « référence à vérifier » (décision du 17/10/2026) | L6 | Chargé de mission |
+| 8 | Prix indicatifs GDS des fourrages et concentrés (source et fréquence de révision) — au lot L6, valeurs de `calculs/` datées, « prix indicatif à valider » (décision du 17/10/2026) | L6 | Comité technique |
 | 9 | Durées de conservation RGPD et registre des traitements | L1 | Direction, DPO |
 | 10 | Nom de domaine et hébergeur | L8 | Direction |
 | 11 | Convention LANO pour un export structuré | L2 (ultérieur) | Direction |

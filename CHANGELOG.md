@@ -3,6 +3,26 @@
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; versions sémantiques (chapitre 6.5).
 Le numéro de version est affiché dans le pied de page de l'application et dans les PDF (ENF-EXP-03).
 
+## [Non publié] — lot L6 (autonomie et approvisionnement)
+
+### Ajouté
+- Domaine de l'autonomie (RC-10 à RC-14) : projection journalière par lot et par famille, sécurité, ruptures,
+  incertitude, leviers et proposition initiale ; tests T-14 à T-16.
+- Bilan mémorisé (`plan.bilan`), recalculé par le job `CalculerBilan` après toute saisie des stocks ou du troupeau
+  (T-20) ; scénarios appliqués virtuellement (RC-13.4) ; incertitude relative de chaque lot de stock.
+- E14 — bilan et projection : trois indicateurs et leur fourchette, repère d'action, tableau mensuel, graphique SVG
+  (`x-projection`), ruptures par famille et par lot, phases de la période de référence ; autonomie sur l'accueil.
+- Alerte d'autonomie par e-mail (EF-M8-03, T-21), évaluée à chaque recalcul et chaque nuit.
+- E15 — approvisionnement : proposition initiale, scénarios et leviers, comparaison de quatre scénarios (T-23),
+  scénario retenu avec lots et mouvements d'achat liés (T-24), technicien prévenu.
+- E16 — paramètres de l'élevage (`app.parametre_elevage`) : pertes, MS par défaut, densité du vrac, marges, prix
+  indicatifs ; référence affichée, écarts listés au technicien.
+- PDF du bilan et du scénario (T-26).
+- Jeu J1 aligné sur T-14 ; procédure `docs/recette/L6_recette_J1.md`.
+
+### Modifié
+- Le bilan compte les achats, ventes et ajustements datés de la période (RC-13.4, EF-M7-05).
+
 ## [Non publié] — lot L5 (stocks et troupeau)
 
 ### Ajouté

@@ -43,7 +43,8 @@ docker compose run --rm --no-deps node sh -c "npm install && npm run build"
 du document 04, rattachés au GDS 24 (recette : `docs/recette/L3_recette_J3.md`), et le jeu J5 : une population
 de référence synthétique (élevages `J5-…` consentants, lots validés) pour voir le positionnement et l'historique
 (`php artisan references:bilan`), et le jeu J1 : l'élevage allaitant synthétique `J1-ALLAITANT` (stocks et
-troupeau, recette : `docs/recette/L5_recette_J1.md`). Tous sont interdits en production. Mot de passe commun :
+troupeau, autonomie et approvisionnement, recettes : `docs/recette/L5_recette_J1.md` et
+`docs/recette/L6_recette_J1.md`). Tous sont interdits en production. Mot de passe commun :
 `J4_MOT_DE_PASSE` dans `.env` (par défaut `j4-developpement-seulement`).
 
 | Compte | Rôle | Périmètre |

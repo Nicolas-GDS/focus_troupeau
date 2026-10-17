@@ -103,6 +103,16 @@ const REGISTRE_ROUTES = [
     'GET elevages/{elevage}/stocks' => ['acces' => 'dossier', 'roles' => ['eleveur', 'technicien']],
     'GET elevages/{elevage}/stocks/{inventaire}' => ['acces' => 'objet'],
     'GET elevages/{elevage}/troupeau' => ['acces' => 'dossier', 'roles' => ['eleveur', 'technicien']],
+    // Lot L6 — E14 (annexe 10 : éleveur, technicien) ; écran testé dans tests/Feature/Autonomie/EcranBilanTest.php
+    'GET elevages/{elevage}/autonomie' => ['acces' => 'dossier', 'roles' => ['eleveur', 'technicien']],
+    // E15 ; scénarios testés dans tests/Feature/Autonomie/ApprovisionnementTest.php
+    'GET elevages/{elevage}/approvisionnement' => ['acces' => 'dossier', 'roles' => ['eleveur', 'technicien']],
+    'GET elevages/{elevage}/scenarios/{scenario}' => ['acces' => 'objet'],
+    // E16 ; écran testé dans tests/Feature/Autonomie/ParametresElevageTest.php
+    'GET elevages/{elevage}/parametres' => ['acces' => 'dossier', 'roles' => ['eleveur', 'technicien']],
+    // PDF du bilan et du scénario (EF-M6-06) ; testés dans tests/Feature/Autonomie/PdfAutonomieTest.php
+    'GET elevages/{elevage}/autonomie/pdf' => ['acces' => 'objet'],
+    'GET elevages/{elevage}/scenarios/{scenario}/pdf' => ['acces' => 'objet'],
 ];
 
 /** Rôles des volets du dossier (annexe 10 : éleveur, technicien, vétérinaire ; vétérinaire conseil pour E07, E11, E21). */

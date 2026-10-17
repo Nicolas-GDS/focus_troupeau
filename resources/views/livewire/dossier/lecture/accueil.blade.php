@@ -76,8 +76,23 @@
             </section>
         </div>
 
-        {{-- Autonomie fourragère : lot L6 (EF-M6-05) --}}
-        <x-ecran-a-venir ecran="E02, autonomie" lot="L6">Jours d'autonomie restants, date de rupture prévisionnelle et couverture des besoins.</x-ecran-a-venir>
+        {{-- Autonomie fourragère : dernier bilan mémorisé (EF-M6-05) --}}
+        @if ($autonomieVisible)
+            <section class="carte" aria-labelledby="titre-autonomie">
+                <h2 id="titre-autonomie" class="text-lg font-semibold">Autonomie fourragère</h2>
+                @if ($bilan === null)
+                    <p class="mt-2 text-sm text-texte-doux">Aucun bilan pour l'inventaire en cours. <a href="{{ route('stocks', $elevage->id) }}" class="lien">Saisir les stocks</a></p>
+                @else
+                    <dl class="mt-2 grid gap-3 text-sm sm:grid-cols-3">
+                        <div><dt class="text-texte-doux">Autonomie</dt><dd class="text-xl font-semibold">{{ $bilan->autonomie_jours }} jours</dd></div>
+                        <div><dt class="text-texte-doux">Rupture prévue</dt><dd class="text-xl font-semibold">{{ $bilan->date_rupture?->format('d/m/Y') ?? 'aucune sur la période' }}</dd>
+                            @if ($bilan->date_rupture) <dd class="text-xs text-texte-doux">entre le {{ $bilan->date_rupture_min?->format('d/m/Y') ?? '—' }} et le {{ $bilan->date_rupture_max?->format('d/m/Y') ?? 'la fin de période' }}</dd> @endif</div>
+                        <div><dt class="text-texte-doux">Couverture des besoins</dt><dd class="text-xl font-semibold">{{ \App\Services\Dossier\Affichage::nombre(round(100 * (float) $bilan->couverture), 0) }} %</dd></div>
+                    </dl>
+                    <p class="mt-2 text-xs text-texte-doux">Bilan calculé le {{ $bilan->calcule_le->timezone(config('app.timezone'))->format('d/m/Y à H:i') }} sur l'inventaire en cours, sécurité déduite (RC-11, RC-12). <a href="{{ route('autonomie', $elevage->id) }}" class="lien">Voir le bilan et la projection</a></p>
+                @endif
+            </section>
+        @endif
 
         <x-limites :limites="$limites" :version="$accueil['interpretation']?->version_grille" />
     @endif
