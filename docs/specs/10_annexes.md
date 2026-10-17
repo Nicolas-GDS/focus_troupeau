@@ -49,6 +49,9 @@ Préfixe `/{gds}` implicite par l'utilisateur ; les identifiants sont des entier
 | GET /admin/gds, /admin/utilisateurs, /admin/conventions | E23 | admin |
 | GET /admin/referentiels/{table} | E24 | admin |
 | GET /admin/pilotage | E25 | admin, technicien |
+| GET /admin/journal | E23 (journal d'audit, ajout L7) | admin |
+| GET /elevages, /elevages/{elevage}/fiche | E23 (élevages, ajout L7) | technicien, admin |
+| GET /import/sagema | M9 (import SAGEMA, ajout L7) | technicien |
 | GET /elevages/{elevage}/export/{type}.pdf ; /export/donnees.zip | — | selon objet |
 | POST /webhooks/brevo | — | Brevo (signature vérifiée) |
 
@@ -84,6 +87,7 @@ Reprise du dictionnaire du document 02 (`ref.parametre`) : MS, MM, MO, MAT, CB, 
 | 17/10/2026 | Lot L6, préparation : projection, sécurité, leviers, proposition et incertitude reproduisant `calculs/` (T-14 à T-16), pertes à la distribution par ration ; graphique de projection en SVG côté serveur (Chart.js abandonné, § 6.1 amendé) ; prix indicatifs de `calculs/` datés et marqués « à valider » (point 8) ; taux de substitution [NV] avec « référence à vérifier » (point 7) ; étape 3 de la proposition limitée au besoin résiduel (point 5) ; J1 : foin consommé par famille, foin 2026 analysé aux teneurs d'essai | Préparation du lot L6 |
 | 17/10/2026 | Lot L6, revue avant enchaînement des étapes : silo de J1 dans un inventaire clos distinct ; scénario retenu → lot « achat » et mouvement par ligne d'achat, retirés si un autre scénario est retenu ; technicien prévenu = celui de la dernière visite, à défaut ceux du GDS ; incertitude des cas absents de RC-14 ([CP]) ; gain des leviers sans achat imputé à une famille de la ligne ; paramètres modifiables par élevage (pertes, MS, densité, marges, prix) ; alerte d'autonomie comptée depuis la date du jour (précisions au § 4.3) | Préparation du lot L6 |
 | 17/10/2026 | Lot L6, réalisation : bilan recalculé par le job `CalculerBilan` (unique par inventaire, dispatché en fin de transaction) ; l'écran E14 refait le calcul à l'affichage, `plan.bilan` sert à l'accueil et aux alertes ; stock disponible du bilan = stocks de l'inventaire + achats, ventes et ajustements datés de la période (RC-13.4 : S' = S + Σ gains ; EF-M7-05), re-comptage hors apports ; repère d'action de EF-M6-03 (80 %) en paramètre `autonomie.repere_couverture` [C] ; repères de durée de RC-10 et mention de limites des PDF en textes types ; étapes 3 et 4 de la proposition enregistrées comme lignes « correction nutritionnelle » sans quantité ; lot « achat » de priorité de consommation maximale ; PDF du bilan et du scénario produits à la demande, non archivés ; E16 : fraction saisie en pourcentage, bornes contrôlées par unité | Lot L6, étapes 2 à 5 |
+| 17/10/2026 | Lot L7, préparation (propositions par défaut validées par l'utilisateur) : partage administrateur / technicien, écran « Élevages » et journal d'audit ajoutés, E17 consentements repris, import SAGEMA avec aperçu, export rationnement en CSV à confirmer, archive RGPD et anonymisation, E24 étendu aux paramètres par défaut et aux textes types (autres référentiels au lot L8), indicateurs de pilotage (§ 3.13, précisions du lot L7) | Lot L7, étape 0 |
 
 ## 10.5 Références bibliographiques
 
