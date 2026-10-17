@@ -22,6 +22,11 @@
             <input id="et-date" type="date" wire:model="dateLimite" class="champ w-full">
         </div>
         <div>
+            <label for="et-ms" class="etiquette">Matière sèche (%)</label>
+            <input id="et-ms" type="number" step="any" min="0" max="100" inputmode="decimal" wire:model="msPct" class="champ w-full">
+            <p class="mt-1 text-xs text-texte-doux">Nécessaire pour l'inscrire dans une ration.</p>
+        </div>
+        <div>
             <label for="et-mode" class="etiquette">Mode de distribution</label>
             <input id="et-mode" type="text" wire:model="modeDistribution" class="champ w-full" placeholder="sur la ration, libre-service…" maxlength="200">
         </div>

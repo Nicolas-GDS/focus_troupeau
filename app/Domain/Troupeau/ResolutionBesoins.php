@@ -34,7 +34,7 @@ final class ResolutionBesoins
                     (float) $parJour->where('base', LigneBesoin::BASE_ANIMAL)->sum('valeur') + (float) $laitier->sum('valeur') * (float) $productionLaitKgJ,
                 );
             } elseif ($parKgMs !== null && $parKgMs->min !== null) {
-                $besoins[(string) $parametre] = Besoin::parKgMs($parKgMs->min, $parKgMs->max);
+                $besoins[(string) $parametre] = Besoin::parKgMs($parKgMs->min, $parKgMs->max, $parKgMs->maximum);
             }
         }
 

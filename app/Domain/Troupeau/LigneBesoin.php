@@ -6,7 +6,7 @@ use App\Domain\Dossier\Repere;
 
 /**
  * Ligne de ref.besoin_journalier retenue pour une catégorie et un stade (RC-9) : par jour (base « animal », ou « par
- * kg de lait » multipliée par la production) ou par kg MS (intervalle) ; avec sa source.
+ * kg de lait » multipliée par la production) ou par kg MS (intervalle, maximum réglementaire éventuel) ; avec sa source.
  */
 final readonly class LigneBesoin
 {
@@ -22,5 +22,6 @@ final readonly class LigneBesoin
         public ?float $min,
         public ?float $max,
         public ?Repere $repere = null,
+        public ?float $maximum = null,
     ) {}
 }

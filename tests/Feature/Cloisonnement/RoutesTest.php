@@ -102,6 +102,7 @@ const REGISTRE_ROUTES = [
     // Lot L5 — E12 (annexe 10 : éleveur, technicien) ; objets testés dans tests/Feature/Stock/EcranInventaireTest.php
     'GET elevages/{elevage}/stocks' => ['acces' => 'dossier', 'roles' => ['eleveur', 'technicien']],
     'GET elevages/{elevage}/stocks/{inventaire}' => ['acces' => 'objet'],
+    'GET elevages/{elevage}/troupeau' => ['acces' => 'dossier', 'roles' => ['eleveur', 'technicien']],
 ];
 
 /** Rôles des volets du dossier (annexe 10 : éleveur, technicien, vétérinaire ; vétérinaire conseil pour E07, E11, E21). */

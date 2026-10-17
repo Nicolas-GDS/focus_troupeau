@@ -25,6 +25,7 @@ use App\Livewire\Dossier\Visites;
 use App\Livewire\Interpretation\InterpretationBulletin;
 use App\Livewire\Stocks\Inventaires;
 use App\Livewire\Stocks\SaisieInventaire;
+use App\Livewire\Troupeau\Troupeau;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -98,11 +99,13 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
         Route::get('/notes-liaison/{note}', NoteLiaisonVeterinaire::class)->name('notes-liaison.voir');
         Route::get('/notes-liaison/{note}/pdf', [NoteLiaisonController::class, 'pdf'])->middleware('signed')->name('notes-liaison.pdf');
 
-        // E12 — stocks fourragers (EF-M4, annexe 10 : éleveur, technicien) ; élevage lié à travers les scopes (404 hors
+        // E12, E13 — stocks fourragers et troupeau (EF-M4, EF-M5, annexe 10 : éleveur, technicien) ; élevage lié à travers les scopes (404 hors
         // périmètre), écriture autorisée par StockPolicy (convention active, T-32)
         Route::middleware('role:eleveur|technicien')->prefix('elevages/{elevage}')->group(function () {
             Route::get('/stocks', Inventaires::class)->name('stocks');
             Route::get('/stocks/{inventaire}', SaisieInventaire::class)->name('stocks.inventaire');
+            // E13 — troupeau : lots d'animaux, phases, rations (EF-M5)
+            Route::get('/troupeau', Troupeau::class)->name('troupeau');
         });
 
         // E23 — Administration : GDS, comptes, conventions

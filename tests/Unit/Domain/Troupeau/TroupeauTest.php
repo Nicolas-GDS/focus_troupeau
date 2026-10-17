@@ -1,12 +1,15 @@
 <?php
 
+use App\Domain\Dossier\ApportEtiquette;
 use App\Domain\Troupeau\Besoin;
 use App\Domain\Troupeau\Besoins;
 use App\Domain\Troupeau\ClasseCouverture;
 use App\Domain\Troupeau\Composant;
+use App\Domain\Troupeau\ControlesRation;
 use App\Domain\Troupeau\Couverture;
 use App\Domain\Troupeau\LigneBesoin;
 use App\Domain\Troupeau\ResolutionBesoins;
+use App\Domain\Troupeau\SeuilsControles;
 use App\Domain\Troupeau\SeuilsCouverture;
 
 // T-12 (RC-8) et T-13 (RC-9) : mêmes vérifications que calculs/test_calculs.py, à 1e-6 près ; codes de paramètres de
@@ -116,4 +119,39 @@ it('résout les besoins d\'une phase : entretien plus production pour la vache l
         ->and($avecLait['manquants'])->toBe([])
         ->and($r->resoudre($vl, null))->toMatchArray(['besoins' => [], 'manquants' => ['UFL_2018', 'PDI']])
         ->and([$va['besoins']['MAT']->mode, $va['besoins']['MAT']->min, $va['besoins']['MAT']->max])->toBe([Besoin::PAR_KG_MS, 120.0, 140.0]);
+});
+
+function controlesEssai(): ControlesRation
+{
+    return new ControlesRation(new SeuilsControles(1.5, 2.5, 3.0, 15.0, 50.0, 90.0, 110.0));
+}
+
+it('contrôle Ca/P, K/Mg, BACA et PDI/UFL de la ration selon le stade et l\'animal (RC-9)', function () {
+    $c = controlesEssai();
+    $parCode = fn (array $controles) => collect($controles)->mapWithKeys(fn ($x) => [$x->code => $x->gravite])->all();
+
+    expect($parCode($c->controler(['CA' => 20, 'P' => 10, 'K' => 100, 'MG' => 10, 'UFL_2018' => 10, 'PDI' => 1000], 12, 'lactation', 'BOV', false)))
+        ->toBe(['CA_P' => null, 'K_MG' => null, 'PDI_UFL' => null])
+        ->and($parCode($c->controler(['CA' => 14, 'P' => 10], 2, 'entretien', 'OVI', true)))->toBe(['CA_P' => 2])
+        ->and($parCode($c->controler(['CA' => 14, 'P' => 10], 2, 'entretien', 'OVI', false)))->toBe(['CA_P' => 0])
+        ->and($parCode($c->controler(['CA' => 31, 'P' => 10, 'K' => 160, 'MG' => 10, 'BACA' => 720], 12, 'prepa_velage', 'BOV', false)))
+        ->toBe(['CA_P' => 1, 'K_MG' => 1, 'BACA' => 2])
+        ->and($parCode($c->controler(['K' => 160, 'MG' => 10, 'BACA' => 720], 12, 'lactation', 'BOV', false)))->toBe(['K_MG' => null, 'BACA' => null])
+        ->and($parCode($c->controler(['UFL_2018' => 10, 'PDI' => 1200], 12, 'lactation', 'BOV', false)))->toBe(['PDI_UFL' => 0])
+        ->and($c->controler([], 12, 'lactation', 'BOV', false))->toBe([]);
+});
+
+it('convertit la teneur d\'une étiquette par kg de produit brut en teneur par kg MS dans l\'unité du référentiel', function () {
+    expect(ApportEtiquette::teneurParKgMs(2000, 'mg/kg', 'mg/kg MS', 100))->toEqualWithDelta(2000.0, 1e-9)
+        ->and(ApportEtiquette::teneurParKgMs(12, '%', 'g/kg MS', 96))->toEqualWithDelta(120 / 0.96, 1e-9)
+        ->and(ApportEtiquette::teneurParKgMs(0.9, 'UFL/kg', 'UFL/kg MS', 88))->toEqualWithDelta(0.9 / 0.88, 1e-9)
+        ->and(ApportEtiquette::teneurParKgMs(5, 'g/kg', 'mg/kg MS', 100))->toEqualWithDelta(5000.0, 1e-9)
+        ->and(ApportEtiquette::teneurParKgMs(1, 'UFL/kg', 'g/kg MS', 88))->toBeNull()
+        ->and(ApportEtiquette::teneurParKgMs(100000, 'UI/kg', 'mg/kg MS', 100))->toBeNull();
+});
+
+it('reporte le maximum réglementaire d\'une ligne de besoin (cuivre des ovins)', function () {
+    $b = (new ResolutionBesoins)->resoudre([new LigneBesoin('CU', Besoin::PAR_KG_MS, LigneBesoin::BASE_ANIMAL, null, 8, null, null, 15)], null);
+
+    expect([$b['besoins']['CU']->min, $b['besoins']['CU']->maximum])->toBe([8.0, 15.0]);
 });

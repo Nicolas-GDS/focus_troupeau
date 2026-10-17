@@ -61,7 +61,8 @@ it('charge les valeurs par défaut de calculs/, les coefficients UGB et les seul
         ->and(DB::table('ref.coefficient_ugb')->pluck('coefficient', 'code')->map(fn ($v) => (float) $v)->only(['VL', 'VA', 'GEN_1_2', 'BREBIS'])->all())
         ->toBe(['VL' => 1.02, 'VA' => 0.9, 'GEN_1_2' => 0.6, 'BREBIS' => 0.15])
         ->and(DB::table('ref.categorie_animale')->whereNull('coefficient_ugb_code')->orderBy('code')->pluck('code')->all())->toBe(['AGNEAU', 'BOUC_MALE', 'CHEVRETTE', 'VEAU'])
-        ->and(DB::table('ref.besoin_journalier')->count())->toBe(23)
+        ->and(DB::table('ref.besoin_journalier')->count())->toBe(39)
+        ->and(DB::table('ref.besoin_journalier')->whereNotNull('reference_id')->count())->toBe(23)
         ->and(DB::table('ref.besoin_journalier')->where('valide', true)->count())->toBe(0)
         ->and(DB::table('ref.aliment_reference')->count())->toBe(0)
         ->and(DB::table('ref.version_referentiel')->max('numero'))->toBe('5');
