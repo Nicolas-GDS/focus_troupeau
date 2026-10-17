@@ -228,6 +228,13 @@ Les erreurs relatives suivantes sont composées quadratiquement par lot de stock
 
 La projection est recalculée avec `S × (1 − e)` et `S × (1 + e)` pour donner la fourchette de la date de rupture. L'incertitude n'est pas appliquée aux besoins (elle y est réelle mais non quantifiée ; le message de limites le dit).
 
+### Précisions du lot L6 (décisions du 17/10/2026, propositions [CP])
+
+- *Implémentation de référence* : la projection (RC-11), la sécurité (RC-12), les leviers et la proposition initiale (RC-13.2, étapes 1 et 2, RC-13.3) et l'incertitude (RC-14) reproduisent `calculs/focus_troupeau_calculs.py` (T-14 à T-16). Les pertes à la distribution sont celles de chaque ration (lot L5), et non une valeur unique par élevage.
+- *Valeurs par défaut* : coefficients de période de RC-10 (transition 0,5 ; complémentation estivale 0,5), taux de substitution de RC-13.3 (0,44 / 0,53 / 0,70, statut [NV], affichés « référence à vérifier », point ouvert 7), prix indicatifs (foin 170, enrubannage 190, paille 75, concentré 290 €/t MS, décapitalisation 900 €/UGB, 6 t MS par génisse : valeurs de `calculs/` et du calculateur, datées, [CP], affichées « prix indicatif à valider », point ouvert 8), erreurs relatives de RC-14 et seuil d'alerte d'autonomie (60 jours, EF-M8-03) : chargés dans `app.parametre_defaut`.
+- *Proposition initiale* : étapes 1 (réaffectation selon `ref.substituabilite`) et 2 (achat de la famille déficitaire) chiffrées ; étape 3 (correction nutritionnelle) limitée, comme l'étape 4, à l'expression du besoin résiduel d'UFL ou de PDI par animal et par jour, sans quantité de concentré, tant que les tables d'aliments sont vides (point ouvert 5) ; une ligne d'achat de fourrage n'a pas de valeurs nutritionnelles tant que ces tables sont vides.
+- *Jeu J1* : les vaches et les génisses consomment le foin par famille (comme T-14 : le foin 2025, plus ancien, est consommé en premier) ; le foin 2026 est analysé aux mêmes teneurs d'essai que le foin 2025 (`calculs/`), pour que la couverture des vaches reste calculable.
+
 ## 4.4 Conventions d'arrondi et d'affichage
 
 Les calculs sont faits en double précision sans arrondi intermédiaire. Affichage : t MS à une décimale ; kg MS/j à une décimale ; densités en kg MS/m³ entiers ; pourcentages entiers ; teneurs selon la précision du paramètre (`ref.parametre.decimales`) ; dates au format jour/mois/année ; jours entiers (autonomie tronquée à l'entier inférieur). Les montants sont en euros hors taxes, entiers.
