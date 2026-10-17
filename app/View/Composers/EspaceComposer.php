@@ -91,6 +91,11 @@ class EspaceComposer
             $liens[] = ['libelle' => 'Paramètres', 'route' => 'parametres', 'parametres' => $dossier];
         }
 
+        // E23 — élevages (EF-M0-02)
+        if ($user->can('elevage.ecrire')) {
+            $liens[] = ['libelle' => 'Élevages', 'route' => 'elevages', 'actif' => 'elevages|elevages.fiche'];
+        }
+
         if ($user->can('bulletin.importer')) {
             $liens[] = ['libelle' => 'Import des bulletins', 'route' => 'import.bulletins'];
         }

@@ -54,7 +54,7 @@ class Elevage extends Model
     protected $table = 'fourrage.elevage';
 
     protected $fillable = [
-        'code_pseudo', 'departement', 'gds_id', 'code_insee_commune',
+        'code_pseudo', 'departement', 'gds_id', 'code_insee_commune', 'especes',
         'systeme_bovin', 'systeme_ovin', 'systeme_caprin',
         'effectif_bovins', 'effectif_ovins', 'effectif_caprins',
         'adherent_gds', 'tiers_facture', 'commentaire',

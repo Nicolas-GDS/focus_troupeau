@@ -27,6 +27,8 @@ use App\Livewire\Dossier\Lecture\SyntheseVisite;
 use App\Livewire\Dossier\NoteLiaisonVeterinaire;
 use App\Livewire\Dossier\SaisieVisite;
 use App\Livewire\Dossier\Visites;
+use App\Livewire\Elevages\Fiche as ElevageFiche;
+use App\Livewire\Elevages\Liste as ElevagesListe;
 use App\Livewire\Interpretation\InterpretationBulletin;
 use App\Livewire\Stocks\Inventaires;
 use App\Livewire\Stocks\SaisieInventaire;
@@ -120,6 +122,12 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
             Route::get('/scenarios/{scenario}/pdf', [AutonomiePdfController::class, 'scenario'])->name('scenarios.pdf');
             // E16 — paramètres de l'élevage (EF-M4-07, D10)
             Route::get('/parametres', ParametresElevageEcran::class)->name('parametres');
+        });
+
+        // E23 — élevages : création, identité, convention, invitation des éleveurs (EF-M0-02 ; technicien, administrateur)
+        Route::middleware('permission:elevage.ecrire')->group(function () {
+            Route::get('/elevages', ElevagesListe::class)->name('elevages');
+            Route::get('/elevages/{elevage}/fiche', ElevageFiche::class)->name('elevages.fiche');
         });
 
         // E23 — Administration : GDS, comptes, conventions

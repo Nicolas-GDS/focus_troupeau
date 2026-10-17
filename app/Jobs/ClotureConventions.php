@@ -10,7 +10,7 @@ use Illuminate\Foundation\Queue\Queueable;
 /**
  * Passage automatique des conventions à « echue » le lendemain de leur date de fin (§ 2.4, EF-M0-06, D12).
  * Tâche quotidienne, hors session : elle travaille sur toutes les conventions de l'instance, explicitement
- * hors cloisonnement. Le rappel au technicien 30 jours avant l'échéance relève des notifications (lot L3).
+ * hors cloisonnement. Le rappel au technicien avant l'échéance : RappelConventions.
  */
 class ClotureConventions implements ShouldQueue
 {
