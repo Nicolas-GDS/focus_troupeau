@@ -72,6 +72,7 @@ const REGISTRE_ROUTES = [
     'GET admin/journal' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global']],
     'GET elevages' => ['acces' => 'roles', 'roles' => ['technicien', 'admin', 'admin_global']],
     'GET elevages/{elevage}/fiche' => ['acces' => 'objet'],
+    'GET import/sagema' => ['acces' => 'roles', 'roles' => ['technicien']],
 
     // Lot L2 — E19 et PDF des bulletins (objets testés dans tests/Feature/Import/EcranImportBulletinsTest.php)
     'GET import/bulletins' => ['acces' => 'roles', 'roles' => ['technicien']],

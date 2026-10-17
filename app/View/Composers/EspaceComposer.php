@@ -100,6 +100,10 @@ class EspaceComposer
             $liens[] = ['libelle' => 'Import des bulletins', 'route' => 'import.bulletins'];
         }
 
+        if ($user->can('sagema.importer')) {
+            $liens[] = ['libelle' => 'Import SAGEMA', 'route' => 'import.sagema'];
+        }
+
         if ($user->hasAnyRole(['admin', Perimetre::ROLE_GLOBAL])) {
             $liens[] = ['libelle' => 'Utilisateurs', 'route' => 'admin.utilisateurs'];
             $liens[] = ['libelle' => 'Conventions', 'route' => 'admin.conventions'];

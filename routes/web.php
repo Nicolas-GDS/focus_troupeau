@@ -29,6 +29,7 @@ use App\Livewire\Dossier\SaisieVisite;
 use App\Livewire\Dossier\Visites;
 use App\Livewire\Elevages\Fiche as ElevageFiche;
 use App\Livewire\Elevages\Liste as ElevagesListe;
+use App\Livewire\Import\ImportSagema;
 use App\Livewire\Interpretation\InterpretationBulletin;
 use App\Livewire\Stocks\Inventaires;
 use App\Livewire\Stocks\SaisieInventaire;
@@ -86,6 +87,8 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
 
         // E19 — Import des bulletins (EF-M9-01) ; PDF servis par route signée et policy (ENF-SEC-05)
         Route::view('/import/bulletins', 'espace.import.bulletins')->middleware('permission:bulletin.importer')->name('import.bulletins');
+        // EF-M9-03 — import SAGEMA (élevages adhérents, bilan sanitaire ; T-27)
+        Route::get('/import/sagema', ImportSagema::class)->middleware('permission:sagema.importer')->name('import.sagema');
         Route::get('/import/bulletins/{import}/pdf', [BulletinPdfController::class, 'import'])->middleware('signed')->name('import.bulletins.pdf');
         Route::get('/bulletins/{analyse}/pdf', [BulletinPdfController::class, 'analyse'])->middleware('signed')->name('bulletins.pdf');
 
