@@ -21,6 +21,7 @@ use App\Services\Dossier\SaisieRefusee;
 use App\Services\ElevageCourant;
 use App\Services\Notifications\NotificationService;
 use App\Services\Notifications\TextesTypes;
+use App\Services\Referentiels\ParametresElevage;
 use App\Services\Troupeau\AnalyseRationService;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -68,6 +69,7 @@ class ApprovisionnementService
         private readonly NotificationService $notifications,
         private readonly TextesTypes $textes,
         private readonly AlerteAutonomie $alertes,
+        private readonly ParametresElevage $parametresElevage,
         private readonly PropositionInitiale $proposition = new PropositionInitiale,
     ) {}
 
@@ -83,7 +85,7 @@ class ApprovisionnementService
         $gds = $this->gds($inventaire);
         ['deficits' => $deficits, 'excedents' => $excedents] = $this->proposition->diagnostic(
             $calcul['centrale']->besoinParFamille, $calcul['securites_famille'], $calcul['stocks_famille']);
-        $prix = $this->prixFamilles($gds);
+        $prix = $this->prixFamilles($gds, $inventaire->elevage_id);
 
         $substituabilites = [];
         foreach (DB::table('ref.substituabilite')->orderBy('famille_source')->orderBy('famille_cible')->get() as $s) {
@@ -179,7 +181,7 @@ class ApprovisionnementService
             throw new SaisieRefusee('Indiquer la famille cédée par la réaffectation.');
         }
         $parametre = $d['parametre'] ?? null;
-        $parametre = $parametre === null ? $this->parametreDefaut($code, $famille, $gds) : (float) $parametre;
+        $parametre = $parametre === null ? $this->parametreDefaut($code, $famille, $gds, $inventaire->elevage_id) : (float) $parametre;
         if ($code === Levier::RATELIER && ($parametre === null || $parametre < 0 || $parametre >= 1)) {
             throw new SaisieRefusee('Saisir le nouveau taux de pertes à la distribution (entre 0 et 1).');
         }
@@ -236,7 +238,7 @@ class ApprovisionnementService
             $vigilance[] = 'Couverture sous le repère de '.round(100 * $repere).' % : un achat extérieur reste nécessaire.';
         }
         foreach ($lignes as $l) {
-            $prixDefaut = $l->famille_code === null ? null : $this->parametreDefaut($l->levier_code, $l->famille_code, $gds);
+            $prixDefaut = $l->famille_code === null ? null : $this->parametreDefaut($l->levier_code, $l->famille_code, $gds, $inventaire->elevage_id);
             if (in_array($l->levier_code, [Levier::ACHAT, Levier::CONCENTRE], true) && $prixDefaut !== null && abs((float) $l->prix_unitaire - $prixDefaut) < 1e-9) {
                 $vigilance[] = 'Prix indicatif à valider : '.mb_strtolower(self::LIBELLES[$l->levier_code]).' à '.round($prixDefaut).' €/t MS.';
             }
@@ -315,18 +317,18 @@ class ApprovisionnementService
         $scenario->delete();
     }
 
-    /** @return array<string, float|null> prix indicatif par famille */
-    public function prixFamilles(?int $gds): array
+    /** @return array<string, float|null> prix indicatif par famille (celui de l'élevage s'il a été modifié, E16) */
+    public function prixFamilles(?int $gds, ?string $elevageId = null): array
     {
-        return array_map(fn (string $cle) => $this->referentiels->parametre($cle, $gds), self::PRIX);
+        return array_map(fn (string $cle) => $this->parametresElevage->valeur($cle, $elevageId, $gds), self::PRIX);
     }
 
     /** Paramètre par défaut d'un levier (prix, perte par UGB, t MS par génisse) ; null s'il se saisit. */
-    public function parametreDefaut(string $code, ?string $famille, ?int $gds): ?float
+    public function parametreDefaut(string $code, ?string $famille, ?int $gds, ?string $elevageId = null): ?float
     {
         return match ($code) {
-            Levier::ACHAT => isset(self::PRIX[$famille ?? '']) ? $this->referentiels->parametre(self::PRIX[$famille], $gds) : null,
-            Levier::CONCENTRE => $this->referentiels->parametre(self::PRIX['CONCENTRE'], $gds),
+            Levier::ACHAT => isset(self::PRIX[$famille ?? '']) ? $this->parametresElevage->valeur(self::PRIX[$famille], $elevageId, $gds) : null,
+            Levier::CONCENTRE => $this->parametresElevage->valeur(self::PRIX['CONCENTRE'], $elevageId, $gds),
             Levier::DECAPITALISATION => $this->referentiels->parametre('decapitalisation.perte_eur_ugb', $gds),
             Levier::GENISSES => $this->referentiels->parametre('genisse.t_ms_par_tete', $gds),
             default => null,

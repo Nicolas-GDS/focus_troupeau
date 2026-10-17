@@ -5,7 +5,7 @@
     $date = fn ($d) => $d?->format('d/m/Y') ?? '—';
 @endphp
 <div class="space-y-6">
-    <p class="text-texte-doux">{{ $libelleElevage }}@if ($libelleElevage !== $elevage->code_pseudo) ({{ $elevage->code_pseudo }})@endif · <a href="{{ route('stocks', $elevage->id) }}" class="lien">stocks</a> · <a href="{{ route('troupeau', $elevage->id) }}" class="lien">troupeau</a></p>
+    <p class="text-texte-doux">{{ $libelleElevage }}@if ($libelleElevage !== $elevage->code_pseudo) ({{ $elevage->code_pseudo }})@endif · <a href="{{ route('stocks', $elevage->id) }}" class="lien">stocks</a> · <a href="{{ route('troupeau', $elevage->id) }}" class="lien">troupeau</a> · <a href="{{ route('approvisionnement', $elevage->id) }}" class="lien">approvisionnement</a>@if ($inventaireCourant?->statut === 'courant') · <a href="{{ route('autonomie.pdf', $elevage->id) }}" class="lien">bilan en PDF</a>@endif</p>
     @if (session('status')) <p class="rounded-md border border-etat-couvert bg-etat-couvert-fond p-3 text-sm" role="status">{{ session('status') }}</p> @endif
 
     @if (! $inventaireCourant)
@@ -59,7 +59,7 @@
                 </div>
             </dl>
             <dl class="mt-4 grid gap-2 text-sm sm:grid-cols-3">
-                <div><dt class="text-texte-doux">Stock utile</dt><dd>{{ $t($i['stock']['valeur']) }} t MS <span class="text-xs text-texte-doux">({{ $t($i['stock']['basse']) }} à {{ $t($i['stock']['haute']) }})</span></dd></div>
+                <div><dt class="text-texte-doux">Stock disponible (achats et ventes compris)</dt><dd>{{ $t($i['stock']['valeur']) }} t MS <span class="text-xs text-texte-doux">({{ $t($i['stock']['basse']) }} à {{ $t($i['stock']['haute']) }})</span></dd></div>
                 <div><dt class="text-texte-doux">Besoin prélevé sur les stocks</dt><dd>{{ $t($ecran['calcul']['centrale']->besoinStock) }} t MS</dd></div>
                 <div><dt class="text-texte-doux">Stock de sécurité ({{ $pct($inventaireCourant->marge_securite) }} du besoin)</dt><dd>{{ $t($ecran['calcul']['centrale']->securite) }} t MS
                     @if ($ecran['entame_securite']) <span class="block text-xs">entamé à partir du {{ $date($ecran['entame_securite']) }}</span> @endif</dd></div>

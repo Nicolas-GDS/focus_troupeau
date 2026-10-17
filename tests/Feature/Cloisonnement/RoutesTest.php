@@ -108,6 +108,11 @@ const REGISTRE_ROUTES = [
     // E15 ; scénarios testés dans tests/Feature/Autonomie/ApprovisionnementTest.php
     'GET elevages/{elevage}/approvisionnement' => ['acces' => 'dossier', 'roles' => ['eleveur', 'technicien']],
     'GET elevages/{elevage}/scenarios/{scenario}' => ['acces' => 'objet'],
+    // E16 ; écran testé dans tests/Feature/Autonomie/ParametresElevageTest.php
+    'GET elevages/{elevage}/parametres' => ['acces' => 'dossier', 'roles' => ['eleveur', 'technicien']],
+    // PDF du bilan et du scénario (EF-M6-06) ; testés dans tests/Feature/Autonomie/PdfAutonomieTest.php
+    'GET elevages/{elevage}/autonomie/pdf' => ['acces' => 'objet'],
+    'GET elevages/{elevage}/scenarios/{scenario}/pdf' => ['acces' => 'objet'],
 ];
 
 /** Rôles des volets du dossier (annexe 10 : éleveur, technicien, vétérinaire ; vétérinaire conseil pour E07, E11, E21). */

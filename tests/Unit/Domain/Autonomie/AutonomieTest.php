@@ -9,6 +9,7 @@ use App\Domain\Autonomie\ParametresLeviers;
 use App\Domain\Autonomie\Periode;
 use App\Domain\Autonomie\Projection;
 use App\Domain\Autonomie\PropositionInitiale;
+use App\Domain\Autonomie\ResultatProjection;
 
 // T-14 (RC-11, RC-12), T-15 (RC-13), T-16 (RC-14) : mêmes vérifications que calculs/test_calculs.py, à 1e-6 près
 // (valeurs continues) ou exactement (dates, entiers).
@@ -143,4 +144,13 @@ it('T-16 : incertitude d\'un silo, de balles estimées et du total (RC-14)', fun
         ->and($i->totale([new LotProjection('A', 'FOIN', 100.0, incertitude: 0.10), new LotProjection('B', 'FOIN', 50.0, incertitude: 0.20)]))
         ->toEqualWithDelta(sqrt(10 ** 2 + 10 ** 2) / 150, 1e-12)
         ->and(array_map(fn ($l) => $l->stockUtile, $i->bornes([new LotProjection('A', 'FOIN', 100.0, incertitude: 0.10)], -1)))->toBe([90.0]);
+});
+
+it('corrige le stock des apports de la période sans toucher aux ruptures (RC-13.4 : S\' = S + Σ gains)', function () {
+    $rupture = new DateTimeImmutable('2026-12-23');
+    $r = new ResultatProjection(222.16, 205.94, 33.324, 205.94 - 222.16 - 33.324, 205.94 / 222.16, 139, 151, $rupture, null, [], [], [], [], [], []);
+    $c = $r->avecApports(30.0);
+
+    expect([$c->stockUtile, $c->bilan, $c->couverture, $c->autonomieJours])->toEqualWithDelta([235.94, 235.94 - 222.16 - 33.324, 235.94 / 222.16, (int) floor(235.94 / (222.16 / 151))], 1e-9)
+        ->and([$c->dateRupture, $c->besoinStock, $c->securite, $c->jours])->toBe([$rupture, 222.16, 33.324, 151]);
 });

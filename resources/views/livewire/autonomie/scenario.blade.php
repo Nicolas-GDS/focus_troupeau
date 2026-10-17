@@ -17,7 +17,7 @@
     $aide = $aides[$ligne['levier_code']] ?? $aides['autre'];
 @endphp
 <div class="space-y-6">
-    <p class="text-texte-doux">{{ $libelleElevage }} · <a href="{{ route('approvisionnement', $elevage->id) }}" class="lien">approvisionnement</a> · <a href="{{ route('autonomie', $elevage->id) }}" class="lien">bilan d'autonomie</a></p>
+    <p class="text-texte-doux">{{ $libelleElevage }} · <a href="{{ route('approvisionnement', $elevage->id) }}" class="lien">approvisionnement</a> · <a href="{{ route('autonomie', $elevage->id) }}" class="lien">bilan d'autonomie</a> · <a href="{{ route('scenarios.pdf', [$elevage->id, $scenario->id]) }}" class="lien">scénario en PDF</a></p>
     @if (session('status')) <p class="rounded-md border border-etat-couvert bg-etat-couvert-fond p-3 text-sm" role="status">{{ session('status') }}</p> @endif
 
     <section class="carte" aria-labelledby="titre-scenario">

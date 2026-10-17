@@ -133,7 +133,7 @@ class ScenarioEcran extends Component
             'familles' => DB::table('ref.famille_fourrage')->pluck('libelle', 'code'),
             'libelles' => ApprovisionnementService::LIBELLES,
             'unites' => ApprovisionnementService::UNITES,
-            'defaut' => $service->parametreDefaut($this->ligne['levier_code'], $this->ligne['famille_code'] ?: null, $service->gds($inventaire)),
+            'defaut' => $service->parametreDefaut($this->ligne['levier_code'], $this->ligne['famille_code'] ?: null, $service->gds($inventaire), $inventaire->elevage_id),
             'peutSaisir' => Gate::allows('update', $scenario),
         ])->layout('components.layouts.espace', ['titre' => 'Scénario d\'approvisionnement']);
     }

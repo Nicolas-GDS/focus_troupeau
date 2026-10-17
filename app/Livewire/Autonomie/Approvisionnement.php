@@ -93,7 +93,7 @@ class Approvisionnement extends Component
             'scenarios' => $inventaire === null ? collect() : $service->scenarios($inventaire),
             'comparaison' => $inventaire === null || $this->compares === [] ? [] : $service->comparer($inventaire, array_map(fn ($c) => (int) $c, array_values($this->compares)), $this->externe()),
             'familles' => DB::table('ref.famille_fourrage')->pluck('libelle', 'code'),
-            'prix' => $service->prixFamilles($inventaire === null ? null : $service->gds($inventaire)),
+
             'peutSaisir' => $peutSaisir,
         ])->layout('components.layouts.espace', ['titre' => 'Approvisionnement']);
     }

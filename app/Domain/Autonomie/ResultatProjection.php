@@ -36,4 +36,22 @@ final readonly class ResultatProjection
         public array $mensuel,
         public array $ecartsRecalage,
     ) {}
+
+    /**
+     * Stock corrigé des apports de la période (RC-13.4 : S' = S + Σ gains ; EF-M7-05 : un achat saisi met le bilan à
+     * jour) : bilan, couverture et autonomie recalculés sur S', avec les formules de la projection ; ruptures inchangées
+     * (la projection journalière tient déjà compte des mouvements datés).
+     */
+    public function avecApports(float $apports): self
+    {
+        $stock = $this->stockUtile + $apports;
+        $besoinJour = $this->jours > 0 ? $this->besoinStock / $this->jours : 0.0;
+
+        return new self(
+            $this->besoinStock, $stock, $this->securite, $stock - $this->besoinStock - $this->securite,
+            $this->besoinStock > 0 ? $stock / $this->besoinStock : 0.0, $besoinJour > 0 ? (int) floor($stock / $besoinJour) : 0, $this->jours,
+            $this->dateRupture, $this->dateEntameSecurite, $this->besoinParFamille, $this->ruptureParLot, $this->epuisementParLot,
+            $this->ruptureParFamille, $this->mensuel, $this->ecartsRecalage,
+        );
+    }
 }

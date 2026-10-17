@@ -71,7 +71,9 @@ class BilanService
         }
 
         $marge = (float) $inventaire->marge_securite;
-        $centrale = $this->projection->projeter($lots, $mouvements, $phases, $debut, $fin, $marge);
+        // apports nets de la période (achats, ventes, ajustements, gains des leviers) : stock corrigé de RC-13.4
+        $apports = array_sum(array_map(fn (MouvementProjection $m) => $m->type === MouvementProjection::RECOMPTAGE || $m->date < $debut || $m->date > $fin ? 0.0 : $m->quantite, $mouvements));
+        $centrale = $this->projection->projeter($lots, $mouvements, $phases, $debut, $fin, $marge)->avecApports($apports);
         $stocksFamille = [];
         foreach ($lots as $l) {
             $stocksFamille[$l->famille] = ($stocksFamille[$l->famille] ?? 0.0) + $l->stockUtile;
@@ -85,8 +87,8 @@ class BilanService
 
         return [
             'centrale' => $centrale,
-            'basse' => $this->projection->projeter($this->incertitude->bornes($lots, -1), $mouvements, $phases, $debut, $fin, $marge),
-            'haute' => $this->projection->projeter($this->incertitude->bornes($lots, 1), $mouvements, $phases, $debut, $fin, $marge),
+            'basse' => $this->projection->projeter($this->incertitude->bornes($lots, -1), $mouvements, $phases, $debut, $fin, $marge)->avecApports($apports),
+            'haute' => $this->projection->projeter($this->incertitude->bornes($lots, 1), $mouvements, $phases, $debut, $fin, $marge)->avecApports($apports),
             'incertitude' => $this->incertitude->totale(array_values(array_filter($lots, fn (LotProjection $l) => $l->stockUtile > 0))),
             'lots' => $lots, 'libelles' => $libelles, 'stocks_famille' => $stocksFamille,
             'securites_famille' => array_map(fn (float $b) => $marge * $b, $centrale->besoinParFamille),

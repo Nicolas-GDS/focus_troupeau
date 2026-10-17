@@ -82,12 +82,13 @@ class EspaceComposer
             $liens[] = ['libelle' => 'Dossier', 'route' => 'dossier.fourrages', 'parametres' => $dossier, 'actif' => 'dossier.*'];
         }
 
-        // E12 à E15 — stocks fourragers, troupeau, autonomie et approvisionnement (annexe 10 : éleveur, technicien)
+        // E12 à E16 — stocks fourragers, troupeau, autonomie, approvisionnement et paramètres de l'élevage (annexe 10 : éleveur, technicien)
         if ($dossier !== null && $user->hasAnyRole(['eleveur', 'technicien'])) {
             $liens[] = ['libelle' => 'Stocks', 'route' => 'stocks', 'parametres' => $dossier, 'actif' => 'stocks*'];
             $liens[] = ['libelle' => 'Troupeau', 'route' => 'troupeau', 'parametres' => $dossier];
             $liens[] = ['libelle' => 'Autonomie', 'route' => 'autonomie', 'parametres' => $dossier];
             $liens[] = ['libelle' => 'Approvisionnement', 'route' => 'approvisionnement', 'parametres' => $dossier, 'actif' => 'approvisionnement|scenarios.*'];
+            $liens[] = ['libelle' => 'Paramètres', 'route' => 'parametres', 'parametres' => $dossier];
         }
 
         if ($user->can('bulletin.importer')) {

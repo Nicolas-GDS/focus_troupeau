@@ -151,8 +151,15 @@ class EcranBilan
         $cle = $inventaire->annee_seche ? 'securite.marge_annee_seche' : 'securite.marge';
         $pct = fn (float $v) => number_format(100 * $v, 0, ',', ' ').' %';
 
+        $propre = DB::table('app.parametre_elevage')->where('elevage_id', $inventaire->elevage_id)->where('cle', $cle)->exists();
+        $source = $this->sourceParametre($cle, $gds);
+        $reference = $this->referentiels->parametre($cle, $gds);
+        if ($propre && $reference !== null) {
+            $source['source'] = 'Valeur de l\'élevage (E16) ; référence '.$pct($reference).' — '.$source['source'];
+        }
+
         return [
-            ['libelle' => 'Marge de sécurité'.($inventaire->annee_seche ? ' (année sèche)' : ''), 'valeur' => $pct((float) $inventaire->marge_securite), ...$this->sourceParametre($cle, $gds)],
+            ['libelle' => 'Marge de sécurité'.($inventaire->annee_seche ? ' (année sèche)' : ''), 'valeur' => $pct((float) $inventaire->marge_securite), ...$source],
             ['libelle' => 'Pertes à la distribution (moyenne pondérée des rations)', 'valeur' => $pct($calcul['pertes_moyennes']), 'source' => 'Rations saisies (RC-8.3)', 'statut' => null],
             ['libelle' => 'Incertitude relative du stock total', 'valeur' => '± '.$pct($calcul['incertitude']), 'source' => 'RC-14 ; erreurs relatives de app.parametre_defaut', 'statut' => 'Hypothèse locale [CP] pour les cas absents du tableau de RC-14'],
             ['libelle' => 'Pas de calcul', 'valeur' => 'journalier, affiché par mois', 'source' => 'RC-11', 'statut' => null],

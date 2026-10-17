@@ -56,6 +56,9 @@ it('recalcule le bilan après un mouvement : l\'achat repousse la rupture, le re
     $bilan = app(BilanService::class)->dernier($this->elevage->id);
 
     expect($bilan->date_rupture->toDateString())->toBe('2027-01-30')
+        // EF-M7-05 : l'achat met le bilan à jour ; le re-comptage reste un écart de recalage, hors apports
+        ->and(round((float) $bilan->stock_utile_t_ms, 2))->toBe(235.94)
+        ->and($bilan->autonomie_jours)->toBe((int) floor(235.94 / (222.16 / 151)))
         ->and($bilan->detail['ecarts'])->toHaveCount(1)
         ->and(round($bilan->detail['ecarts'][0]['ecart'], 2))->toBe(41.53);
 });
@@ -70,7 +73,9 @@ it('applique un scénario virtuellement, sans toucher au bilan de l\'inventaire 
         'famille_source_code' => 'FOIN', 'quantite' => 10, 'unite' => 't MS', 'gain_t_ms' => 10]);
 
     expect($simule->date_rupture->toDateString())->toBe('2027-01-30')
-        ->and(round((float) $simule->stock_utile_t_ms, 2))->toBe(205.94)
+        // RC-13.4 : stock corrigé S' = S + Σ gains
+        ->and(round((float) $simule->stock_utile_t_ms, 2))->toBe(235.94)
+        ->and(round((float) $simule->bilan_t_ms, 2))->toBe(-19.54)
         ->and(Bilan::query()->withoutGlobalScopes()->where('inventaire_id', $this->inventaire->id)->count())->toBe(2)
         ->and($service->dernier($this->elevage->id)->date_rupture->toDateString())->toBe('2026-12-23')
         ->and($service->calculer($this->inventaire, $scenario->refresh())['stocks_famille'])
