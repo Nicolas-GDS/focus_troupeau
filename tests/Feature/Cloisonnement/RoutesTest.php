@@ -68,6 +68,8 @@ const REGISTRE_ROUTES = [
     'GET admin/gds' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global']],
     'GET admin/utilisateurs' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global']],
     'GET admin/conventions' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global']],
+    // Lot L7 — journal d'audit (E23) ; écrans testés dans tests/Feature/Administration/*
+    'GET admin/journal' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global']],
 
     // Lot L2 — E19 et PDF des bulletins (objets testés dans tests/Feature/Import/EcranImportBulletinsTest.php)
     'GET import/bulletins' => ['acces' => 'roles', 'roles' => ['technicien']],
