@@ -8,6 +8,7 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\FicheVisiteController;
 use App\Http\Controllers\NoteLiaisonController;
 use App\Http\Controllers\NoticeRgpdController;
+use App\Http\Controllers\PilotageController;
 use App\Http\Controllers\TravailController;
 use App\Livewire\Autonomie\Approvisionnement;
 use App\Livewire\Autonomie\Bilan as AutonomieBilan;
@@ -32,6 +33,7 @@ use App\Livewire\Elevages\Fiche as ElevageFiche;
 use App\Livewire\Elevages\Liste as ElevagesListe;
 use App\Livewire\Import\ImportSagema;
 use App\Livewire\Interpretation\InterpretationBulletin;
+use App\Livewire\Pilotage\Indicateurs as PilotageIndicateurs;
 use App\Livewire\Stocks\Inventaires;
 use App\Livewire\Stocks\SaisieInventaire;
 use App\Livewire\Troupeau\Troupeau;
@@ -138,6 +140,13 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
         Route::middleware('permission:elevage.ecrire')->group(function () {
             Route::get('/elevages', ElevagesListe::class)->name('elevages');
             Route::get('/elevages/{elevage}/fiche', ElevageFiche::class)->name('elevages.fiche');
+        });
+
+        // E25 — indicateurs de pilotage (EF-M10-04 ; administrateur et technicien, dans leurs GDS)
+        Route::middleware('permission:pilotage.lire')->prefix('admin/pilotage')->name('pilotage')->group(function () {
+            Route::get('/', PilotageIndicateurs::class)->name('');
+            Route::get('/indicateurs.csv', [PilotageController::class, 'indicateurs'])->name('.indicateurs');
+            Route::get('/references.csv', [PilotageController::class, 'references'])->name('.references');
         });
 
         // E23 — Administration : GDS, comptes, conventions

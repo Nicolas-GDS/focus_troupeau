@@ -100,6 +100,10 @@ class EspaceComposer
             $liens[] = ['libelle' => 'Import des bulletins', 'route' => 'import.bulletins'];
         }
 
+        if ($user->can('pilotage.lire')) {
+            $liens[] = ['libelle' => 'Pilotage', 'route' => 'pilotage', 'actif' => 'pilotage*'];
+        }
+
         if ($user->can('sagema.importer')) {
             $liens[] = ['libelle' => 'Import SAGEMA', 'route' => 'import.sagema'];
         }

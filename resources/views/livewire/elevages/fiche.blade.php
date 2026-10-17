@@ -5,7 +5,7 @@
         'code_postal' => 'Code postal', 'telephone' => 'Téléphone', 'courriel' => 'E-mail', 'num_client_labo' => 'N° client laboratoire'];
 @endphp
 <div class="space-y-6">
-    <p class="text-texte-doux"><a href="{{ route('elevages') }}" class="lien">élevages</a> · {{ $elevage->code_pseudo }} · GDS {{ $elevage->gds_id }}
+    <p class="text-texte-doux"><a href="{{ route('elevages') }}" class="lien">élevages</a> · <strong>{{ $identite['raison_sociale'] ?: $elevage->code_pseudo }}</strong> · {{ $elevage->code_pseudo }} · GDS {{ $elevage->gds_id }}
         @if ($peutExporter) · <a href="{{ route('export.rationnement', $elevage->id) }}" class="lien">export rationnement (CSV)</a> · <a href="{{ route('export.donnees', $elevage->id) }}" class="lien">données de l'élevage (ZIP)</a> @endif</p>
     @if (session('status')) <p class="rounded-md border border-etat-couvert bg-etat-couvert-fond p-3 text-sm" role="status">{{ session('status') }}</p> @endif
 

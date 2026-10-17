@@ -70,6 +70,10 @@ en recette uniquement.
 
 ### À savoir en développement
 
+- **Tests** : `docker compose exec app php artisan test --parallel --processes=4` ; le seuil de 10 s des rendus PDF
+  (T-26) se vérifie en exécution séquentielle : `docker compose exec app php artisan test --filter=Chromium`.
+- **Recettes** : `docs/recette/` (une procédure par lot ; lot L7 : `L7_recette.md`, fichiers SAGEMA d'essai dans
+  `tests/Fixtures/sagema/`).
 - **Files d'attente** : le service `queue-worker` garde le code en mémoire. Après toute modification du code PHP,
   `docker compose exec app php artisan queue:restart` (à faire aussi à chaque déploiement).
 - **Styles** : Tailwind ne génère que les classes présentes dans les vues lors de la compilation. Après avoir modifié
