@@ -2,6 +2,7 @@
 
 namespace App\Services\Stocks;
 
+use App\Domain\Autonomie\Incertitude;
 use App\Domain\Referentiels\Referentiels;
 use App\Domain\Stocks\Balles;
 use App\Domain\Stocks\DensiteHorsDomaine;
@@ -40,6 +41,7 @@ class StocksService
         private readonly Referentiels $referentiels,
         private readonly Silo $silo = new Silo,
         private readonly Balles $balles = new Balles,
+        private readonly Incertitude $incertitudeDomaine = new Incertitude,
     ) {}
 
     /**
@@ -72,7 +74,7 @@ class StocksService
     public function enregistrerLot(Inventaire $inventaire, array $donnees, ?LotStock $lot = null, bool $publiesSeulement = false): LotStock
     {
         $donnees = $this->completer($inventaire, $donnees, $publiesSeulement);
-        $resultats = $this->calculer($inventaire, $donnees);
+        $resultats = [...$this->calculer($inventaire, $donnees), 'incertitude_rel' => $this->incertitude($inventaire, $donnees)];
 
         return DB::transaction(function () use ($inventaire, $donnees, $resultats, $lot) {
             $attributs = [...$donnees, ...$resultats, 'inventaire_id' => $inventaire->id, 'elevage_id' => $inventaire->elevage_id];
@@ -288,6 +290,38 @@ class StocksService
             'stock_brut_t_ms' => $this->silo->stockUtile($volume, $densite, 0.0),
             'stock_utile_t_ms' => $this->silo->stockUtile($volume, $densite, $pertes),
         ];
+    }
+
+    /**
+     * Incertitude relative du stock utile d'un lot (RC-14) : composition quadratique des erreurs de volume, de densité
+     * ou de poids, de MS et de pertes ; cas absents du tableau de RC-14 tranchés le 17/10/2026 ([CP]).
+     *
+     * @param  array<string, mixed>  $d
+     */
+    public function incertitude(Inventaire $inventaire, array $d): float
+    {
+        $gds = (int) DB::table('fourrage.elevage')->where('id', $inventaire->elevage_id)->value('gds_id');
+        $e = fn (string $cle) => $this->parametre('incertitude.'.$cle, $gds);
+        $ms = (float) $d['ms_pct'];
+        $ensilage = in_array($d['famille_code'], ['ENRUB', 'ENSIL_HERBE', 'ENSIL_MAIS', 'ENSIL_AUTRE'], true);
+        $points = match ($d['ms_origine']) {
+            'analyse' => $e('ms_analyse_points'),
+            'defaut' => $e('ms_defaut_points'),
+            default => $ensilage ? $e('ms_ensilage_points') : $e('ms_saisie_points'),
+        };
+        $facteurs = [$this->incertitudeDomaine->ms($points, $ms), $e('pertes_relatif') * (float) $d['pertes_pct']];
+
+        if ($d['forme'] === 'silo') {
+            $facteurs[] = $d['ouvrage'] === 'taupiniere' ? $e('volume_taupiniere') : $e('volume_couloir');
+            $facteurs[] = $e('densite_'.($d['methode_densite'] === 'equation' ? 'equation' : $d['methode_densite']));
+        } elseif ($d['forme'] === 'vrac') {
+            $facteurs[] = $e('vrac_volume');
+            $facteurs[] = $e('vrac_densite');
+        } else {
+            $facteurs[] = ! empty($d['poids_mesure']) ? $e('poids_mesure') : $e('poids_estime');
+        }
+
+        return $this->incertitudeDomaine->lot($facteurs);
     }
 
     private function msAnalysee(int $prelevementId, bool $publiesSeulement): ?float

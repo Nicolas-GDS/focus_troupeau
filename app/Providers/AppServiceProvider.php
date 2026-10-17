@@ -20,10 +20,12 @@ use App\Models\Fourrage\Analyse;
 use App\Models\Fourrage\AnalyseAnimale;
 use App\Models\Fourrage\Elevage;
 use App\Models\Fourrage\Interpretation;
+use App\Models\Plan\LevierLigne;
 use App\Models\Plan\LotAnimaux;
 use App\Models\Plan\Phase;
 use App\Models\Plan\Ration;
 use App\Models\Plan\RationComposant;
+use App\Models\Plan\Scenario;
 use App\Models\Ref\PlagePlausibilite;
 use App\Models\Ref\SeuilInterpretation;
 use App\Models\Ref\VersionReferentiel;
@@ -31,6 +33,7 @@ use App\Models\Stock\Inventaire;
 use App\Models\Stock\LotStock;
 use App\Models\Stock\Mouvement;
 use App\Models\Stock\PeriodePhase;
+use App\Observers\BilanObservateur;
 use App\Policies\ActionPolicy;
 use App\Policies\AnalyseAnimalePolicy;
 use App\Policies\AnalyseEauPolicy;
@@ -47,8 +50,10 @@ use App\Policies\MesureTerrainPolicy;
 use App\Policies\NoteLiaisonPolicy;
 use App\Policies\PlanPolicy;
 use App\Policies\ReferentielPolicy;
+use App\Policies\ScenarioPolicy;
 use App\Policies\StockPolicy;
 use App\Policies\VisitePolicy;
+use App\Services\Autonomie\RecalculBilan;
 use App\Services\Import\ExtracteurBulletin;
 use App\Services\Import\ExtracteurLano;
 use App\Services\Notifications\PasserelleSms;
@@ -78,6 +83,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ExtracteurBulletin::class, ExtracteurLano::class);
         $this->app->bind(RenduPdf::class, RenduBrowsershot::class);
         $this->app->bind(PasserelleSms::class, fn () => config('services.brevo.pilote_sms') === 'brevo' ? new SmsBrevo : new SmsJournal);
+        // EF-M6-05 : inventaires à recalculer en fin de transaction, propres à la requête ou au job
+        $this->app->scoped(RecalculBilan::class);
     }
 
     public function boot(): void
@@ -116,6 +123,12 @@ class AppServiceProvider extends ServiceProvider
         foreach ([LotAnimaux::class, Phase::class, Ration::class, RationComposant::class] as $modele) {
             Gate::policy($modele, PlanPolicy::class);
         }
+        // EF-M6-05 : recalcul du bilan mémorisé après tout changement des stocks ou du troupeau
+        foreach ([Inventaire::class, LotStock::class, Mouvement::class, LotAnimaux::class, Phase::class, Ration::class, RationComposant::class] as $modele) {
+            $modele::observe(BilanObservateur::class);
+        }
+        Gate::policy(Scenario::class, ScenarioPolicy::class);
+        Gate::policy(LevierLigne::class, ScenarioPolicy::class);
         // E24 — Référentiels versionnés
         Gate::policy(VersionReferentiel::class, ReferentielPolicy::class);
         Gate::policy(SeuilInterpretation::class, ReferentielPolicy::class);
