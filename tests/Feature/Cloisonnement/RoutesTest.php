@@ -21,7 +21,7 @@ use Tests\Support\JeuCloisonnement;
 |   connecte    : tout compte connecté
 |   roles       : compte connecté ayant l'un des rôles listés (sinon 403)
 |   elevage     : action portant sur un élevage passé dans la requête — 404 hors périmètre
-|   dossier     : volet du dossier /elevages/{elevage}/… (E04 à E11) — rôles de ROLES_DOSSIER, 404 hors périmètre ;
+|   dossier     : écran /elevages/{elevage}/… (E04 à E12) — rôles de ROLES_DOSSIER (ou « roles »), 404 hors périmètre ;
 |                 appelé ici pour chaque élevage J4 ; contenu publié / non publié testé dans
 |                 tests/Feature/Dossier/LectureDossierTest.php
 |   objet       : route portant sur un objet (signée + policy), testée avec ses objets dans le fichier de l'écran
@@ -99,6 +99,9 @@ const REGISTRE_ROUTES = [
     'GET elevages/{elevage}/sanitaire' => ['acces' => 'dossier'],
     'GET elevages/{elevage}/historique' => ['acces' => 'dossier'],
     'GET elevages/{elevage}/plan-action' => ['acces' => 'dossier'],
+    // Lot L5 — E12 (annexe 10 : éleveur, technicien) ; objets testés dans tests/Feature/Stock/EcranInventaireTest.php
+    'GET elevages/{elevage}/stocks' => ['acces' => 'dossier', 'roles' => ['eleveur', 'technicien']],
+    'GET elevages/{elevage}/stocks/{inventaire}' => ['acces' => 'objet'],
 ];
 
 /** Rôles des volets du dossier (annexe 10 : éleveur, technicien, vétérinaire ; vétérinaire conseil pour E07, E11, E21). */
@@ -224,11 +227,11 @@ it('ouvre chaque volet du dossier aux seuls rôles prévus et à aucun élevage 
     $elevages = ['J4-24A' => $jeu->elevage24a, 'J4-24B' => $jeu->elevage24b, 'J4-47' => $jeu->elevage47];
     $horsPerimetre = collect(JeuJ4Seeder::ELEVAGES)->except(PERIMETRES_J4[$profil]);
 
-    foreach (array_keys(array_filter(REGISTRE_ROUTES, fn ($r) => $r['acces'] === 'dossier')) as $cle) {
+    foreach (array_filter(REGISTRE_ROUTES, fn ($r) => $r['acces'] === 'dossier') as $cle => $regle) {
         foreach ($elevages as $code => $elevage) {
             $url = '/'.str_replace('{elevage}', $elevage->id, explode(' ', $cle, 2)[1]);
             $dansPerimetre = in_array($code, PERIMETRES_J4[$profil], true);
-            $attendu = ! $dansPerimetre ? 404 : ($user->hasAnyRole(ROLES_DOSSIER) ? 200 : 403);
+            $attendu = ! $dansPerimetre ? 404 : ($user->hasAnyRole($regle['roles'] ?? ROLES_DOSSIER) ? 200 : 403);
             $reponse = $this->get($url);
 
             expect($reponse->status())->toBe($attendu, "{$profil} → {$cle} ({$code})");

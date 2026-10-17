@@ -23,6 +23,8 @@ use App\Livewire\Dossier\NoteLiaisonVeterinaire;
 use App\Livewire\Dossier\SaisieVisite;
 use App\Livewire\Dossier\Visites;
 use App\Livewire\Interpretation\InterpretationBulletin;
+use App\Livewire\Stocks\Inventaires;
+use App\Livewire\Stocks\SaisieInventaire;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -95,6 +97,13 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
         // Note de liaison vétérinaire (EF-M2-09) : vétérinaire destinataire et agents du périmètre (policy)
         Route::get('/notes-liaison/{note}', NoteLiaisonVeterinaire::class)->name('notes-liaison.voir');
         Route::get('/notes-liaison/{note}/pdf', [NoteLiaisonController::class, 'pdf'])->middleware('signed')->name('notes-liaison.pdf');
+
+        // E12 — stocks fourragers (EF-M4, annexe 10 : éleveur, technicien) ; élevage lié à travers les scopes (404 hors
+        // périmètre), écriture autorisée par StockPolicy (convention active, T-32)
+        Route::middleware('role:eleveur|technicien')->prefix('elevages/{elevage}')->group(function () {
+            Route::get('/stocks', Inventaires::class)->name('stocks');
+            Route::get('/stocks/{inventaire}', SaisieInventaire::class)->name('stocks.inventaire');
+        });
 
         // E23 — Administration : GDS, comptes, conventions
         Route::middleware('role:admin|admin_global')->prefix('admin')->name('admin.')->group(function () {

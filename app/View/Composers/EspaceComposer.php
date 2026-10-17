@@ -82,6 +82,11 @@ class EspaceComposer
             $liens[] = ['libelle' => 'Dossier', 'route' => 'dossier.fourrages', 'parametres' => $dossier, 'actif' => 'dossier.*'];
         }
 
+        // E12 — stocks fourragers (annexe 10 : éleveur, technicien)
+        if ($dossier !== null && $user->hasAnyRole(['eleveur', 'technicien'])) {
+            $liens[] = ['libelle' => 'Stocks', 'route' => 'stocks', 'parametres' => $dossier, 'actif' => 'stocks*'];
+        }
+
         if ($user->can('bulletin.importer')) {
             $liens[] = ['libelle' => 'Import des bulletins', 'route' => 'import.bulletins'];
         }
