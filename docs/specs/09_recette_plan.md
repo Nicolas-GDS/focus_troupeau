@@ -76,8 +76,8 @@ Estimation indicative pour un développement interne assisté par IA, à affiner
 | 2 | Grille eau d'abreuvement (paramètres et seuils) — seul le fer est sourcé (présentation Forgeneuf) ; nitrates, pH, dureté, sulfates, bactériologie, conductivité sans seuil | L3 | Vétérinaire conseil |
 | 3 | Repères des mesures terrain et des profils sanguins : sources à citer ou valeurs à remplacer (statut [C] actuel, transcrits de la présentation Forgeneuf le 16/10/2026, marqués « repère à valider ») | L3 | Vétérinaire conseil |
 | 4 | Seuils S1/S2 du bilan sanitaire et grille trouble × cause (NBVC) : droits d'usage et source à citer | L3 | Chargé de mission |
-| 5 | Chargement des tables INRAE-CIRAD-AFZ (licence d'utilisation des Feedtables pour un usage applicatif) | L5 | Chargé de mission |
-| 6 | Besoins journaliers INRA 2018 par catégorie et stade : périmètre de la table à charger ; remplacement des repères [C] des vaches allaitantes | L5 | Vétérinaire conseil, technicien référent |
+| 5 | Chargement des tables INRAE-CIRAD-AFZ (licence d'utilisation des Feedtables pour un usage applicatif) — au lot L5, tables créées vides, concentrés décrits par leur composition saisie (décision du 17/10/2026) | L5 | Chargé de mission |
+| 6 | Besoins journaliers INRA 2018 par catégorie et stade : périmètre de la table à charger ; remplacement des repères [C] des vaches allaitantes — au lot L5, seuls les repères de RC-9 sont chargés, « repère à valider » (décision du 17/10/2026) | L5 | Vétérinaire conseil, technicien référent |
 | 7 | Référence complète de Faverdin et al. (taux de substitution) | L6 | Chargé de mission |
 | 8 | Prix indicatifs GDS des fourrages et concentrés (source et fréquence de révision) | L6 | Comité technique |
 | 9 | Durées de conservation RGPD et registre des traitements | L1 | Direction, DPO |
@@ -86,6 +86,7 @@ Estimation indicative pour un développement interne assisté par IA, à affiner
 | 12 | Nom définitif (Focus Troupeau / Mise au point) | L1 (jetons) | Conseil d'administration |
 | 14 | Consentements « références » des élevages de J0 : à enregistrer avant la recette du positionnement (sans consentement actif, aucun lot n'entre dans les références) | L4 | Chargé de mission |
 | 15 | Couches `sig` (BRGM, RRP) et localisation des prélèvements ou des sièges : nécessaires à la population lithologique ; sans elles, seules les populations départementale et bi-GDS sont affichées | L4 | Chargé de mission |
+| 16 | Calculateur HTML d'autonomie fourragère et exemples de fichiers `gds-autonomie-fourragere-v1` à verser au dépôt pour l'import T-28 | L5 | Chargé de mission |
 | 13 | Béliers : la catégorie `BOUC_MALE` (« mâles caprins / ovins ») est rattachée à l'espèce caprine ; aucun seuil Ca/P (urolithiase) ne s'applique aux béliers depuis la correction de la grille v3 — créer une catégorie ovine dédiée et son seuil ? | L2 / E24 | Comité technique |
 
 ## 9.5 Risques

@@ -140,6 +140,13 @@ Chaque ligne de référentiel porte un **mode** : `par_jour` (comparaison `A_e` 
 
 **Affectation conseillée** : si la ration d'un lot d'animaux comprend un lot de stock dont l'interprétation publiée déconseille la catégorie (champ `utilisation_deconseillee`), l'application le signale (EF-M5-05).
 
+### Précisions du lot L5 (décisions du 17/10/2026)
+
+- *Valeurs par défaut* (RC-6, RC-7, RC-8, RC-9) : chargées dans `app.parametre_defaut` sous les clés et les valeurs de `calculs/focus_troupeau_calculs.py` (`DEFAUTS`), qui fait foi pour les tests T-10 à T-13 (par exemple pertes à la distribution « râtelier à anneau » 6,1 % et « remorque » 11,4 %, arrondies à 6 et 11 % dans le tableau RC-6) ; les coefficients UGB de RC-8.1 sont des paramètres par catégorie.
+- *Tables d'aliments* (point ouvert 5) : `ref.aliment_reference` et `ref.aliment_reference_valeur` sont créées **vides** ; aucune valeur de table n'est inventée. Un concentré, un correcteur ou un minéral distribué est décrit par sa composition saisie : c'est une étiquette (`dossier.etiquette_aliment`, natures existantes), complétée d'une matière sèche (`ms_pct`) pour convertir la ration brute en kg MS ; la teneur saisie par kg de produit brut est ramenée au kg MS. Un lot de stock non analysé garde sa MS par défaut (RC-7) mais n'apporte aucune valeur nutritionnelle : ses apports sont « inconnus », la couverture des éléments concernés n'est pas calculée et l'écran invite à l'analyser (EF-M4-04).
+- *Besoins* (point ouvert 6) : `ref.besoin_journalier` ne reçoit que les repères écrits dans RC-9 (vache laitière par kg de lait et entretien, brebis et chèvre à l'entretien, concentrations des vaches allaitantes et des génisses par stade), avec leur statut ([V], [C]) et la mention « repère à valider » ; une catégorie ou un stade sans repère n'a pas de couverture (« besoin non renseigné »), sans valeur de remplacement.
+- *Tables du socle* : `fourrage.lot_animaux`, `fourrage.ration` et `fourrage.ration_composant` restent intactes (le script 03, hors migrations, pourrait y écrire) ; `plan.*` fait foi, sans vue de compatibilité.
+
 ### RC-10 — Période de référence
 
 La période va de la date du bilan à la prochaine récolte de même nature. Elle est décrite en phases avec un coefficient de ration : hivernage pleine ration (coefficient 1), transition de mise à l'herbe (0,5), complémentation estivale (saisi, défaut 0,5). `jours_equivalents = Σ jours_phase × coefficient`. Repères affichés (FRGDS AURA / Idele 2019 [V]) : plaine 160 jours minimum, montagne 200 ; transition + 30 jours à demi-ration ; complémentation estivale 30 jours en année favorable, 90–100 en année sèche. Le choix est celui de l'éleveur, assisté par le technicien ; l'application ne tranche pas (document 05, § 6.4).

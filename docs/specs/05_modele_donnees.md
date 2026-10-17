@@ -430,6 +430,8 @@ CREATE TABLE plan.levier_ligne (
 );
 ```
 
+Lot L5 (décisions du 17/10/2026) : `ref.aliment_reference` et `ref.aliment_reference_valeur` sont créées vides (point ouvert 5) ; `dossier.etiquette_aliment` reçoit `ms_pct` pour servir de composant de ration ; les tables du socle `fourrage.lot_animaux`, `ration`, `ration_composant` ne sont ni migrées ni remplacées par des vues (§ 5.1 amendé : `plan.*` fait foi).
+
 ## 5.6 Vues analytiques ajoutées (`valo`)
 
 | Vue | Rôle |
