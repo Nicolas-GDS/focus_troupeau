@@ -3,6 +3,20 @@
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; versions sémantiques (chapitre 6.5).
 Le numéro de version est affiché dans le pied de page de l'application et dans les PDF (ENF-EXP-03).
 
+## [Non publié] — lot L5 (stocks et troupeau)
+
+### Ajouté
+- Schémas `stock` et `plan` (§ 5.4, § 5.5), référentiels version 5 : valeurs par défaut de RC-6 à RC-9 et RC-12,
+  coefficients UGB, besoins journaliers (repères de RC-9 et besoins du socle transcrits), seuils des contrôles de ration ;
+  tables d'aliments créées vides.
+- Domaine des stocks et du troupeau (RC-5 à RC-9) : silos, balles et vrac, besoins par les deux voies, couverture,
+  contrôles de la ration ; tests T-10 à T-13.
+- E12 — inventaire des stocks sur téléphone : lots calculés à l'enregistrement, aperçu en ligne, MS d'une analyse
+  reliée, mouvements, tableau de bord par famille ; reprise d'un bilan du calculateur HTML (T-28).
+- E13 — troupeau : lots d'animaux, phases, rations, besoins, apports et couverture, contrôles, affectation, copie d'une
+  période.
+- Jeu J1 et procédure `docs/recette/L5_recette_J1.md`.
+
 ## [Non publié] — lot L4 (positionnement)
 
 ### Ajouté

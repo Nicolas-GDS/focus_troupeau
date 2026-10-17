@@ -1,0 +1,9 @@
+{"expl":"EARL exemple — naisseur-engraisseur (24)","date":"2026-11-01","jours":"160","marge":"15","distrib":"0.13","voie":"true",
+"silos":[{"nom":"Maïs — silo couloir","type":"mais_couloir","l1":"18","l2":"6","larg":"8","haut":"2.4","ms":"33","am":"30","dens":"","pertes":"5"},
+{"nom":"Herbe — taupinière","type":"herbe_longs","l1":"12","l2":"5","larg":"6","haut":"1.6","ms":"28","am":"28","dens":"","pertes":"8"}],
+"balles":[{"nom":"Foin prairie permanente Ø 1,50 m — sous toit","n":"260","p":"275","ms":"85","st":"3","pertes":"3"},
+{"nom":"Enrubannage Ø 1,20 m — 50 % MS, bâché au sol","n":"90","p":"440","ms":"50","st":"8","pertes":"8"},
+{"nom":"Paille alimentaire Ø 1,50 m — sous toit","n":"70","p":"185","ms":"90","st":"3","pertes":"3"}],
+"ugb":[{"cat":"Vache allaitante","coef":"0.9","n":"60"},{"cat":"Génisse < 1 an","coef":"0.3","n":"22"}],
+"ration":[{"nom":"Vaches suitées","n":"60","kg":"13","j":"160"}],
+"lev":[{"type":"ratelier","q":"0","p":"4"}]}

@@ -33,6 +33,45 @@
         </section>
     @endif
 
+    @if ($peutCreer)
+        <details class="carte" @if ($apercu) open @endif>
+            <summary class="cursor-pointer text-lg font-semibold">Reprendre un bilan du calculateur</summary>
+            <p class="mt-2 text-sm text-texte-doux">Le calculateur d'autonomie fourragère garde sa saisie dans le navigateur (clé « gds-autonomie-fourragere-v1 »). Coller ce contenu ci-dessous : les silos et les balles deviennent les lots d'un nouvel inventaire, recalculés avec les règles de l'application.</p>
+            <form wire:submit="analyserCalculateur" class="mt-3 space-y-2">
+                <label for="contenu-calc" class="etiquette">Contenu du calculateur</label>
+                <textarea id="contenu-calc" wire:model="contenuCalculateur" rows="4" class="champ w-full font-mono text-xs" placeholder='{"expl": "…", "silos": […], "balles": […]}'></textarea>
+                @error('contenuCalculateur') <p class="text-sm text-etat-critique" role="alert">{{ $message }}</p> @enderror
+                <button type="submit" class="bouton-secondaire">Voir ce qui sera repris</button>
+            </form>
+
+            @if ($apercu)
+                <div class="mt-4 space-y-3">
+                    <p class="text-sm">{{ $apercu['inventaire']['libelle'] ?: 'Bilan sans nom' }} · bilan du {{ \Illuminate\Support\Carbon::parse($apercu['inventaire']['date'])->format('d/m/Y') }} sur {{ $apercu['inventaire']['jours'] }} jours · marge de sécurité {{ \App\Services\Dossier\Affichage::nombre(100 * $apercu['inventaire']['marge'], 0) }} %</p>
+                    @foreach ($apercu['lots'] as $i => $lot)
+                        <div class="rounded-md border border-filet p-3 text-sm" wire:key="apercu-{{ $i }}">
+                            <p class="font-medium">{{ $lot['donnees']['libelle'] }}</p>
+                            @if ($lot['donnees']['forme'] !== 'silo')
+                                <div class="mt-2 grid gap-2 sm:grid-cols-2">
+                                    <select wire:model="apercu.lots.{{ $i }}.donnees.famille_code" class="champ" aria-label="Famille de {{ $lot['donnees']['libelle'] }}">
+                                        @foreach ($familles as $code => $libelle) <option value="{{ $code }}">{{ $libelle }}</option> @endforeach
+                                    </select>
+                                    <select wire:model="apercu.lots.{{ $i }}.donnees.forme" class="champ" aria-label="Forme de {{ $lot['donnees']['libelle'] }}">
+                                        <option value="balle_ronde">Balles rondes</option><option value="balle_carree">Balles carrées</option><option value="botte">Bottes</option>
+                                    </select>
+                                </div>
+                            @else
+                                <p class="text-texte-doux">Silo · {{ $familles[$lot['donnees']['famille_code']] ?? '' }} · {{ $lot['donnees']['ouvrage'] === 'taupiniere' ? 'taupinière' : 'couloir' }}</p>
+                            @endif
+                            @foreach ($lot['alertes'] as $alerte) <p class="mt-1 text-etat-vigilance">{{ $alerte }}</p> @endforeach
+                        </div>
+                    @endforeach
+                    @if ($apercu['non_repris'] !== []) <p class="text-sm text-texte-doux">Non repris : {{ implode(' ; ', $apercu['non_repris']) }}.</p> @endif
+                    <button type="button" wire:click="importerCalculateur" class="bouton-principal w-full sm:w-auto">Créer l'inventaire</button>
+                </div>
+            @endif
+        </details>
+    @endif
+
     <section aria-labelledby="titre-liste">
         <h2 id="titre-liste" class="text-lg font-semibold">Inventaires</h2>
         @forelse ($inventaires as $inv)
