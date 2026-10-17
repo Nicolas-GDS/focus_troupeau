@@ -3,6 +3,8 @@
 namespace App\Livewire\Dossier\Lecture;
 
 use App\Models\App\User;
+use App\Models\Stock\Inventaire;
+use App\Services\Autonomie\BilanService;
 use App\Services\Dossier\LectureDossierService;
 use App\Services\ElevageCourant;
 use Illuminate\Contracts\View\View;
@@ -13,16 +15,18 @@ use RuntimeException;
 
 /**
  * E02 — accueil de l'éleveur et du vétérinaire d'élevage (EF-M1-01) pour l'élevage courant du sélecteur (EF-M0-08) :
- * dernière visite publiée, messages hiérarchisés, actions qui incombent au lecteur, contrôles à venir. L'état de
- * l'autonomie fourragère rejoint l'accueil au lot L6.
+ * dernière visite publiée, messages hiérarchisés, actions qui incombent au lecteur, contrôles à venir ; état de
+ * l'autonomie fourragère d'après le dernier bilan mémorisé (EF-M6-05), pour l'éleveur (annexe 10 : E14).
  */
 class Accueil extends Component
 {
-    public function render(LectureDossierService $lecture): View
+    public function render(LectureDossierService $lecture, BilanService $bilans): View
     {
         $elevage = app(ElevageCourant::class)->courant();
         $accueil = $elevage === null ? null : $lecture->accueil($elevage, $this->lecteur());
         $interpretation = $accueil['interpretation'] ?? null;
+        // annexe 10 : E14 ouvert à l'éleveur et au technicien
+        $autonomie = $elevage !== null && $this->lecteur()->hasAnyRole(['eleveur', 'technicien']) && $this->lecteur()->can('viewAny', Inventaire::class);
 
         return view('livewire.dossier.lecture.accueil', [
             'elevage' => $elevage,
@@ -31,6 +35,8 @@ class Accueil extends Component
             'lienFiche' => $interpretation === null || $interpretation->fiche_html === null ? null
                 : URL::temporarySignedRoute('visites.fiche.pdf', now()->addMinutes(30), ['visite' => $interpretation->visite_id, 'version' => $interpretation->version]),
             'limites' => $lecture->limites(),
+            'autonomieVisible' => $autonomie,
+            'bilan' => $autonomie ? $bilans->dernier($elevage->id) : null,
         ])->layout('components.layouts.espace', ['titre' => 'Accueil']);
     }
 

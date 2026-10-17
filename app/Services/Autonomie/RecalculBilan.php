@@ -2,12 +2,13 @@
 
 namespace App\Services\Autonomie;
 
-use App\Models\Stock\Inventaire;
+use App\Jobs\CalculerBilan;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Recalcul du bilan mémorisé après un changement d'inventaire, de lot, de mouvement, de lot d'animaux, de phase ou de
- * ration (EF-M6-05, T-20) : les inventaires touchés sont recalculés une fois, à la fin de la transaction.
+ * ration (EF-M6-05, T-20) : un job CalculerBilan par inventaire touché, dispatché une fois, à la fin de la transaction
+ * (chapitre 6.4).
  */
 class RecalculBilan
 {
@@ -34,10 +35,7 @@ class RecalculBilan
         $this->enAttente = [];
 
         foreach ($ids as $id) {
-            $inventaire = Inventaire::query()->withoutGlobalScopes()->find($id);
-            if ($inventaire !== null) {
-                app(BilanService::class)->enregistrer($inventaire);
-            }
+            CalculerBilan::dispatch($id);
         }
     }
 }

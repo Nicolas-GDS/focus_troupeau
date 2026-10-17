@@ -7,6 +7,7 @@ use App\Http\Controllers\FicheVisiteController;
 use App\Http\Controllers\NoteLiaisonController;
 use App\Http\Controllers\NoticeRgpdController;
 use App\Http\Controllers\TravailController;
+use App\Livewire\Autonomie\Bilan as AutonomieBilan;
 use App\Livewire\Dossier\Interpretation\EcranVisite;
 use App\Livewire\Dossier\Lecture\Accueil;
 use App\Livewire\Dossier\Lecture\Aliments;
@@ -106,6 +107,8 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
             Route::get('/stocks/{inventaire}', SaisieInventaire::class)->name('stocks.inventaire');
             // E13 — troupeau : lots d'animaux, phases, rations (EF-M5)
             Route::get('/troupeau', Troupeau::class)->name('troupeau');
+            // E14 — autonomie, bilan et projection (EF-M6)
+            Route::get('/autonomie', AutonomieBilan::class)->name('autonomie');
         });
 
         // E23 — Administration : GDS, comptes, conventions

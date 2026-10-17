@@ -84,7 +84,7 @@ it('affiche à l\'éleveur l\'accueil de sa dernière visite publiée (EF-M1-01)
         ->assertSee('au-dessus du repère')
         ->assertSee(route('dossier.visite', [$this->elevage->id, $this->visite->id]), false)
         ->assertSee('Cette fiche ne remplace ni un calcul de ration ni un diagnostic vétérinaire.')
-        ->assertSee('lot L6');
+        ->assertSee('Autonomie fourragère')->assertSee('Aucun bilan pour l\'inventaire en cours.', false)->assertDontSee('lot L6');
 });
 
 it('restitue la visite publiée dans l\'ordre des six étapes, valeurs avec repère et source (E03, EF-M1-09, EF-GEN-02)', function () {

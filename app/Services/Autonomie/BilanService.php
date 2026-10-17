@@ -38,7 +38,7 @@ class BilanService
     ) {}
 
     /**
-     * @return array{centrale: ResultatProjection, basse: ResultatProjection, haute: ResultatProjection, incertitude: float, lots: list<LotProjection>, libelles: array<string, string>, stocks_famille: array<string, float>, securites_famille: array<string, float>, besoin_ration_t_ms: float, pertes_moyennes: float, voie_ugb: array{t_ms: float|null, jours_equivalents: float|null}, debut: DateTimeImmutable, fin: DateTimeImmutable}
+     * @return array{centrale: ResultatProjection, basse: ResultatProjection, haute: ResultatProjection, incertitude: float, lots: list<LotProjection>, libelles: array<string, string>, stocks_famille: array<string, float>, securites_famille: array<string, float>, besoin_ration_t_ms: float, pertes_moyennes: float, voie_ugb: array{t_ms: float|null, jours_equivalents: float|null}, phases: list<ConsommationPhase>, debut: DateTimeImmutable, fin: DateTimeImmutable}
      */
     public function calculer(Inventaire $inventaire, ?Scenario $scenario = null): array
     {
@@ -90,7 +90,7 @@ class BilanService
             'incertitude' => $this->incertitude->totale(array_values(array_filter($lots, fn (LotProjection $l) => $l->stockUtile > 0))),
             'lots' => $lots, 'libelles' => $libelles, 'stocks_famille' => $stocksFamille,
             'securites_famille' => array_map(fn (float $b) => $marge * $b, $centrale->besoinParFamille),
-            'besoin_ration_t_ms' => $besoinRation, 'pertes_moyennes' => $pertesMoyennes, 'voie_ugb' => $ugb,
+            'besoin_ration_t_ms' => $besoinRation, 'pertes_moyennes' => $pertesMoyennes, 'voie_ugb' => $ugb, 'phases' => $phases,
             'debut' => $debut, 'fin' => $fin,
         ];
     }

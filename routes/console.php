@@ -1,6 +1,7 @@
 <?php
 
 use App\Jobs\ClotureConventions;
+use App\Jobs\EvaluerAlertesAutonomie;
 use App\Jobs\RafraichirContextePrelevements;
 use Illuminate\Support\Facades\Schedule;
 
@@ -15,3 +16,6 @@ Schedule::job(new ClotureConventions)->dailyAt('01:00')->name('cloture-conventio
 
 // § 5.6, RC-3 : contexte pédo-géologique des prélèvements (population lithologique des références), chaque nuit.
 Schedule::job(new RafraichirContextePrelevements)->dailyAt('02:00')->name('contexte-prelevements')->withoutOverlapping();
+
+// EF-M8-03 : alertes d'autonomie, la rupture prévisionnelle étant comptée depuis la date du jour.
+Schedule::job(new EvaluerAlertesAutonomie)->dailyAt('03:00')->name('alertes-autonomie')->withoutOverlapping();

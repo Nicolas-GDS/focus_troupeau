@@ -124,7 +124,7 @@ class AppServiceProvider extends ServiceProvider
             Gate::policy($modele, PlanPolicy::class);
         }
         // EF-M6-05 : recalcul du bilan mémorisé après tout changement des stocks ou du troupeau
-        foreach ([Inventaire::class, LotStock::class, Mouvement::class, LotAnimaux::class, Phase::class, Ration::class, RationComposant::class] as $modele) {
+        foreach ([Inventaire::class, LotStock::class, Mouvement::class, PeriodePhase::class, LotAnimaux::class, Phase::class, Ration::class, RationComposant::class] as $modele) {
             $modele::observe(BilanObservateur::class);
         }
         Gate::policy(Scenario::class, ScenarioPolicy::class);

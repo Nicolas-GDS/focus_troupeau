@@ -9,6 +9,7 @@ use App\Models\Plan\RationComposant;
 use App\Models\Stock\Inventaire;
 use App\Models\Stock\LotStock;
 use App\Models\Stock\Mouvement;
+use App\Models\Stock\PeriodePhase;
 use App\Services\Autonomie\RecalculBilan;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -34,7 +35,7 @@ class BilanObservateur
             ->where('id', DB::table('plan.phase')->where('id', $phaseId)->value('lot_animaux_id'))->value('inventaire_id');
         $id = match (true) {
             $modele instanceof Inventaire => $modele->id,
-            $modele instanceof LotStock, $modele instanceof LotAnimaux => $modele->inventaire_id,
+            $modele instanceof LotStock, $modele instanceof LotAnimaux, $modele instanceof PeriodePhase => $modele->inventaire_id,
             $modele instanceof Mouvement => DB::table('stock.lot_stock')->where('id', $modele->lot_stock_id)->value('inventaire_id'),
             $modele instanceof Phase => DB::table('plan.lot_animaux')->where('id', $modele->lot_animaux_id)->value('inventaire_id'),
             $modele instanceof Ration => $phaseVersInventaire($modele->phase_id),
