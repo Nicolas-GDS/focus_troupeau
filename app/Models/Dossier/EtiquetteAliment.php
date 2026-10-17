@@ -23,6 +23,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $dose_g_par_animal_jour
  * @property string|null $mode_distribution
  * @property string $statut
+ * @property string|null $ms_pct matière sèche, quand l'étiquette décrit un concentré de ration (lot L5)
  * @property int|null $cree_par
  */
 class EtiquetteAliment extends Model
@@ -48,7 +49,7 @@ class EtiquetteAliment extends Model
 
     protected $fillable = [
         'elevage_id', 'visite_id', 'nature', 'libelle_eleveur', 'photo', 'date_limite', 'dose_g_par_animal_jour',
-        'mode_distribution', 'statut',
+        'mode_distribution', 'statut', 'ms_pct',
     ];
 
     protected $attributes = ['statut' => self::STATUT_SAISIE];

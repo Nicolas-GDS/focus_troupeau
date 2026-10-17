@@ -95,13 +95,13 @@ it('T-26 : reprend la structure du prototype, la charte bi-entité, les limites 
         ->toContain('Tarissement')
         ->toContain('Cette fiche ne remplace ni un calcul de ration ni un diagnostic vétérinaire.')
         ->toContain('Éléments non dosés dans les fourrages de la visite :')
-        ->toContain('Grille d\'interprétation version 4')
+        ->toContain('Grille d\'interprétation version 5')
         ->toContain('repère à valider')
         ->not->toContain('J4-47')
         ->not->toContain(JeuJ4Seeder::ELEVAGES['J4-47']['raison_sociale'])
         ->not->toContain('/fonts/');                            // aucune ressource externe : fiche autonome
 
-    expect(app(FicheVisiteService::class)->piedDePage($iv))->toContain('grille v4')->toContain('pageNumber')->toContain('GDS France');
+    expect(app(FicheVisiteService::class)->piedDePage($iv))->toContain('grille v5')->toContain('pageNumber')->toContain('GDS France');
 });
 
 it('T-06 : la fiche de la version 1 reste archivée et téléchargeable par le technicien après la version 2', function () {

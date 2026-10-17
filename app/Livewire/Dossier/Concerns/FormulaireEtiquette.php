@@ -24,6 +24,9 @@ trait FormulaireEtiquette
 
     public string $modeDistribution = '';
 
+    /** Matière sèche (%) : nécessaire pour utiliser l'étiquette dans une ration (RC-9, lot L5). */
+    public ?string $msPct = null;
+
     /** @var list<array{code: string, valeur: string|null, unite: string}> */
     public array $composition = [['code' => '', 'valeur' => null, 'unite' => 'mg/kg']];
 
@@ -51,10 +54,11 @@ trait FormulaireEtiquette
             'dose' => ['nullable', 'numeric', 'min:0'],
             'dateLimite' => ['nullable', 'date'],
             'modeDistribution' => ['nullable', 'string', 'max:200'],
+            'msPct' => ['nullable', 'numeric', 'gt:0', 'max:100'],
             'composition.*.code' => ['nullable', 'string', Rule::in(DB::table('ref.parametre')->pluck('code')->map(fn ($v) => (string) $v)->all())],
             'composition.*.valeur' => ['nullable', 'numeric', 'min:0'],
             'composition.*.unite' => ['required', Rule::in(ApportEtiquette::unitesAdmises())],
-        ], [], ['libelle' => 'libellé', 'dateLimite' => 'date limite', 'composition.*.code' => 'élément', 'composition.*.valeur' => 'teneur']);
+        ], [], ['libelle' => 'libellé', 'msPct' => 'matière sèche', 'dateLimite' => 'date limite', 'composition.*.code' => 'élément', 'composition.*.valeur' => 'teneur']);
 
         $composition = [];
         foreach ($this->composition as $ligne) {
@@ -70,6 +74,7 @@ trait FormulaireEtiquette
                 'dose_g_par_animal_jour' => self::nombreSaisi($this->dose),
                 'date_limite' => $this->dateLimite ?: null,
                 'mode_distribution' => trim($this->modeDistribution) === '' ? null : trim($this->modeDistribution),
+                'ms_pct' => self::nombreSaisi($this->msPct),
             ],
             'composition' => $composition,
         ];
@@ -77,7 +82,7 @@ trait FormulaireEtiquette
 
     protected function viderFormulaireEtiquette(): void
     {
-        $this->reset('libelle', 'dose', 'dateLimite', 'modeDistribution', 'composition');
+        $this->reset('libelle', 'dose', 'dateLimite', 'modeDistribution', 'msPct', 'composition');
     }
 
     /** @return array<string, string> */

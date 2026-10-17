@@ -5,6 +5,7 @@ namespace App\Livewire\Dossier;
 use App\Domain\Dossier\ClasseBilan;
 use App\Domain\Dossier\LectureMesure;
 use App\Domain\Dossier\LectureProfil;
+use App\Domain\Troupeau\ClasseCouverture;
 
 /**
  * Rendu visuel des lectures du dossier (EF-GEN-03 : couleur, libellé et valeur, jamais la couleur seule). Les
@@ -60,6 +61,39 @@ final class Etats
         return ['libelle' => ucfirst(str_replace('_', ' ', $classe)), 'etat' => match ($gravite) {
             1 => 'vigilance', 2 => 'alerte', 3 => 'critique', default => 'couvert',
         }];
+    }
+
+    /**
+     * Couverture d'un élément par la ration (RC-9) : déficit en alerte, limite en vigilance, excès selon sa gravité,
+     * maximum réglementaire dépassé en critique.
+     *
+     * @return array{libelle: string, etat: string}
+     */
+    public static function couverture(?ClasseCouverture $classe, ?int $gravite): array
+    {
+        return match ($classe) {
+            null => ['libelle' => 'Non calculée', 'etat' => 'information'],
+            ClasseCouverture::Deficit => ['libelle' => $classe->libelle(), 'etat' => 'alerte'],
+            ClasseCouverture::Limite => ['libelle' => $classe->libelle(), 'etat' => 'vigilance'],
+            ClasseCouverture::Couvert => ['libelle' => $classe->libelle(), 'etat' => 'couvert'],
+            ClasseCouverture::Exces => ['libelle' => $classe->libelle(), 'etat' => $gravite >= 1 ? 'vigilance' : 'information'],
+            ClasseCouverture::MaximumDepasse => ['libelle' => $classe->libelle(), 'etat' => 'critique'],
+        };
+    }
+
+    /**
+     * Gravité d'un contrôle de ration (RC-9) : null dans le repère.
+     *
+     * @return array{libelle: string, etat: string}
+     */
+    public static function controle(?int $gravite): array
+    {
+        return match ($gravite) {
+            null => ['libelle' => 'Dans le repère', 'etat' => 'couvert'],
+            0 => ['libelle' => 'Information', 'etat' => 'information'],
+            1 => ['libelle' => 'Vigilance', 'etat' => 'vigilance'],
+            default => ['libelle' => 'Alerte', 'etat' => 'alerte'],
+        };
     }
 
     /** @return array{libelle: string, etat: string} */
