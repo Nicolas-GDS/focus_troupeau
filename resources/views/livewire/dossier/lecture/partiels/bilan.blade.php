@@ -3,7 +3,7 @@
     use App\Services\Dossier\Affichage;
 @endphp
 {{-- Indicateurs du bilan sanitaire positionnés sur les seuils S1/S2 (EF-M1-07), avec la campagne précédente --}}
-<div class="mt-2 overflow-x-auto">
+<div class="mt-2 overflow-x-auto" tabindex="0">
     <table class="min-w-full text-sm">
         <caption class="sr-only">Indicateurs du bilan sanitaire : valeur, situation, seuils et source</caption>
         <thead class="text-left text-texte-doux"><tr><th scope="col" class="py-1 pr-4">Indicateur</th><th scope="col" class="py-1 pr-4">Valeur et situation</th><th scope="col" class="py-1">Campagne précédente</th></tr></thead>

@@ -43,7 +43,7 @@
         @endif
     </section>
 
-    <section class="carte overflow-x-auto" aria-labelledby="titre-leviers">
+    <section class="carte overflow-x-auto" aria-labelledby="titre-leviers" tabindex="0">
         <h2 id="titre-leviers" class="text-lg font-semibold">Leviers</h2>
         @if ($evaluation['lignes']->isEmpty())
             <p class="mt-2 text-sm text-texte-doux">Aucun levier.</p>

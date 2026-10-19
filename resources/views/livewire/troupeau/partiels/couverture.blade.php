@@ -16,7 +16,7 @@
         <p class="mt-1 text-sm text-texte-doux">Production laitière à saisir pour calculer : {{ implode(', ', $analyse['manquants']) }}.</p>
     @endif
     @if ($analyse['elements'] !== [])
-        <div class="mt-2 overflow-x-auto">
+        <div class="mt-2 overflow-x-auto" tabindex="0">
             <table class="min-w-full text-sm">
                 <caption class="sr-only">Apports de la ration comparés aux besoins : valeur, couverture, besoin résiduel, repère et source</caption>
                 <thead class="text-left text-texte-doux"><tr><th scope="col" class="py-1 pr-3">Élément</th><th scope="col" class="py-1 pr-3">Apport</th><th scope="col" class="py-1 pr-3">Besoin</th><th scope="col" class="py-1">Couverture</th></tr></thead>

@@ -18,7 +18,7 @@
     </section>
 
     @if ($rapport)
-        <section class="carte overflow-x-auto" aria-labelledby="titre-rapport">
+        <section class="carte overflow-x-auto" aria-labelledby="titre-rapport" tabindex="0">
             <h2 id="titre-rapport" class="text-lg font-semibold">{{ $importe ? 'Rapport d\'import' : 'Aperçu' }}</h2>
             <p class="mt-1 flex flex-wrap gap-2 text-sm">@foreach ($actions as $code => [$libelle, $etat]) <x-pastille :etat="$etat" :libelle="$libelle.' : '.$rapport['totaux'][$code]" /> @endforeach</p>
             <table class="mt-3 w-full text-sm">

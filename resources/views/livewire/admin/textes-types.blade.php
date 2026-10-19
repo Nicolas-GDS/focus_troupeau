@@ -17,7 +17,7 @@
         </section>
     @endif
 
-    <section class="carte overflow-x-auto" aria-labelledby="titre-textes">
+    <section class="carte overflow-x-auto" aria-labelledby="titre-textes" tabindex="0">
         <h2 id="titre-textes" class="text-lg font-semibold">Textes types</h2>
         <div class="mt-2"><label for="t-filtre" class="etiquette">Filtrer (code ou texte)</label><input id="t-filtre" type="search" wire:model.live.debounce.300ms="filtre" class="champ"></div>
         <table class="mt-3 w-full text-sm">

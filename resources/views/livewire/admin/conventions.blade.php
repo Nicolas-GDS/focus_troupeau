@@ -2,7 +2,7 @@
 <div class="space-y-6">
     @if (session('status')) <p class="rounded-md border border-etat-couvert bg-etat-couvert-fond p-3 text-sm" role="status">{{ session('status') }}</p> @endif
     <div class="grid gap-6 lg:grid-cols-3">
-        <section class="carte overflow-x-auto lg:col-span-2" aria-labelledby="titre-conventions">
+        <section class="carte overflow-x-auto lg:col-span-2" aria-labelledby="titre-conventions" tabindex="0">
             <h2 id="titre-conventions" class="text-lg font-semibold">Conventions</h2>
             <div class="mt-2 flex flex-wrap gap-2">
                 <div><label for="f-statut" class="etiquette">Statut</label><select id="f-statut" wire:model.live="statut" class="champ"><option value="">Tous</option>@foreach ($statuts as $c => $l) <option value="{{ $c }}">{{ $l }}</option> @endforeach</select></div>

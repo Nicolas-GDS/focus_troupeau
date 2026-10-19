@@ -18,7 +18,7 @@
     <p class="mt-1"><x-pastille etat="alerte" :libelle="'Date limite dépassée '.$datePeremption" /></p>
 @endif
 @if ($item['lecture']['composition'] !== [])
-    <div class="mt-2 overflow-x-auto">
+    <div class="mt-2 overflow-x-auto" tabindex="0">
         <table class="min-w-full text-sm">
             <caption class="sr-only">Composition par kg de produit et apport journalier</caption>
             <thead class="text-left text-texte-doux"><tr><th scope="col" class="py-1 pr-4">Élément</th><th scope="col" class="py-1 pr-4">Teneur</th><th scope="col" class="py-1">Apport par animal et par jour</th></tr></thead>

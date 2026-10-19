@@ -14,7 +14,7 @@
                 <p class="font-medium">{{ $analyse->point_prelevement }} · {{ $analyse->date_prelevement->format('d/m/Y') }}</p>
                 <x-pastille :etat="$statut['etat']" :libelle="$statut['libelle']" />
             </div>
-            <div class="mt-2 overflow-x-auto">
+            <div class="mt-2 overflow-x-auto" tabindex="0">
                 <table class="min-w-full text-sm">
                     <caption class="sr-only">Résultats de l'analyse d'eau, classe, repère et source</caption>
                     <thead class="text-left text-texte-doux">

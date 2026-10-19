@@ -80,7 +80,7 @@
         </section>
 
         {{-- Par famille : stock, besoin, sécurité, rupture --}}
-        <section class="carte overflow-x-auto" aria-labelledby="titre-familles">
+        <section class="carte overflow-x-auto" aria-labelledby="titre-familles" tabindex="0">
             <h2 id="titre-familles" class="text-lg font-semibold">Par famille de fourrage</h2>
             <table class="mt-3 w-full text-sm">
                 <thead><tr class="text-left text-texte-doux"><th scope="col" class="py-1 pr-3">Famille</th><th scope="col" class="pr-3 text-right">Stock (mouvements compris)</th><th scope="col" class="pr-3 text-right">Besoin</th><th scope="col" class="pr-3 text-right">Sécurité</th><th scope="col">Rupture</th></tr></thead>
@@ -116,7 +116,7 @@
         </section>
 
         {{-- Projection mensuelle (EF-M6-02) --}}
-        <section class="carte overflow-x-auto" aria-labelledby="titre-mensuel">
+        <section class="carte overflow-x-auto" aria-labelledby="titre-mensuel" tabindex="0">
             <h2 id="titre-mensuel" class="text-lg font-semibold">Projection mois par mois</h2>
             <table class="mt-3 w-full text-sm">
                 <thead><tr class="text-left text-texte-doux"><th scope="col" class="py-1 pr-3">Mois</th><th scope="col" class="pr-3">Famille</th><th scope="col" class="pr-3 text-right">Stock début</th><th scope="col" class="pr-3 text-right">Consommation</th><th scope="col" class="pr-3 text-right">Mouvements</th><th scope="col" class="text-right">Stock fin</th></tr></thead>

@@ -20,7 +20,7 @@
                     </div>
                 @endif
             </div>
-            <div class="mt-3 overflow-x-auto">
+            <div class="mt-3 overflow-x-auto" tabindex="0">
                 <table class="min-w-full text-sm">
                     <caption class="sr-only">Matrice de vigilance minérale : lots en lignes, éléments en colonnes ; valeur, classe et repère</caption>
                     <thead class="text-left text-texte-doux">

@@ -65,7 +65,7 @@
                 <h2 id="etape-analyser" class="text-lg font-semibold">2. Analyser</h2>
                 @if ($synthese['lots'] !== [])
                     <h3 class="mt-3 font-medium">Vos fourrages</h3>
-                    <div class="mt-2 overflow-x-auto">
+                    <div class="mt-2 overflow-x-auto" tabindex="0">
                         <table class="min-w-full text-sm">
                             <caption class="sr-only">Valeurs des lots analysés, avec leur classe, leur repère et sa source</caption>
                             <thead class="text-left text-texte-doux">

@@ -57,7 +57,7 @@
     {{-- Résultats : valeur, classe, repère et source (EF-M2-02, EF-GEN-02, EF-GEN-03) --}}
     <section aria-labelledby="titre-resultats">
         <h2 id="titre-resultats" class="text-lg font-semibold">Résultats du bulletin</h2>
-        <div class="mt-3 overflow-x-auto rounded-lg border border-filet bg-surface">
+        <div class="mt-3 overflow-x-auto rounded-lg border border-filet bg-surface" tabindex="0">
             <table class="min-w-full text-sm">
                 <caption class="sr-only">Résultats, classe dans la grille d'interprétation, repère et source</caption>
                 <thead class="bg-fond font-titre text-left text-texte-doux">

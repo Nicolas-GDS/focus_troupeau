@@ -43,7 +43,7 @@
             <p class="mt-2 text-sm">{{ $i['notes_liaison'] }} notes de liaison envoyées · {{ $i['interpretations_niveau3'] }} interprétations de niveau 3 (visa du vétérinaire conseil)</p>
         </section>
 
-        <section class="carte overflow-x-auto" aria-labelledby="titre-references">
+        <section class="carte overflow-x-auto" aria-labelledby="titre-references" tabindex="0">
             <h2 id="titre-references" class="text-lg font-semibold">Couverture des références</h2>
             <p class="mt-1 text-sm">{{ $i['types_couverts'] }} types de fourrage sur {{ $i['types_total'] }} atteignent n ≥ {{ $i['n_min'] }} (bulletins validés, consentement « références », hors exclusions ; RC-3).</p>
             @if ($i['couverture'] !== [])
