@@ -20,6 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Production derrière le proxy TLS de l'hébergeur : schéma et adresse du client transmis (HTTPS, HSTS, journal)
+        $proxies = env('TRUSTED_PROXIES');
+        if (is_string($proxies) && $proxies !== '') {
+            $middleware->trustProxies(at: $proxies === '*' ? '*' : array_map('trim', explode(',', $proxies)));
+        }
+
         // ENF-SEC-01 : en-têtes de sécurité sur toutes les réponses web
         $middleware->web(append: [EnTetesSecurite::class]);
 

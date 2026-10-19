@@ -74,7 +74,14 @@ en recette uniquement.
 - **Tests** : `docker compose exec app php artisan test --parallel --processes=4` ; le seuil de 10 s des rendus PDF
   (T-26) se vérifie en exécution séquentielle : `docker compose exec app php artisan test --filter=Chromium`.
 - **Recettes** : `docs/recette/` (une procédure par lot ; lot L7 : `L7_recette.md`, fichiers SAGEMA d'essai dans
-  `tests/Fixtures/sagema/`).
+  `tests/Fixtures/sagema/` ; lot L8 : accessibilité, performance, élevages testeurs).
+- **Accessibilité** : `docker compose exec app php artisan accessibilite:auditer` (axe-core, écrans éleveur de J1 et J2).
+- **Charge** : `docker compose exec app php artisan db:seed --class=JeuChargeSeeder` puis
+  `docker compose --profile charge run --rm k6 run /scripts/consultation.js` (`docs/recette/L8_performance.md`).
+- **Sauvegarde** : `docker compose --profile exploitation run --rm sauvegarde` (`docs/exploitation/sauvegardes.md`).
+- **Production** : image `docker/production/Dockerfile`, `docker-compose.production.yml`, procédure
+  `docs/exploitation/deploiement.md`.
+- **Guides utilisateurs** : `docs/guides/` (éleveur, technicien, administrateur).
 - **Files d'attente** : le service `queue-worker` garde le code en mémoire. Après toute modification du code PHP,
   `docker compose exec app php artisan queue:restart` (à faire aussi à chaque déploiement).
 - **Styles** : Tailwind ne génère que les classes présentes dans les vues lors de la compilation. Après avoir modifié

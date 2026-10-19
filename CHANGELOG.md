@@ -3,6 +3,30 @@
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; versions sémantiques (chapitre 6.5).
 Le numéro de version est affiché dans le pied de page de l'application et dans les PDF (ENF-EXP-03).
 
+## [1.0.0-rc.1] — lot L8 (recette et mise en production), candidate à la recette des élevages testeurs
+
+### Ajouté
+- Sécurité : en-têtes CSP, HSTS (derrière le proxy TLS), X-Frame-Options, nosniff, Referrer-Policy,
+  Permissions-Policy (ENF-SEC-01).
+- Exploitation : purges de conservation paramétrables (ENF-RGPD-05), supervision horaire avec alerte aux
+  administrateurs et écran « Exploitation » (ENF-EXP-02), sauvegarde chiffrée et restauration de contrôle
+  (ENF-SEC-07).
+- Jeu J2 ovin (T-13, T-22) ; recherche automatique de marques dans les libellés générés (T-25).
+- Audit d'accessibilité automatisé des écrans éleveur (axe-core, `accessibilite:auditer`, T-41).
+- Test de charge k6 de 50 utilisateurs (T-42) ; comptes de charge.
+- E24 : besoins journaliers, repères des mesures terrain et des profils sanguins, seuils du bilan sanitaire,
+  aliments de table.
+- Brouillon local chiffré du formulaire de lot de stock (ENF-ACC-03).
+- Image de production (`docker/production/`), Compose de production, procédure de déploiement, commande
+  `compte:super-administrateur`, guides éleveur, technicien et administrateur, protocole de recette des élevages
+  testeurs.
+
+### Modifié
+- Autorisations mémorisées le temps d'une requête (historique : 105 → 20 requêtes SQL) ; pool PHP-FPM de 20
+  processus.
+- Zones défilantes atteignables au clavier (RGAA 7.3).
+- nginx de développement : les en-têtes de sécurité des pages sont posés par l'application seule.
+
 ## [Non publié] — lot L7 (administration, imports, pilotage)
 
 ### Ajouté
