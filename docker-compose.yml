@@ -116,6 +116,15 @@ services:
       postgres:
         condition: service_healthy
 
+  # Test de charge (T-42, ENF-PERF-01) : k6, hors application, scénarios dans tests/charge
+  k6:
+    image: grafana/k6:0.54.0
+    profiles: ["charge"]
+    volumes:
+      - ./tests/charge:/scripts:ro
+    depends_on:
+      - nginx
+
 volumes:
   pgdata:
   redisdata:

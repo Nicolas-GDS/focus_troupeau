@@ -32,6 +32,12 @@ class Perimetre
 
     private readonly bool $console;
 
+    /** @var array<string, bool> couverture déjà vérifiée pendant la requête (« utilisateur:élevage ») */
+    private array $couverture = [];
+
+    /** @var array<int, string|null> élevage de chaque prélèvement déjà lu pendant la requête */
+    private array $elevagesPrelevements = [];
+
     public function __construct(?bool $console = null)
     {
         $this->console = $console ?? app()->runningInConsole();
@@ -110,9 +116,46 @@ class Perimetre
 
         $id = $elevage instanceof Elevage ? $elevage->getKey() : $elevage;
 
-        return DB::query()->fromSub(fn (Builder $q) => $this->elevagesAccessibles($user)($q), 'acces')
+        // ENF-PERF-01 : une page liste des dizaines d'objets du même élevage ; la vérification est faite une fois par
+        // requête (instance limitée à la requête ou au job, vidée à tout changement de rattachement ou de consentement)
+        return $this->couverture[$user->id.':'.$id] ??= DB::query()->fromSub(fn (Builder $q) => $this->elevagesAccessibles($user)($q), 'acces')
             ->where('acces.'.($this->estAgent($user) ? 'id' : 'elevage_id'), $id)
             ->exists();
+    }
+
+    /** Élevage d'un prélèvement, lu une fois par requête. */
+    public function elevageDuPrelevement(int $prelevementId): ?string
+    {
+        if (! array_key_exists($prelevementId, $this->elevagesPrelevements)) {
+            $id = DB::table('fourrage.prelevement')->where('id', $prelevementId)->value('elevage_id');
+            $this->elevagesPrelevements[$prelevementId] = $id === null ? null : (string) $id;
+        }
+
+        return $this->elevagesPrelevements[$prelevementId];
+    }
+
+    /** @var array<string, array<int, true>> analyses dont une interprétation est publiée, par élevage */
+    private array $analysesPubliees = [];
+
+    /**
+     * Une interprétation de l'analyse est-elle publiée ? Les analyses publiées de l'élevage sont lues en une requête
+     * (règle de statut de l'éleveur, § 6.3 ; ENF-PERF-01).
+     */
+    public function analysePubliee(int $analyseId, string $elevageId): bool
+    {
+        $this->analysesPubliees[$elevageId] ??= array_fill_keys(DB::table('fourrage.interpretation as i')
+            ->join('fourrage.analyse as a', 'a.id', '=', 'i.analyse_id')->join('fourrage.prelevement as p', 'p.id', '=', 'a.prelevement_id')
+            ->where('p.elevage_id', $elevageId)->where('i.statut', RegleStatut::PUBLIE)->distinct()->pluck('i.analyse_id')->map(fn ($id) => (int) $id)->all(), true);
+
+        return isset($this->analysesPubliees[$elevageId][$analyseId]);
+    }
+
+    /** Vide les vérifications mémorisées (rattachement, consentement, GDS ou publication modifiés). */
+    public function oublier(): void
+    {
+        $this->couverture = [];
+        $this->elevagesPrelevements = [];
+        $this->analysesPubliees = [];
     }
 
     /**

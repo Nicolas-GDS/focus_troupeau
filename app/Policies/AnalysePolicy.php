@@ -6,7 +6,6 @@ use App\Models\App\User;
 use App\Models\Fourrage\Analyse;
 use App\Services\Cloisonnement\Perimetre;
 use App\Services\Cloisonnement\RegleStatut;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Bulletins de laboratoire (§ 2.3, ENF-SEC-04, ENF-SEC-05) : lecture dans le périmètre ; les comptes externes
@@ -22,10 +21,11 @@ class AnalysePolicy
 
     public function view(User $user, Analyse $analyse): bool
     {
+        $elevage = $this->elevageDe($analyse);
+
         return $user->can('bulletin.lire')
-            && $this->perimetre->couvreElevage($user, $this->elevageDe($analyse))
-            && ($this->regleStatut->voitTousLesStatuts($user) || DB::table('fourrage.interpretation')
-                ->where('analyse_id', $analyse->id)->where('statut', RegleStatut::PUBLIE)->exists());
+            && $this->perimetre->couvreElevage($user, $elevage)
+            && ($this->regleStatut->voitTousLesStatuts($user) || $this->perimetre->analysePubliee((int) $analyse->id, $elevage));
     }
 
     public function leverAnomalie(User $user, Analyse $analyse): bool
@@ -45,6 +45,6 @@ class AnalysePolicy
 
     private function elevageDe(Analyse $analyse): string
     {
-        return (string) DB::table('fourrage.prelevement')->where('id', $analyse->prelevement_id)->value('elevage_id');
+        return (string) $this->perimetre->elevageDuPrelevement((int) $analyse->prelevement_id);
     }
 }

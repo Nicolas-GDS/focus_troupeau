@@ -98,8 +98,8 @@ class InterpretationPolicy
 
     private function couvre(User $user, int $prelevementId): bool
     {
-        $elevageId = DB::table('fourrage.prelevement')->where('id', $prelevementId)->value('elevage_id');
+        $elevageId = $this->perimetre->elevageDuPrelevement($prelevementId);
 
-        return $elevageId !== null && $this->perimetre->couvreElevage($user, (string) $elevageId);
+        return $elevageId !== null && $this->perimetre->couvreElevage($user, $elevageId);
     }
 }
