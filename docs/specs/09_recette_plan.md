@@ -68,6 +68,14 @@ La livraison se fait en une version (D21), mais l'ordre de construction suit les
 
 Estimation indicative pour un développement interne assisté par IA, à affiner après le lot 1 : L1 8 jours, L2 8, L3 12, L4 4, L5 10, L6 10, L7 6, L8 8, soit environ 65 jours de travail, hors validation des référentiels par le comité technique (temps du vétérinaire conseil et des techniciens non compté).
 
+### Précisions du lot L8 (décisions du 19/10/2026)
+
+- *Découpage* : (1) sécurité et exploitation : en-têtes HTTPS, CSP et cookies (ENF-SEC-01), purges de conservation (ENF-RGPD-05), supervision (ENF-EXP-02), sauvegarde et restauration (ENF-SEC-07) ; (2) jeu J2 ovin (T-13, T-22) et recherche automatique de noms de marques (T-25) ; (3) audit d'accessibilité automatisé des écrans éleveur par axe-core dans le Chromium de l'image (T-41) et corrections ; (4) charge de 50 utilisateurs simultanés et mesures ENF-PERF (T-42) ; (5) reports : édition dans E24 des besoins, des repères des mesures terrain, des seuils du bilan sanitaire et des aliments de table, brouillon local de saisie mobile (ENF-ACC-03) ; (6) image et procédure de production, guides utilisateurs, protocole de recette des élevages testeurs, version 1.0.
+- *Charge* : k6 en conteneur (image `grafana/k6`, profil Docker Compose « charge », scénarios versionnés dans `tests/charge/`) ; outil de test hors application, signalé au chapitre 6.
+- *Déploiement* : générique Docker (image versionnée, Compose de production, procédure valable sur tout VPS avec PostgreSQL managé ou en conteneur) tant que l'hébergeur n'est pas choisi (point 10).
+- *Conservation* (ENF-RGPD-05, point 9) : purge nocturne des journaux de connexion (12 mois) et des notifications (24 mois), durées en paramètres par défaut ; dossiers dont la convention est terminée depuis 10 ans : liste à l'administrateur, sans suppression automatique, en attendant le registre des traitements.
+- La recette avec 3 à 5 élevages testeurs et la mise en production elle-même relèvent du GDS ; le lot livre le protocole, les guides et la procédure.
+
 ## 9.4 Points ouverts à trancher avant ou pendant le lot concerné
 
 | N° | Point | Lot | Qui tranche |
