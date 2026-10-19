@@ -75,8 +75,8 @@ identité).
 
 - Format d'import d'INRAtion V5 et de Rumin'Al non documenté : CSV proposé, à confirmer sur un fichier d'exemple.
 - Document 03, § 6.5 (indicateurs de pilotage) non versé : définitions proposées au § 3.13.
-- Édition des besoins, repères des mesures terrain, seuils du bilan sanitaire et aliments de table : lot L8, après
-  validation de ces référentiels par le comité technique.
+- Édition des besoins, repères des mesures terrain et des profils sanguins, seuils du bilan sanitaire et aliments de
+  table : faite au lot L8 (onglets de « Référentiels »).
 - Lecture planifiée d'un partage réseau pour SAGEMA : non faite (adaptateur prévu, § 6.4).
 - `sig.commune` vide en développement : la commune d'un élevage importé n'est rapprochée qu'une fois le socle
   géographique chargé (script 03).

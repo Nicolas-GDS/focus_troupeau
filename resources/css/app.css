@@ -172,3 +172,8 @@
         @apply bg-entite-clair text-entite-texte;
     }
 }
+
+/* Alpine : éléments masqués jusqu’à l’initialisation (brouillon local, ENF-ACC-03) */
+[x-cloak] {
+    display: none !important;
+}

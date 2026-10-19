@@ -8,6 +8,7 @@ use App\Models\Fourrage\Elevage;
 use App\Models\Stock\Inventaire;
 use App\Models\Stock\LotStock;
 use App\Models\Stock\Mouvement;
+use App\Services\BrouillonLocal;
 use App\Services\Cloisonnement\RegleStatut;
 use App\Services\Dossier\SaisieRefusee;
 use App\Services\ElevageCourant;
@@ -90,6 +91,7 @@ class SaisieInventaire extends Component
         try {
             $service->enregistrerLot($inventaire, $this->donneesLot(), $lot, ! $this->agent());
             session()->flash('status', $lot === null ? 'Lot ajouté à l\'inventaire.' : 'Lot mis à jour.');
+            $this->dispatch('brouillon-purge', cle: $this->cleBrouillon());
             $this->nouveauLot($this->lot['forme']);
         } catch (SaisieRefusee $e) {
             $this->addError('lot', $e->getMessage());
@@ -147,6 +149,8 @@ class SaisieInventaire extends Component
         $lots = LotStock::query()->where('inventaire_id', $inventaire->id)->with(['mouvements' => fn ($q) => $q->orderBy('date_mouvement')])->orderBy('famille_code')->orderBy('id')->get();
 
         return view('livewire.stocks.saisie-inventaire', [
+            'cleBrouillon' => $this->cleBrouillon(),
+            'secretBrouillon' => BrouillonLocal::secret($this->lecteur()),
             'elevage' => $elevage,
             'libelleElevage' => ElevageCourant::libelle(app(ElevageCourant::class)->accessibles()->firstWhere('id', $elevage->id) ?? $elevage),
             'inventaire' => $inventaire,
@@ -275,6 +279,12 @@ class SaisieInventaire extends Component
     private function lotDeLInventaire(int $id): LotStock
     {
         return LotStock::query()->where('inventaire_id', $this->inventaireId)->findOrFail($id);
+    }
+
+    /** Brouillon local du formulaire de lot (ENF-ACC-03) : un par inventaire et par lot en cours de saisie. */
+    private function cleBrouillon(): string
+    {
+        return 'lot-'.$this->inventaireId.'-'.($this->lotId ?? 'nouveau');
     }
 
     private function agent(): bool

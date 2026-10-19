@@ -39,7 +39,7 @@ it('ouvre l\'écran aux seuls administrateurs, pour chaque table', function (str
 ]);
 
 it('répond 404 pour une table inconnue', function () {
-    $this->actingAs($this->jeu->admin24)->get('/admin/referentiels/besoins')->assertNotFound();
+    $this->actingAs($this->jeu->admin24)->get('/admin/referentiels/inconnue')->assertNotFound();
 });
 
 it('renvoie un visiteur vers la connexion', function () {

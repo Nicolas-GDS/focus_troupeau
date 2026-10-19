@@ -70,7 +70,8 @@ lignes UGB, ration et leviers ne sont pas reprises.
 - Croquis de cubage du document 05 : à intégrer dès que les quatre images (`silo_couloir_cubage.png`,
   `silo_largeur_mi_pente.png`, `carottage_front.png`, `silo_taupiniere.png`, produites par `build_figures_stocks.py`)
   sont versées au dépôt ; elles ne sont pas extractibles proprement du PDF.
-- Brouillon local chiffré en cas de perte de réseau (§ 6.1) : non fait, proposé au lot L8.
+- Brouillon local chiffré en cas de perte de réseau (§ 6.1) : fait au lot L8 pour le formulaire de lot (E12) ; il
+  demande un contexte sécurisé (HTTPS ou `localhost`).
 - Phases de la période de référence (RC-10), projection, sécurité, autonomie, ruptures : lot L6. Le silo de J1 n'entre
   dans aucune ration, comme au § 9.1.
 - Encombrement de la ration : non contrôlé (capacité d'ingestion absente des repères).

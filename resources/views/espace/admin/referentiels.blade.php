@@ -1,6 +1,9 @@
 <x-layouts.espace titre="Référentiels versionnés">
-    @if (isset(\App\Livewire\Admin\Referentiels::COMPOSANTS[$table]))
-        @livewire(\App\Livewire\Admin\Referentiels::COMPOSANTS[$table])
+    @php($composant = \App\Livewire\Admin\Referentiels::COMPOSANTS[$table] ?? null)
+    @if ($composant === 'admin.table-referentiel-ecran')
+        @livewire($composant, ['table' => $table])
+    @elseif ($composant !== null)
+        @livewire($composant)
     @else
         <livewire:admin.referentiels :table="$table" />
     @endif

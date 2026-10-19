@@ -7,6 +7,7 @@ use App\Models\Fourrage\Analyse;
 use App\Models\Stock\Inventaire;
 use App\Models\Stock\LotStock;
 use App\Models\Stock\Mouvement;
+use App\Services\BrouillonLocal;
 use App\Services\Dossier\SaisieRefusee;
 use App\Services\Interpretation\InterpretationService;
 use App\Services\Interpretation\RedactionInterpretation;
@@ -180,4 +181,17 @@ it('ne propose à l\'éleveur que les analyses publiées pour la MS d\'un lot (�
         ->and(fn () => $this->service->enregistrerLot($this->inventaire, lotBalles(['nombre' => 1, 'poids_brut_kg' => 300, 'prelevement_id' => $brouillon->prelevement_id]), null, true))
         ->not->toThrow(SaisieRefusee::class);
     expect(LotStock::query()->where('prelevement_id', $brouillon->prelevement_id)->sole()->ms_origine)->toBe('defaut');
+});
+
+it('propose le brouillon local chiffré du formulaire de lot et le purge à l\'enregistrement (ENF-ACC-03)', function () {
+    $cle = 'lot-'.$this->inventaire->id.'-nouveau';
+
+    Livewire::test(SaisieInventaire::class, ['elevage' => $this->jeu->elevage24a, 'inventaire' => $this->inventaire])
+        ->assertSeeHtml("x-data=\"brouillon('{$cle}', '".BrouillonLocal::secret($this->jeu->technicien24)."')\"")
+        ->assertSee('Reprendre la saisie')
+        ->set('lot.libelle', 'Foin 2026')->set('lot.nombre', '400')->set('lot.poids_brut_kg', '300')
+        ->call('enregistrerLot')->assertHasNoErrors()
+        ->assertDispatched('brouillon-purge', cle: $cle);
+
+    expect(BrouillonLocal::secret($this->jeu->technicien24))->not->toBe(BrouillonLocal::secret($this->jeu->eleveur24a));
 });

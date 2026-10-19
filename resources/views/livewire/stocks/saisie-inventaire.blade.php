@@ -105,7 +105,13 @@
             @endif
             @error('lot') <p class="mt-3 rounded-md border border-etat-critique bg-etat-critique-fond p-3 text-sm" role="alert">{{ $message }}</p> @enderror
 
-            <form wire:submit="enregistrerLot" class="mt-4 space-y-3">
+            <form wire:submit="enregistrerLot" class="mt-4 space-y-3" x-data="brouillon('{{ $cleBrouillon }}', '{{ $secretBrouillon }}')" wire:key="formulaire-{{ $cleBrouillon }}">
+                {{-- Brouillon local (ENF-ACC-03) : saisie conservée sur l'appareil en cas de coupure ou de rechargement --}}
+                <p x-show="disponible" x-cloak class="rounded-md border border-etat-vigilance bg-etat-vigilance-fond p-3 text-sm" role="status">
+                    Une saisie non enregistrée de ce lot est conservée sur cet appareil (<span x-text="date"></span>).
+                    <button type="button" x-on:click="reprendre()" class="lien">Reprendre la saisie</button> ·
+                    <button type="button" x-on:click="oublier()" class="lien">Ignorer</button>
+                </p>
                 <div>
                     <label for="lot-libelle" class="etiquette">Désignation</label>
                     <input id="lot-libelle" type="text" wire:model="lot.libelle" class="champ w-full text-lg" placeholder="Foin 1re coupe prairie du bas" maxlength="200">
