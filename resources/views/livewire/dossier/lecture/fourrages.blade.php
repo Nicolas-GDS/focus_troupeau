@@ -6,7 +6,10 @@
 
     @forelse ($campagnes as $campagne => $lots)
         <section class="carte mb-6" aria-labelledby="campagne-{{ $loop->index }}" wire:key="campagne-{{ $campagne }}">
-            <h2 id="campagne-{{ $loop->index }}" class="text-lg font-semibold">Campagne {{ $campagne }}</h2>
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+                <h2 id="campagne-{{ $loop->index }}" class="text-lg font-semibold">Campagne {{ $campagne }}</h2>
+                @can('donnees.exporter') <a href="{{ route('export.rationnement', ['elevage' => $elevage->id, 'campagne' => $campagne]) }}" class="lien text-sm">valeurs pour le rationnement (CSV)</a> @endcan
+            </div>
             <ul class="mt-3 divide-y divide-filet">
                 @foreach ($lots as $lot)
                     @php($p = $lot['prelevement'])

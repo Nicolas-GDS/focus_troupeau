@@ -14,6 +14,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 use Tests\Support\JeuCloisonnement;
+use Tests\Support\RenduChromium;
 
 // PDF du bilan d'autonomie et d'un scénario (EF-M6-06, EF-GEN-08, T-26) : charte bi-entité, tableaux, graphique,
 // hypothèses et sources, mentions de limites, version du référentiel ; cloisonnement (T-40).
@@ -78,8 +79,7 @@ it('T-26 : rend le bilan en PDF avec Chromium en moins de 10 s', function () {
     }
 
     $service = app(PdfAutonomie::class);
-    $debut = microtime(true);
-    $pdf = (new RenduBrowsershot)->pdf($service->bilanHtml($this->inventaire), $service->piedDePage('bilan d\'autonomie'));
+    [$pdf, $duree] = RenduChromium::mesurer(fn () => (new RenduBrowsershot)->pdf($service->bilanHtml($this->inventaire), $service->piedDePage('bilan d\'autonomie')));
 
-    expect($pdf)->toStartWith('%PDF')->and(strlen($pdf))->toBeGreaterThan(10_000)->and(microtime(true) - $debut)->toBeLessThan(10.0);
+    expect($pdf)->toStartWith('%PDF')->and(strlen($pdf))->toBeGreaterThan(10_000)->and(RenduChromium::dansLeSeuil($duree))->toBeTrue("Rendu en {$duree} s (seuil de T-26 : 10 s)");
 });

@@ -9,6 +9,7 @@ use App\Domain\Referentiels\Edition\Nomenclatures;
 use App\Domain\Referentiels\Edition\SaisiePlage;
 use App\Domain\Referentiels\Edition\SaisieSeuil;
 use App\Domain\Referentiels\Referentiels;
+use App\Domain\Referentiels\StatutEpistemique;
 use App\Models\App\User;
 use App\Models\Ref\PlagePlausibilite as PlagePlausibiliteModele;
 use App\Models\Ref\SeuilInterpretation;
@@ -16,6 +17,7 @@ use App\Models\Ref\VersionReferentiel;
 use App\Services\JournalService;
 use Closure;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -35,6 +37,10 @@ class EditionReferentielsService
     public const TABLE_SEUILS = 'ref.seuil_interpretation';
 
     public const TABLE_PLAGES = 'ref.plage_plausibilite';
+
+    public const TABLE_TEXTES = 'ref.texte_type';
+
+    public const TABLE_PARAMETRES = 'app.parametre_defaut';
 
     public function __construct(
         private readonly Referentiels $referentiels,
@@ -95,6 +101,66 @@ class EditionReferentielsService
     public function retirerPlage(int $id, string $decision, User $auteur): string
     {
         return $this->retirer(self::TABLE_PLAGES, $id, $decision, $auteur);
+    }
+
+    /**
+     * Modifie un texte type (EF-M10-03) : clôture la ligne en vigueur et insère le nouveau texte dans une nouvelle
+     * version ; renvoie l'identifiant de la nouvelle ligne.
+     */
+    public function modifierTexte(string $code, string $texte, string $decision, User $auteur): int
+    {
+        if (trim($texte) === '') {
+            throw new EditionRefusee(['texte' => 'Le texte ne peut pas être vide.']);
+        }
+
+        return $this->enVersion($decision, $auteur, function (string $version) use ($code, $texte) {
+            $avant = DB::table(self::TABLE_TEXTES)->where('code', $code)->whereNull('version_fin')->first();
+            if ($avant === null) {
+                throw new EditionRefusee(['texte' => 'Texte type introuvable : '.$code.'.']);
+            }
+            DB::table(self::TABLE_TEXTES)->where('id', $avant->id)->update(['version_fin' => $version]);
+            $id = (int) DB::table(self::TABLE_TEXTES)->insertGetId(['code' => $code, 'texte' => trim($texte), 'source' => $avant->source, 'version_creation' => $version]);
+
+            return [$id, self::TABLE_TEXTES, 'modification', (array) $avant, (array) DB::table(self::TABLE_TEXTES)->find($id)];
+        });
+    }
+
+    /**
+     * Modifie une valeur par défaut (EF-M10-02, app.parametre_defaut, versionnement daté) : la ligne en vigueur est close
+     * la veille et une ligne datée du jour est insérée (nationale, ou propre au GDS) ; une valeur déjà modifiée le jour
+     * même est remplacée. Source et statut épistémique se saisissent avec la valeur. Une nouvelle version des
+     * référentiels porte la décision du comité technique.
+     */
+    public function modifierParametre(string $cle, ?int $gdsId, float $valeur, ?string $source, ?string $statut, string $decision, User $auteur): int
+    {
+        return $this->enVersion($decision, $auteur, function () use ($cle, $gdsId, $valeur, $source, $statut) {
+            $vigueur = fn (?int $gds) => DB::table(self::TABLE_PARAMETRES)->where('cle', $cle)->where(fn ($q) => $gds === null ? $q->whereNull('gds_id') : $q->where('gds_id', $gds))
+                ->whereDate('valide_du', '<=', today())->where(fn ($q) => $q->whereNull('valide_au')->orWhereDate('valide_au', '>=', today()))->orderByDesc('valide_du')->first();
+            $avant = $vigueur($gdsId);
+            $modele = $avant ?? $vigueur(null);
+            if ($modele === null) {
+                throw new EditionRefusee(['valeur' => 'Paramètre inconnu : '.$cle.'.']);
+            }
+            $erreur = ParametresElevage::erreurValeur((string) $modele->unite, $valeur);
+            if ($erreur !== null) {
+                throw new EditionRefusee(['valeur' => $erreur]);
+            }
+            $colonnes = ['valeur' => $valeur, 'source' => trim((string) $source) ?: $modele->source,
+                'statut_epistemique' => (StatutEpistemique::tryFrom((string) $statut) ?? StatutEpistemique::from((string) $modele->statut_epistemique))->value];
+
+            if ($avant !== null && Carbon::parse($avant->valide_du)->isToday()) {
+                DB::table(self::TABLE_PARAMETRES)->where('id', $avant->id)->update($colonnes);
+                $id = (int) $avant->id;
+            } else {
+                if ($avant !== null) {
+                    DB::table(self::TABLE_PARAMETRES)->where('id', $avant->id)->update(['valide_au' => today()->subDay()->toDateString()]);
+                }
+                $id = (int) DB::table(self::TABLE_PARAMETRES)->insertGetId([...$colonnes, 'gds_id' => $gdsId, 'cle' => $cle, 'unite' => $modele->unite,
+                    'libelle' => $modele->libelle, 'valide_du' => today()->toDateString()]);
+            }
+
+            return [$id, self::TABLE_PARAMETRES, $avant === null ? 'creation' : 'modification', $avant === null ? null : (array) $avant, (array) DB::table(self::TABLE_PARAMETRES)->find($id)];
+        });
     }
 
     /**

@@ -23,18 +23,18 @@ it('attribue à chaque rôle les permissions de la matrice du § 2.3', function 
 })->with([
     'éleveur' => ['eleveur', [
         'bilan_sanitaire.lire', 'bulletin.lire', 'consentement.gerer_propre', 'consentement.lire', 'convention.lire',
-        'eau.lire', 'elevage.lire', 'etiquette.lire', 'etiquette.rediger', 'interpretation.lire',
+        'donnees.exporter', 'eau.lire', 'elevage.lire', 'etiquette.lire', 'etiquette.rediger', 'interpretation.lire',
         'mesure_terrain.lire', 'plan.ecrire', 'plan.lire', 'plan_action.lire', 'plan_action.marquer_fait',
         'profil_sanguin.lire', 'stock.ecrire', 'stock.lire', 'visite.lire',
     ]],
     'technicien' => ['technicien', [
         'bilan_sanitaire.lire', 'bilan_sanitaire.rediger', 'bulletin.controler', 'bulletin.importer', 'bulletin.lire',
-        'compte.inviter', 'compte.lire', 'consentement.lire', 'convention.ecrire', 'convention.lire', 'eau.lire',
-        'eau.rediger', 'elevage.ecrire', 'elevage.lire', 'etiquette.lire', 'etiquette.rediger', 'etiquette.valider',
+        'compte.inviter', 'compte.lire', 'consentement.lire', 'convention.ecrire', 'convention.lire', 'donnees.exporter',
+        'eau.lire', 'eau.rediger', 'elevage.ecrire', 'elevage.lire', 'etiquette.lire', 'etiquette.rediger', 'etiquette.valider',
         'interpretation.lire', 'interpretation.rediger', 'mesure_terrain.lire', 'mesure_terrain.rediger',
-        'note_liaison.rediger', 'plan.ecrire', 'plan.lire', 'plan_action.lire', 'plan_action.rediger',
-        'profil_sanguin.lire', 'profil_sanguin.rediger', 'profil_sanguin.valider', 'referentiel.lire', 'stock.ecrire',
-        'stock.lire', 'visite.lire', 'visite.rediger',
+        'note_liaison.rediger', 'pilotage.lire', 'plan.ecrire', 'plan.lire', 'plan_action.lire', 'plan_action.rediger',
+        'profil_sanguin.lire', 'profil_sanguin.rediger', 'profil_sanguin.valider', 'referentiel.lire', 'sagema.importer',
+        'stock.ecrire', 'stock.lire', 'visite.lire', 'visite.rediger',
     ]],
     'vétérinaire conseil' => ['veterinaire_gds', [
         'bilan_sanitaire.lire', 'bulletin.lire', 'convention.lire', 'eau.lire', 'elevage.lire', 'etiquette.lire',
@@ -49,10 +49,10 @@ it('attribue à chaque rôle les permissions de la matrice du § 2.3', function 
     ]],
     'administrateur' => ['admin', [
         'bilan_sanitaire.lire', 'bulletin.lire', 'compte.ecrire', 'compte.inviter', 'compte.lire',
-        'consentement.ecrire', 'consentement.lire', 'convention.ecrire', 'convention.lire', 'eau.lire',
-        'elevage.ecrire', 'elevage.lire', 'etiquette.lire', 'interpretation.lire', 'journal.lire',
-        'mesure_terrain.lire', 'plan.lire', 'plan_action.lire', 'profil_sanguin.lire', 'referentiel.ecrire',
-        'referentiel.lire', 'stock.lire', 'visite.lire',
+        'consentement.ecrire', 'consentement.lire', 'convention.ecrire', 'convention.lire', 'convention.resilier',
+        'donnees.exporter', 'eau.lire', 'elevage.anonymiser', 'elevage.ecrire', 'elevage.lire', 'etiquette.lire',
+        'gds.ecrire', 'interpretation.lire', 'journal.lire', 'mesure_terrain.lire', 'pilotage.lire', 'plan.lire',
+        'plan_action.lire', 'profil_sanguin.lire', 'referentiel.ecrire', 'referentiel.lire', 'stock.lire', 'visite.lire',
     ]],
 ]);
 

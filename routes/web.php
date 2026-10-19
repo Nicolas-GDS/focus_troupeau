@@ -4,9 +4,11 @@ use App\Http\Controllers\AiguillageController;
 use App\Http\Controllers\AutonomiePdfController;
 use App\Http\Controllers\BulletinPdfController;
 use App\Http\Controllers\ElevageCourantController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\FicheVisiteController;
 use App\Http\Controllers\NoteLiaisonController;
 use App\Http\Controllers\NoticeRgpdController;
+use App\Http\Controllers\PilotageController;
 use App\Http\Controllers\TravailController;
 use App\Livewire\Autonomie\Approvisionnement;
 use App\Livewire\Autonomie\Bilan as AutonomieBilan;
@@ -27,7 +29,11 @@ use App\Livewire\Dossier\Lecture\SyntheseVisite;
 use App\Livewire\Dossier\NoteLiaisonVeterinaire;
 use App\Livewire\Dossier\SaisieVisite;
 use App\Livewire\Dossier\Visites;
+use App\Livewire\Elevages\Fiche as ElevageFiche;
+use App\Livewire\Elevages\Liste as ElevagesListe;
+use App\Livewire\Import\ImportSagema;
 use App\Livewire\Interpretation\InterpretationBulletin;
+use App\Livewire\Pilotage\Indicateurs as PilotageIndicateurs;
 use App\Livewire\Stocks\Inventaires;
 use App\Livewire\Stocks\SaisieInventaire;
 use App\Livewire\Troupeau\Troupeau;
@@ -84,6 +90,8 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
 
         // E19 — Import des bulletins (EF-M9-01) ; PDF servis par route signée et policy (ENF-SEC-05)
         Route::view('/import/bulletins', 'espace.import.bulletins')->middleware('permission:bulletin.importer')->name('import.bulletins');
+        // EF-M9-03 — import SAGEMA (élevages adhérents, bilan sanitaire ; T-27)
+        Route::get('/import/sagema', ImportSagema::class)->middleware('permission:sagema.importer')->name('import.sagema');
         Route::get('/import/bulletins/{import}/pdf', [BulletinPdfController::class, 'import'])->middleware('signed')->name('import.bulletins.pdf');
         Route::get('/bulletins/{analyse}/pdf', [BulletinPdfController::class, 'analyse'])->middleware('signed')->name('bulletins.pdf');
 
@@ -122,11 +130,31 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
             Route::get('/parametres', ParametresElevageEcran::class)->name('parametres');
         });
 
+        // EF-M9-04, EF-M9-05 — exports de l'élevage (rationnement, portabilité RGPD)
+        Route::middleware('permission:donnees.exporter')->prefix('elevages/{elevage}/export')->name('export.')->group(function () {
+            Route::get('/rationnement.csv', [ExportController::class, 'rationnement'])->name('rationnement');
+            Route::get('/donnees.zip', [ExportController::class, 'donnees'])->name('donnees');
+        });
+
+        // E23 — élevages : création, identité, convention, invitation des éleveurs (EF-M0-02 ; technicien, administrateur)
+        Route::middleware('permission:elevage.ecrire')->group(function () {
+            Route::get('/elevages', ElevagesListe::class)->name('elevages');
+            Route::get('/elevages/{elevage}/fiche', ElevageFiche::class)->name('elevages.fiche');
+        });
+
+        // E25 — indicateurs de pilotage (EF-M10-04 ; administrateur et technicien, dans leurs GDS)
+        Route::middleware('permission:pilotage.lire')->prefix('admin/pilotage')->name('pilotage')->group(function () {
+            Route::get('/', PilotageIndicateurs::class)->name('');
+            Route::get('/indicateurs.csv', [PilotageController::class, 'indicateurs'])->name('.indicateurs');
+            Route::get('/references.csv', [PilotageController::class, 'references'])->name('.references');
+        });
+
         // E23 — Administration : GDS, comptes, conventions
         Route::middleware('role:admin|admin_global')->prefix('admin')->name('admin.')->group(function () {
             Route::view('/gds', 'espace.admin.gds')->name('gds');
             Route::view('/utilisateurs', 'espace.admin.utilisateurs')->name('utilisateurs');
             Route::view('/conventions', 'espace.admin.conventions')->name('conventions');
+            Route::view('/journal', 'espace.admin.journal')->name('journal');
 
             // E24 — Référentiels versionnés (EF-M10-02) : {table} ∈ seuils, plages (404 sinon) ; l'écriture
             // (permission referentiel.ecrire) est autorisée côté serveur dans chaque action du composant (ENF-SEC-04)

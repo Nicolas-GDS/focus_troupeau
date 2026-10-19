@@ -1,3 +1,3 @@
 <x-layouts.espace titre="Administration — GDS">
-    <x-ecran-a-venir ecran="E23" lot="L7" />
+    <livewire:admin.gds />
 </x-layouts.espace>

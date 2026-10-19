@@ -3,6 +3,23 @@
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; versions sémantiques (chapitre 6.5).
 Le numéro de version est affiché dans le pied de page de l'application et dans les PDF (ENF-EXP-03).
 
+## [Non publié] — lot L7 (administration, imports, pilotage)
+
+### Ajouté
+- E23 — administration : comptes (création, invitation, rôles et GDS dans le périmètre, rattachements, activation),
+  conventions (prolongation, résiliation), GDS, journal d'audit filtrable (`/admin/journal`).
+- Élevages (EF-M0-02) : création d'un élevage et de son identité, convention, invitation des éleveurs (`/elevages`) ;
+  rappel d'échéance de convention au technicien (EF-M0-06).
+- E17 — consentements de l'éleveur (« références », « vétérinaire »), effet immédiat, journalisés.
+- Import SAGEMA (T-27) : élevages adhérents et bilan sanitaire, aperçu, rapport, aucune écriture externe.
+- Exports : valeurs pour le rationnement (CSV), données de l'élevage (ZIP, portabilité) ; anonymisation sur demande.
+- E24 étendu aux paramètres par défaut (datés, nationaux ou par GDS) et aux textes types.
+- E25 — indicateurs de pilotage par GDS et campagne, exports CSV des indicateurs et des références agrégées.
+- Procédure `docs/recette/L7_recette.md`.
+
+### Modifié
+- Tests T-26 : rendus Chromium sérialisés, seuil de 10 s vérifié en exécution séquentielle.
+
 ## [Non publié] — lot L6 (autonomie et approvisionnement)
 
 ### Ajouté

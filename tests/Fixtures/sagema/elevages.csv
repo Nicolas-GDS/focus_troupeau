@@ -1,0 +1,7 @@
+num_ede;siret;raison_sociale;contact;adresse;cp;commune;telephone;courriel;especes;effectif_bovins;effectif_ovins;effectif_caprins;adherent
+FR24000001;;EARL du Ruisseau;Paul Lenoir;Le Bourg;24100;Bergerac;05 53 00 00 01;earl.ruisseau@exemple.test;BOV;85;;;oui
+FR24000002;;GAEC des Coteaux;;;24200;;;;BOV,OVI;120;40;;oui
+FR24000001;;EARL du Ruisseau (doublon);;;;;;;;;;;oui
+24000003;;Sans préfixe;;;;;;;;;;;oui
+FR24000004;;;;;;;;;;;;;oui
+FR24000005;;Ferme du Pech;;;24300;;;courriel-invalide;CAP;;;30;non

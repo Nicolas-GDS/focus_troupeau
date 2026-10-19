@@ -91,14 +91,28 @@ class EspaceComposer
             $liens[] = ['libelle' => 'Paramètres', 'route' => 'parametres', 'parametres' => $dossier];
         }
 
+        // E23 — élevages (EF-M0-02)
+        if ($user->can('elevage.ecrire')) {
+            $liens[] = ['libelle' => 'Élevages', 'route' => 'elevages', 'actif' => 'elevages|elevages.fiche'];
+        }
+
         if ($user->can('bulletin.importer')) {
             $liens[] = ['libelle' => 'Import des bulletins', 'route' => 'import.bulletins'];
+        }
+
+        if ($user->can('pilotage.lire')) {
+            $liens[] = ['libelle' => 'Pilotage', 'route' => 'pilotage', 'actif' => 'pilotage*'];
+        }
+
+        if ($user->can('sagema.importer')) {
+            $liens[] = ['libelle' => 'Import SAGEMA', 'route' => 'import.sagema'];
         }
 
         if ($user->hasAnyRole(['admin', Perimetre::ROLE_GLOBAL])) {
             $liens[] = ['libelle' => 'Utilisateurs', 'route' => 'admin.utilisateurs'];
             $liens[] = ['libelle' => 'Conventions', 'route' => 'admin.conventions'];
             $liens[] = ['libelle' => 'GDS', 'route' => 'admin.gds'];
+            $liens[] = ['libelle' => 'Journal', 'route' => 'admin.journal'];
             $liens[] = ['libelle' => 'Référentiels', 'route' => 'admin.referentiels', 'parametres' => ['table' => 'seuils']];
         }
 

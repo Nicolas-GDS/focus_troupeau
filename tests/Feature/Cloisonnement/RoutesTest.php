@@ -68,6 +68,18 @@ const REGISTRE_ROUTES = [
     'GET admin/gds' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global']],
     'GET admin/utilisateurs' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global']],
     'GET admin/conventions' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global']],
+    // Lot L7 — journal d'audit (E23) ; écrans testés dans tests/Feature/Administration/*
+    'GET admin/journal' => ['acces' => 'roles', 'roles' => ['admin', 'admin_global']],
+    'GET elevages' => ['acces' => 'roles', 'roles' => ['technicien', 'admin', 'admin_global']],
+    'GET elevages/{elevage}/fiche' => ['acces' => 'objet'],
+    'GET import/sagema' => ['acces' => 'roles', 'roles' => ['technicien']],
+    // E25 — pilotage ; testé dans tests/Feature/Administration/PilotageTest.php
+    'GET admin/pilotage' => ['acces' => 'roles', 'roles' => ['technicien', 'admin', 'admin_global']],
+    'GET admin/pilotage/indicateurs.csv' => ['acces' => 'roles', 'roles' => ['technicien', 'admin', 'admin_global']],
+    'GET admin/pilotage/references.csv' => ['acces' => 'objet'],
+    // exports de l'élevage ; testés dans tests/Feature/Administration/ExportsTest.php
+    'GET elevages/{elevage}/export/rationnement.csv' => ['acces' => 'objet'],
+    'GET elevages/{elevage}/export/donnees.zip' => ['acces' => 'objet'],
 
     // Lot L2 — E19 et PDF des bulletins (objets testés dans tests/Feature/Import/EcranImportBulletinsTest.php)
     'GET import/bulletins' => ['acces' => 'roles', 'roles' => ['technicien']],

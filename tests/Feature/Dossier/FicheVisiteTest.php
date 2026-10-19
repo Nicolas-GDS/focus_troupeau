@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Tests\Support\AnalyseEssai;
 use Tests\Support\JeuCloisonnement;
+use Tests\Support\RenduChromium;
 
 // Fiche de visite figée (EF-M2-07, EF-GEN-08, § 8.4) : HTML et PDF archivés à la publication, T-06 (PDF v1 conservé),
 // T-26 (gabarit « fiche de visite » : charte bi-entité, mentions de limites, version de grille, moins de 10 s),
@@ -149,11 +150,9 @@ it('T-26 : rend la fiche en PDF avec Chromium en moins de 10 s', function () {
 
     $iv = publierFiche();
     $service = app(FicheVisiteService::class);
-    $debut = microtime(true);
-    $pdf = (new RenduBrowsershot)->pdf((string) Storage::disk('local')->get((string) $iv->fiche_html), $service->piedDePage($iv));
-    $duree = microtime(true) - $debut;
+    [$pdf, $duree] = RenduChromium::mesurer(fn () => (new RenduBrowsershot)->pdf((string) Storage::disk('local')->get((string) $iv->fiche_html), $service->piedDePage($iv)));
 
     expect($pdf)->toStartWith('%PDF')
         ->and(strlen($pdf))->toBeGreaterThan(10_000)
-        ->and($duree)->toBeLessThan(10.0);
+        ->and(RenduChromium::dansLeSeuil($duree))->toBeTrue("Rendu en {$duree} s (seuil de T-26 : 10 s)");
 });
