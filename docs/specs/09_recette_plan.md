@@ -6,7 +6,7 @@
 |---|---|---|
 | J0 — Campagne 2025-2026 | Les 59 bulletins réels chargés par `03_chargement_campagne_2025-2026.sql` (données nominatives : environnement de recette uniquement, accès restreint) | Import, classement, positionnement, anomalie HA25-42515 |
 | J1 — Élevage allaitant synthétique | Décrit ci-dessous ; reproduit dans `calculs/test_calculs.py` ; seeder `JeuJ1Seeder` (lot L5) | Stocks, besoins, couverture, projection, leviers, incertitude |
-| J2 — Élevage ovin synthétique | 300 brebis, foin et seau « bovins » à 300 mg Cu/kg | Maximum réglementaire cuivre (niveau 3), SMS |
+| J2 — Élevage ovin synthétique | 300 brebis, foin et seau « bovins » à 300 mg Cu/kg ; seeder `JeuJ2Seeder` (lot L8) | Maximum réglementaire cuivre (niveau 3), SMS |
 | J3 — ELV-0001 (pseudonymisé) | Les neuf lots du prototype de fiche (document 04, figures 2 et 3 : MS, UFL 2018, PDI, BPR, MAT, minéraux, BACA ; numéros d'échantillon fictifs), avec ses messages et son plan d'action ; seeder `JeuJ3Seeder` | Fiche de visite complète, PDF, positionnement |
 | J5 — Population de référence synthétique | Élevages fictifs consentants du GDS 24 (et quelques lots du GDS 47) portant des lots `valide` de la campagne 2025-2026 autour des types de J3 (dont plus de cinq foins de prairie permanente), valeurs synthétiques ; développement uniquement (décision du 16/10/2026) | Positionnement et historique en développement ; J0 en recette |
 | J4 — Cloisonnement | Deux GDS, trois élevages, un technicien par GDS, un chargé de mission bi-GDS, un vétérinaire consenti sur un seul élevage | Tests d'accès |

@@ -1,0 +1,42 @@
+# T-25 (EF-GEN-04) : noms de marques et de fabricants courants en alimentation animale et en santé animale, recherchés
+# dans les libellés générés par l'application (référentiels, textes types, propositions, PDF). Une ligne par nom ; le
+# GDS complète la liste au fil de la recette. Recherche insensible à la casse et aux accents, mot entier.
+Sanders
+Techna
+InVivo
+Neovia
+Provimi
+Cargill
+Trouw
+Purina
+Néolait
+Vitalac
+Bonilait
+Inzo
+Galaction
+Obione
+Phytosynthèse
+Feedia
+CCPA
+Agrial
+Terrena
+Euralis
+Axéréal
+Lallemand
+Alltech
+Biochem
+Calcialiment
+Timab
+Roullier
+Olmix
+Virbac
+Zoetis
+Boehringer
+Ceva
+Elanco
+Vétoquinol
+Bayer
+Rumiplus
+Rumistar
+Salvana
+Agritech
