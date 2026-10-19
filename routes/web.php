@@ -155,6 +155,7 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
             Route::view('/utilisateurs', 'espace.admin.utilisateurs')->name('utilisateurs');
             Route::view('/conventions', 'espace.admin.conventions')->name('conventions');
             Route::view('/journal', 'espace.admin.journal')->name('journal');
+            Route::view('/exploitation', 'espace.admin.exploitation')->name('exploitation');
 
             // E24 — Référentiels versionnés (EF-M10-02) : {table} ∈ seuils, plages (404 sinon) ; l'écriture
             // (permission referentiel.ecrire) est autorisée côté serveur dans chaque action du composant (ENF-SEC-04)

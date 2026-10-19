@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\CompteActif;
+use App\Http\Middleware\EnTetesSecurite;
 use App\Http\Middleware\NoticeRgpdAcceptee;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -19,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // ENF-SEC-01 : en-têtes de sécurité sur toutes les réponses web
+        $middleware->web(append: [EnTetesSecurite::class]);
+
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo('/');
 

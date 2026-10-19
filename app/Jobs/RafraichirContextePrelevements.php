@@ -2,9 +2,11 @@
 
 namespace App\Jobs;
 
+use App\Services\Exploitation\SupervisionService;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -19,5 +21,6 @@ class RafraichirContextePrelevements implements ShouldBeUnique, ShouldQueue
     public function handle(): void
     {
         DB::statement('REFRESH MATERIALIZED VIEW CONCURRENTLY valo.mv_prelevement_contexte');
+        Cache::forever(SupervisionService::CLE_RAFRAICHISSEMENT, now());
     }
 }

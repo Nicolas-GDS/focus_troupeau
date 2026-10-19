@@ -113,6 +113,7 @@ class EspaceComposer
             $liens[] = ['libelle' => 'Conventions', 'route' => 'admin.conventions'];
             $liens[] = ['libelle' => 'GDS', 'route' => 'admin.gds'];
             $liens[] = ['libelle' => 'Journal', 'route' => 'admin.journal'];
+            $liens[] = ['libelle' => 'Exploitation', 'route' => 'admin.exploitation'];
             $liens[] = ['libelle' => 'Référentiels', 'route' => 'admin.referentiels', 'parametres' => ['table' => 'seuils']];
         }
 
