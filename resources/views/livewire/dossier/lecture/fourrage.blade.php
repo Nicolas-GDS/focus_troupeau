@@ -59,7 +59,7 @@
                     <h2 id="valeurs-{{ $lot['analyse']->id }}" class="text-lg font-semibold">Résultats du bulletin {{ $lot['analyse']->num_echantillon_labo }}</h2>
                     @if ($url = $lienPdf($lot['analyse'])) <a href="{{ $url }}" class="lien text-sm">Bulletin original (PDF)</a> @endif
                 </div>
-                <div class="mt-2 overflow-x-auto">
+                <div class="mt-2 overflow-x-auto" tabindex="0">
                     <table class="min-w-full text-sm">
                         <caption class="sr-only">Résultats du bulletin : valeur, classe, repère et source</caption>
                         <thead class="text-left text-texte-doux"><tr><th scope="col" class="py-1 pr-4">Paramètre</th><th scope="col" class="py-1">Valeur, classe et repère</th></tr></thead>

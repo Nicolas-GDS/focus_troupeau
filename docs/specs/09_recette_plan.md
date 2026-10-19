@@ -6,7 +6,7 @@
 |---|---|---|
 | J0 — Campagne 2025-2026 | Les 59 bulletins réels chargés par `03_chargement_campagne_2025-2026.sql` (données nominatives : environnement de recette uniquement, accès restreint) | Import, classement, positionnement, anomalie HA25-42515 |
 | J1 — Élevage allaitant synthétique | Décrit ci-dessous ; reproduit dans `calculs/test_calculs.py` ; seeder `JeuJ1Seeder` (lot L5) | Stocks, besoins, couverture, projection, leviers, incertitude |
-| J2 — Élevage ovin synthétique | 300 brebis, foin et seau « bovins » à 300 mg Cu/kg | Maximum réglementaire cuivre (niveau 3), SMS |
+| J2 — Élevage ovin synthétique | 300 brebis, foin et seau « bovins » à 300 mg Cu/kg ; seeder `JeuJ2Seeder` (lot L8) | Maximum réglementaire cuivre (niveau 3), SMS |
 | J3 — ELV-0001 (pseudonymisé) | Les neuf lots du prototype de fiche (document 04, figures 2 et 3 : MS, UFL 2018, PDI, BPR, MAT, minéraux, BACA ; numéros d'échantillon fictifs), avec ses messages et son plan d'action ; seeder `JeuJ3Seeder` | Fiche de visite complète, PDF, positionnement |
 | J5 — Population de référence synthétique | Élevages fictifs consentants du GDS 24 (et quelques lots du GDS 47) portant des lots `valide` de la campagne 2025-2026 autour des types de J3 (dont plus de cinq foins de prairie permanente), valeurs synthétiques ; développement uniquement (décision du 16/10/2026) | Positionnement et historique en développement ; J0 en recette |
 | J4 — Cloisonnement | Deux GDS, trois élevages, un technicien par GDS, un chargé de mission bi-GDS, un vétérinaire consenti sur un seul élevage | Tests d'accès |
@@ -67,6 +67,14 @@ La livraison se fait en une version (D21), mais l'ordre de construction suit les
 | L8 — Recette et mise en production | Recette avec 3 à 5 élevages testeurs, audit d'accessibilité, performance, documentation, déploiement chez l'hébergeur | Mise en production |
 
 Estimation indicative pour un développement interne assisté par IA, à affiner après le lot 1 : L1 8 jours, L2 8, L3 12, L4 4, L5 10, L6 10, L7 6, L8 8, soit environ 65 jours de travail, hors validation des référentiels par le comité technique (temps du vétérinaire conseil et des techniciens non compté).
+
+### Précisions du lot L8 (décisions du 19/10/2026)
+
+- *Découpage* : (1) sécurité et exploitation : en-têtes HTTPS, CSP et cookies (ENF-SEC-01), purges de conservation (ENF-RGPD-05), supervision (ENF-EXP-02), sauvegarde et restauration (ENF-SEC-07) ; (2) jeu J2 ovin (T-13, T-22) et recherche automatique de noms de marques (T-25) ; (3) audit d'accessibilité automatisé des écrans éleveur par axe-core dans le Chromium de l'image (T-41) et corrections ; (4) charge de 50 utilisateurs simultanés et mesures ENF-PERF (T-42) ; (5) reports : édition dans E24 des besoins, des repères des mesures terrain, des seuils du bilan sanitaire et des aliments de table, brouillon local de saisie mobile (ENF-ACC-03) ; (6) image et procédure de production, guides utilisateurs, protocole de recette des élevages testeurs, version 1.0.
+- *Charge* : k6 en conteneur (image `grafana/k6`, profil Docker Compose « charge », scénarios versionnés dans `tests/charge/`) ; outil de test hors application, signalé au chapitre 6.
+- *Déploiement* : générique Docker (image versionnée, Compose de production, procédure valable sur tout VPS avec PostgreSQL managé ou en conteneur) tant que l'hébergeur n'est pas choisi (point 10).
+- *Conservation* (ENF-RGPD-05, point 9) : purge nocturne des journaux de connexion (12 mois) et des notifications (24 mois), durées en paramètres par défaut ; dossiers dont la convention est terminée depuis 10 ans : liste à l'administrateur, sans suppression automatique, en attendant le registre des traitements.
+- La recette avec 3 à 5 élevages testeurs et la mise en production elle-même relèvent du GDS ; le lot livre le protocole, les guides et la procédure.
 
 ## 9.4 Points ouverts à trancher avant ou pendant le lot concerné
 

@@ -1,0 +1,72 @@
+# Production (chapitre 6.5, § 9.3 « Précisions du lot L8 ») : déploiement Docker générique, valable sur tout VPS.
+# Images versionnées construites par docker/production/Dockerfile ; secrets dans .env.production (jamais versionné).
+# Base PostgreSQL + PostGIS managée par l'hébergeur (recommandé) ou conteneur local (profil « base-locale »).
+# Procédure : docs/exploitation/deploiement.md
+#   VERSION=1.0.0 docker compose -f docker-compose.production.yml --env-file .env.production up -d
+
+x-app: &app
+  image: focustroupeau/app:${VERSION:?VERSION de l'image à déployer}
+  env_file: .env.production
+  volumes:
+    - fichiers:/var/www/html/storage/app
+  restart: unless-stopped
+
+services:
+  app:
+    <<: *app
+    environment:
+      MIGRER: "1"
+
+  queue-worker:
+    <<: *app
+    command: php artisan queue:work redis --sleep=3 --tries=3 --max-time=3600
+
+  scheduler:
+    <<: *app
+    command: php artisan schedule:work
+
+  web:
+    image: focustroupeau/web:${VERSION}
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      - app
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis:/data
+    restart: unless-stopped
+
+  postgres:
+    image: postgis/postgis:16-3.4
+    profiles: ["base-locale"]
+    env_file: .env.production
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-focustroupeau}
+      POSTGRES_USER: ${DB_USERNAME:-focustroupeau}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Sauvegarde chiffrée quotidienne (cron de l'hôte) : docker compose -f docker-compose.production.yml run --rm sauvegarde
+  sauvegarde:
+    image: postgis/postgis:16-3.4
+    profiles: ["exploitation"]
+    entrypoint: ["/sauvegarde.sh"]
+    env_file: .env.production
+    environment:
+      SAUVEGARDE_DOSSIER: /sauvegardes
+    volumes:
+      - fichiers:/fichiers:ro
+      - ./sauvegardes:/sauvegardes
+      - ./docker/sauvegarde/sauvegarde.sh:/sauvegarde.sh:ro
+      - ./docker/sauvegarde/restauration.sh:/restauration.sh:ro
+
+volumes:
+  fichiers:
+  redis:
+  pgdata:

@@ -125,6 +125,7 @@ class ComptesService
             sort($roles);
             sort($gds);
             if ($avant !== ['roles' => $roles, 'gds' => $gds]) {
+                app(Perimetre::class)->oublier();
                 $this->journal->ecrire('attribution_roles', $admin->id, 'app.user:'.$user->id, ['avant' => $avant, 'apres' => ['roles' => $roles, 'gds' => $gds]]);
             }
 
@@ -161,6 +162,7 @@ class ComptesService
         if (! $user->hasRole('eleveur')) {
             $user->assignRole('eleveur');
         }
+        app(Perimetre::class)->oublier();
         $this->journal->ecrire('rattachement_elevage', $auteur->id, 'app.user:'.$user->id, [], $elevage->id);
     }
 
@@ -170,6 +172,7 @@ class ComptesService
             throw new SaisieRefusee('Cet élevage est hors de votre périmètre.');
         }
         DB::table('app.elevage_acces')->where('user_id', $user->id)->where('elevage_id', $elevage->id)->where('role', ElevageAcces::ROLE_ELEVEUR)->delete();
+        app(Perimetre::class)->oublier();
         $this->journal->ecrire('detachement_elevage', $auteur->id, 'app.user:'.$user->id, [], $elevage->id);
     }
 

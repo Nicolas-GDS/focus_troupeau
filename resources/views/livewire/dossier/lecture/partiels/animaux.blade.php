@@ -24,7 +24,7 @@
 @endforeach
 @if ($profils !== [])
     <h4 class="mt-4 font-medium">Prises de sang</h4>
-    <div class="mt-2 overflow-x-auto">
+    <div class="mt-2 overflow-x-auto" tabindex="0">
         <table class="min-w-full text-sm">
             <caption class="sr-only">Profils sanguins : valeur, lecture, repère et source</caption>
             <thead class="text-left text-texte-doux"><tr><th scope="col" class="py-1 pr-4">Élément</th><th scope="col" class="py-1">Résultat, lecture et référence</th></tr></thead>

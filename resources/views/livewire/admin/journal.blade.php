@@ -8,7 +8,7 @@
             <div><label for="j-au" class="etiquette">Au</label><input id="j-au" type="date" wire:model.live="au" class="champ"></div>
         </div>
     </section>
-    <section class="carte overflow-x-auto" aria-labelledby="titre-journal">
+    <section class="carte overflow-x-auto" aria-labelledby="titre-journal" tabindex="0">
         <h2 id="titre-journal" class="text-lg font-semibold">Journal d'audit</h2>
         <table class="mt-3 w-full text-sm">
             <thead><tr class="text-left text-texte-doux"><th scope="col" class="py-1 pr-3">Date</th><th scope="col" class="pr-3">Action</th><th scope="col" class="pr-3">Compte</th><th scope="col" class="pr-3">Élevage</th><th scope="col" class="pr-3">Objet</th><th scope="col">Détail</th></tr></thead>

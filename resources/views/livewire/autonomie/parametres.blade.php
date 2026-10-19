@@ -26,7 +26,7 @@
 
     @foreach ($groupes as $prefixe => $titre)
         @continue(! isset($lignes[$prefixe]))
-        <section class="carte overflow-x-auto" aria-labelledby="titre-{{ Str::slug($titre) }}">
+        <section class="carte overflow-x-auto" aria-labelledby="titre-{{ Str::slug($titre) }}" tabindex="0">
             <h2 id="titre-{{ Str::slug($titre) }}" class="text-lg font-semibold">{{ $titre }}</h2>
             <ul class="mt-2 divide-y divide-filet text-sm">
                 @foreach ($lignes[$prefixe] as $l)

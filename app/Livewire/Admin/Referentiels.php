@@ -25,10 +25,12 @@ use RuntimeException;
  */
 class Referentiels extends Component
 {
-    public const TABLES = ['seuils' => 'Grille de seuils', 'plages' => 'Plages de plausibilité', 'parametres' => 'Paramètres par défaut', 'textes' => 'Textes types'];
+    public const TABLES = ['seuils' => 'Grille de seuils', 'plages' => 'Plages de plausibilité', 'besoins' => 'Besoins journaliers', 'reperes_mesures' => 'Repères des mesures terrain',
+        'reperes_animaux' => 'Repères des profils sanguins', 'bilan_sanitaire' => 'Seuils du bilan sanitaire', 'aliments' => 'Aliments de table', 'parametres' => 'Paramètres par défaut', 'textes' => 'Textes types'];
 
-    /** Tables éditées par un composant dédié (lot L7). */
-    public const COMPOSANTS = ['parametres' => 'admin.parametres-defaut', 'textes' => 'admin.textes-types'];
+    /** Tables éditées par un composant dédié (lots L7 et L8) ; le composant générique reçoit la clé de la table. */
+    public const COMPOSANTS = ['parametres' => 'admin.parametres-defaut', 'textes' => 'admin.textes-types', 'besoins' => 'admin.table-referentiel-ecran',
+        'reperes_mesures' => 'admin.table-referentiel-ecran', 'reperes_animaux' => 'admin.table-referentiel-ecran', 'bilan_sanitaire' => 'admin.table-referentiel-ecran', 'aliments' => 'admin.aliments'];
 
     #[Locked]
     public string $table = 'seuils';

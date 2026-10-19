@@ -44,7 +44,7 @@
         @if ($bilan === [])
             <p class="mt-3 text-sm text-texte-doux">La visite n'est rattachée à aucune campagne.</p>
         @else
-            <div class="mt-3 overflow-x-auto">
+            <div class="mt-3 overflow-x-auto" tabindex="0">
                 <table class="min-w-full text-sm">
                     <caption class="sr-only">Indicateurs du bilan sanitaire, valeur, situation par rapport aux seuils S1 et S2, source</caption>
                     <thead class="text-left text-texte-doux">

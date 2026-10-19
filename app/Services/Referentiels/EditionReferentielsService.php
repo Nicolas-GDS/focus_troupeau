@@ -8,6 +8,7 @@ use App\Domain\Referentiels\Edition\EditionRefusee;
 use App\Domain\Referentiels\Edition\Nomenclatures;
 use App\Domain\Referentiels\Edition\SaisiePlage;
 use App\Domain\Referentiels\Edition\SaisieSeuil;
+use App\Domain\Referentiels\Edition\TableReferentiel;
 use App\Domain\Referentiels\Referentiels;
 use App\Domain\Referentiels\StatutEpistemique;
 use App\Models\App\User;
@@ -161,6 +162,51 @@ class EditionReferentielsService
 
             return [$id, self::TABLE_PARAMETRES, $avant === null ? 'creation' : 'modification', $avant === null ? null : (array) $avant, (array) DB::table(self::TABLE_PARAMETRES)->find($id)];
         });
+    }
+
+    /**
+     * Crée, modifie ou retire une ligne d'un référentiel versionné décrit par TableReferentiel (EF-M10-02, lot L8) :
+     * même mécanisme que la grille (nouvelle version, ligne close puis réinsérée, journal).
+     *
+     * @param  array<string, mixed>  $saisie
+     */
+    public function enregistrerLigne(TableReferentiel $table, ?int $id, array $saisie, string $decision, User $auteur): int
+    {
+        $valeurs = $table->normaliser($saisie, $this->choix($table));
+
+        return $this->enVersion($decision, $auteur, function (string $version) use ($table, $id, $valeurs) {
+            $avant = $id === null ? null : $this->ligneActive($table->table, $id);
+            if ($id !== null) {
+                $this->cloturer($table->table, $id, $version);
+            }
+            $colonnes = $valeurs + ['version_creation' => $version, 'version_fin' => null] + ($table->avecActif ? ['actif' => true] : []);
+            $nouveau = (int) DB::table($table->table)->insertGetId($colonnes);
+
+            return [$nouveau, $table->table, $id === null ? 'creation' : 'modification', $avant, $this->ligne($table->table, $nouveau)];
+        });
+    }
+
+    public function retirerLigne(TableReferentiel $table, int $id, string $decision, User $auteur): string
+    {
+        return $this->retirer($table->table, $id, $decision, $auteur);
+    }
+
+    /**
+     * Listes de choix des colonnes reliées à une nomenclature (« ref.table.colonne »).
+     *
+     * @return array<string, list<string>>
+     */
+    public function choix(TableReferentiel $table): array
+    {
+        $choix = [];
+        foreach ($table->colonnes as $nom => $c) {
+            if (is_string($c['choix'] ?? null)) {
+                [$schema, $nomTable, $colonne] = explode('.', $c['choix']);
+                $choix[$nom] = DB::table($schema.'.'.$nomTable)->orderBy($colonne)->pluck($colonne)->map(fn ($v) => (string) $v)->all();
+            }
+        }
+
+        return $choix;
     }
 
     /**
@@ -369,7 +415,7 @@ class EditionReferentielsService
     {
         $ligne = DB::table($table)->where('id', $id)->lockForUpdate()->first();
 
-        if ($ligne === null || ! $ligne->actif || $ligne->version_fin !== null) {
+        if ($ligne === null || ! ($ligne->actif ?? true) || $ligne->version_fin !== null) {
             throw new EditionRefusee(['ligne' => 'Cette ligne n\'est plus active : elle a été modifiée ou retirée entre-temps.']);
         }
 

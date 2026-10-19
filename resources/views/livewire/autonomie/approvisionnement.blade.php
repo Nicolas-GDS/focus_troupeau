@@ -85,7 +85,7 @@
 
         {{-- Comparaison côte à côte (EF-M7-02, RC-13.4, T-23) --}}
         @if ($comparaison !== [])
-            <section class="carte overflow-x-auto" aria-labelledby="titre-comparaison">
+            <section class="carte overflow-x-auto" aria-labelledby="titre-comparaison" tabindex="0">
                 <h2 id="titre-comparaison" class="text-lg font-semibold">Comparaison</h2>
                 <table class="mt-3 w-full text-sm">
                     <thead><tr><th scope="col" class="py-1 pr-3 text-left text-texte-doux"></th>

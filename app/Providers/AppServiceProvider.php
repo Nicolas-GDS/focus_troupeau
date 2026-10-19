@@ -54,6 +54,7 @@ use App\Policies\ScenarioPolicy;
 use App\Policies\StockPolicy;
 use App\Policies\VisitePolicy;
 use App\Services\Autonomie\RecalculBilan;
+use App\Services\Cloisonnement\Perimetre;
 use App\Services\Import\ExtracteurBulletin;
 use App\Services\Import\ExtracteurLano;
 use App\Services\Notifications\PasserelleSms;
@@ -85,6 +86,8 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(PasserelleSms::class, fn () => config('services.brevo.pilote_sms') === 'brevo' ? new SmsBrevo : new SmsJournal);
         // EF-M6-05 : inventaires à recalculer en fin de transaction, propres à la requête ou au job
         $this->app->scoped(RecalculBilan::class);
+        // ENF-PERF-01 : vérifications de périmètre mémorisées le temps d'une requête ou d'un job
+        $this->app->scoped(Perimetre::class);
     }
 
     public function boot(): void

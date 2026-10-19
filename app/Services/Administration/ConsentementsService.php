@@ -6,6 +6,7 @@ use App\Models\App\Consentement;
 use App\Models\App\ElevageAcces;
 use App\Models\App\User;
 use App\Models\Fourrage\Elevage;
+use App\Services\Cloisonnement\Perimetre;
 use App\Services\Dossier\SaisieRefusee;
 use App\Services\JournalService;
 use Illuminate\Support\Facades\DB;
@@ -39,6 +40,7 @@ class ConsentementsService
                 DB::table('app.elevage_acces')->updateOrInsert(['user_id' => $veterinaire->id, 'elevage_id' => $elevage->id],
                     ['role' => ElevageAcces::ROLE_VETERINAIRE, 'consentement_id' => $c->id]);
             }
+            app(Perimetre::class)->oublier();
             $this->journal->ecrire('accord_consentement', $auteur->id, 'app.consentement:'.$c->id, ['type' => $type, 'veterinaire' => $veterinaire?->id], $elevage->id);
 
             return $c;
@@ -56,6 +58,7 @@ class ConsentementsService
                 DB::table('app.elevage_acces')->where('elevage_id', $consentement->elevage_id)->where('user_id', $consentement->veterinaire_user_id)
                     ->where('role', ElevageAcces::ROLE_VETERINAIRE)->delete();
             }
+            app(Perimetre::class)->oublier();
             $this->journal->ecrire('revocation_consentement', $auteur->id, 'app.consentement:'.$consentement->id, ['type' => $consentement->type], $consentement->elevage_id);
         });
     }

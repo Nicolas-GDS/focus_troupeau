@@ -37,14 +37,15 @@ docker compose run --rm --no-deps node sh -c "npm install && npm run build"
 | `mailpit` | Capture des e-mails en développement | http://localhost:8026 |
 | `node` | Vite / Tailwind (profil `front`) | `docker compose --profile front up node` (port 5174) |
 
-### Comptes de démonstration (jeux d'essai J4, J3, J5 et J1, § 9.1)
+### Comptes de démonstration (jeux d'essai J4, J3, J5, J1 et J2, § 9.1)
 
 `migrate --seed` charge le jeu J4, entièrement synthétique, puis le jeu J3 : l'élevage `ELV-0001` et ses neuf lots
 du document 04, rattachés au GDS 24 (recette : `docs/recette/L3_recette_J3.md`), et le jeu J5 : une population
 de référence synthétique (élevages `J5-…` consentants, lots validés) pour voir le positionnement et l'historique
 (`php artisan references:bilan`), et le jeu J1 : l'élevage allaitant synthétique `J1-ALLAITANT` (stocks et
 troupeau, autonomie et approvisionnement, recettes : `docs/recette/L5_recette_J1.md` et
-`docs/recette/L6_recette_J1.md`). Tous sont interdits en production. Mot de passe commun :
+`docs/recette/L6_recette_J1.md`), et le jeu J2 : l'élevage ovin synthétique `J2-OVIN` (seau pour bovins, cuivre
+au-delà du maximum des ovins, visite de niveau 3 publiée avec SMS ; compte `eleveur.j2@j2.test`). Tous sont interdits en production. Mot de passe commun :
 `J4_MOT_DE_PASSE` dans `.env` (par défaut `j4-developpement-seulement`).
 
 | Compte | Rôle | Périmètre |
@@ -73,7 +74,14 @@ en recette uniquement.
 - **Tests** : `docker compose exec app php artisan test --parallel --processes=4` ; le seuil de 10 s des rendus PDF
   (T-26) se vérifie en exécution séquentielle : `docker compose exec app php artisan test --filter=Chromium`.
 - **Recettes** : `docs/recette/` (une procédure par lot ; lot L7 : `L7_recette.md`, fichiers SAGEMA d'essai dans
-  `tests/Fixtures/sagema/`).
+  `tests/Fixtures/sagema/` ; lot L8 : accessibilité, performance, élevages testeurs).
+- **Accessibilité** : `docker compose exec app php artisan accessibilite:auditer` (axe-core, écrans éleveur de J1 et J2).
+- **Charge** : `docker compose exec app php artisan db:seed --class=JeuChargeSeeder` puis
+  `docker compose --profile charge run --rm k6 run /scripts/consultation.js` (`docs/recette/L8_performance.md`).
+- **Sauvegarde** : `docker compose --profile exploitation run --rm sauvegarde` (`docs/exploitation/sauvegardes.md`).
+- **Production** : image `docker/production/Dockerfile`, `docker-compose.production.yml`, procédure
+  `docs/exploitation/deploiement.md`.
+- **Guides utilisateurs** : `docs/guides/` (éleveur, technicien, administrateur).
 - **Files d'attente** : le service `queue-worker` garde le code en mémoire. Après toute modification du code PHP,
   `docker compose exec app php artisan queue:restart` (à faire aussi à chaque déploiement).
 - **Styles** : Tailwind ne génère que les classes présentes dans les vues lors de la compilation. Après avoir modifié

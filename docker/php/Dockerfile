@@ -27,6 +27,8 @@ RUN npm install -g puppeteer@23.11.1 && npm cache clean --force
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY docker/php/php.ini /usr/local/etc/php/conf.d/zz-focustroupeau.ini
+COPY docker/php/fpm-pool.conf /usr/local/etc/php-fpm.d/zz-focustroupeau.conf
+ENV PHP_FPM_MAX_CHILDREN=20
 
 # Exécution sous l'UID de l'hôte pour éviter les fichiers root dans le dépôt monté
 RUN groupmod -o -g "${GID}" www-data && usermod -o -u "${UID}" -g "${GID}" www-data

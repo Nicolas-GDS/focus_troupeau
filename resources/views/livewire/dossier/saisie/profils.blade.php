@@ -8,7 +8,7 @@
     @error('saisie') <p class="mt-2 text-sm text-etat-critique" role="alert">{{ $message }}</p> @enderror
 
     @if ($lignes !== [])
-        <div class="mt-3 overflow-x-auto">
+        <div class="mt-3 overflow-x-auto" tabindex="0">
             <table class="min-w-full text-sm">
                 <caption class="sr-only">Profils sanguins : valeur, lecture, repère et source</caption>
                 <thead class="text-left text-texte-doux">

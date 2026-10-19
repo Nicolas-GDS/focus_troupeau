@@ -19,6 +19,7 @@ use App\Models\Fourrage\Analyse;
 use App\Models\Fourrage\EvenementSanitaire as EvenementSanitaireModele;
 use App\Models\Fourrage\Interpretation;
 use App\Models\Fourrage\Prelevement;
+use App\Services\Cloisonnement\Perimetre;
 use App\Services\JournalService;
 use App\Services\Notifications\NotificationsPublication;
 use DateTimeImmutable;
@@ -308,6 +309,7 @@ class InterpretationService
 
         DB::transaction(function () use ($interpretation, $technicien, $notifier) {
             $interpretation->update(['statut' => Interpretation::STATUT_PUBLIE]);
+            app(Perimetre::class)->oublier(); // la règle de statut change pour l'éleveur
 
             $this->journaliser('publication_interpretation', $technicien, $interpretation);
 

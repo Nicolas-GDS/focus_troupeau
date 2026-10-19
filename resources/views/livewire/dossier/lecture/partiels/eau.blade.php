@@ -3,7 +3,7 @@
     use App\Services\Dossier\Affichage;
 @endphp
 {{-- Résultats d'une analyse d'eau, classés par la grille eau d'abreuvement (EF-M1-04), avec repère et source --}}
-<div class="mt-2 overflow-x-auto">
+<div class="mt-2 overflow-x-auto" tabindex="0">
     <table class="min-w-full text-sm">
         <caption class="sr-only">Résultats de l'analyse d'eau, lecture, repère et source</caption>
         <thead class="text-left text-texte-doux">

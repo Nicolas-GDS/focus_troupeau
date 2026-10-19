@@ -14,7 +14,7 @@
 | Extraction des bulletins LANO | Script Python `scripts/parse_lano.py` existant (pdftotext), appelé par un job via `Symfony\Process` en mode `--json` (un bulletin, sortie JSON ingérée par PHP ; le mode `--lot` historique produit un CSV) | EF-M9-01 ; réécriture en PHP non justifiée tant que le format LANO n'est pas conventionné ; JSON plutôt que CSV : censure et unités portées sans échappement (décision du lot L2) |
 | Notifications | Canal Laravel `mail` via Brevo SMTP/API et canal `sms` via l'API Brevo ; journalisation dans `app.notification` | EF-M8 |
 | Graphiques | Positionnement et historique (lot L4) : SVG rendu côté serveur par des composants Blade, identique à l'écran, dans la fiche figée et dans le PDF, avec tableau équivalent (décision du 16/10/2026). projection du bilan d'autonomie (lot L6) : également en SVG côté serveur, avec son tableau mensuel équivalent (décision du 17/10/2026) ; Chart.js n'est plus prévu | Chapitre 8 |
-| Tests | Pest (PHP), jeux de données de référence partagés avec `calculs/` (Python) | Chapitre 9 |
+| Tests | Pest (PHP), jeux de données de référence partagés avec `calculs/` (Python) ; charge : k6 en conteneur, profil « charge » (ajout L8) ; accessibilité : axe-core dans le Chromium de l'image (ajout L8) | Chapitre 9 |
 | Qualité | Pint (style), Larastan niveau 6, GitHub Actions ou équivalent local | — |
 
 ## 6.2 Organisation du code

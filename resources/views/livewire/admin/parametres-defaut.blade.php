@@ -25,7 +25,7 @@
         </section>
     @endif
 
-    <section class="carte overflow-x-auto" aria-labelledby="titre-parametres">
+    <section class="carte overflow-x-auto" aria-labelledby="titre-parametres" tabindex="0">
         <h2 id="titre-parametres" class="text-lg font-semibold">Paramètres par défaut</h2>
         <div class="mt-2"><label for="p-filtre" class="etiquette">Filtrer (clé ou libellé)</label><input id="p-filtre" type="search" wire:model.live.debounce.300ms="filtre" class="champ"></div>
         <table class="mt-3 w-full text-sm">

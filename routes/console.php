@@ -2,8 +2,10 @@
 
 use App\Jobs\ClotureConventions;
 use App\Jobs\EvaluerAlertesAutonomie;
+use App\Jobs\PurgerConservation;
 use App\Jobs\RafraichirContextePrelevements;
 use App\Jobs\RappelConventions;
+use App\Jobs\VerifierExploitation;
 use Illuminate\Support\Facades\Schedule;
 
 /*
@@ -23,3 +25,9 @@ Schedule::job(new RafraichirContextePrelevements)->dailyAt('02:00')->name('conte
 
 // EF-M8-03 : alertes d'autonomie, la rupture prévisionnelle étant comptée depuis la date du jour.
 Schedule::job(new EvaluerAlertesAutonomie)->dailyAt('03:00')->name('alertes-autonomie')->withoutOverlapping();
+
+// ENF-RGPD-05 : purge des journaux de connexion et des notifications au-delà de leur durée de conservation.
+Schedule::job(new PurgerConservation)->dailyAt('04:00')->name('purge-conservation')->withoutOverlapping();
+
+// ENF-EXP-02 : vérification de l'exploitation (base, file, disque, sauvegarde, références), alerte aux administrateurs.
+Schedule::job(new VerifierExploitation)->hourly()->name('verification-exploitation')->withoutOverlapping();

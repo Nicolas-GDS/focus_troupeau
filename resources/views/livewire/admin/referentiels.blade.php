@@ -262,7 +262,7 @@
             @if ($lignes->isEmpty())
                 <p class="carte mt-3 text-texte-doux">Aucune ligne active{{ $filtreParametre !== '' ? ' pour ce paramètre' : '' }}.</p>
             @else
-                <div class="mt-3 overflow-x-auto rounded-lg border border-filet bg-surface">
+                <div class="mt-3 overflow-x-auto rounded-lg border border-filet bg-surface" tabindex="0">
                     <table class="min-w-full text-sm">
                         <caption class="sr-only">{{ $composant::TABLES[$table] }} : lignes en vigueur</caption>
                         <thead class="bg-fond font-titre text-left text-texte-doux">
