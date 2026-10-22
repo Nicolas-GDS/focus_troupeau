@@ -214,3 +214,17 @@ it('déconnecte un compte désactivé en cours de session', function () {
     $this->get(route('accueil'))->assertRedirect(route('login'));
     $this->assertGuest();
 });
+
+it('range les imports et l\'administration dans des menus déroulants de la barre de navigation', function () {
+    $page = $this->actingAs($this->jeu->chargeDeMission)->get(route('admin.journal'))->assertOk();
+    $html = $page->getContent();
+
+    expect($html)->toMatch('#<summary\s+data-actif\s*>Administration</summary>#')
+        ->toMatch('#<summary\s*>Imports</summary>#')
+        ->toMatch('#href="'.preg_quote(route('admin.journal'), '#').'" class="option"\s+aria-current="page"#');
+    $page->assertSee(route('admin.utilisateurs'), false)->assertSee(route('import.sagema'), false)
+        ->assertSeeInOrder(['Navigation principale', 'Élevages', 'Imports', 'Administration']);
+
+    $this->actingAs($this->jeu->veterinaireConseil24)->get(route('travail'))
+        ->assertDontSee('>Imports</summary>', false)->assertDontSee('>Administration</summary>', false);
+});

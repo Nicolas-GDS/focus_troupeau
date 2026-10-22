@@ -160,6 +160,23 @@
         @apply absolute right-0 z-50 mt-1 min-w-64 overflow-hidden rounded-lg border border-filet bg-surface shadow-lg;
     }
 
+    /* Menu déroulant de la barre de navigation : ouvert vers la droite, entrée marquée quand une de ses pages est affichée */
+    .menu-deroulant-gauche > summary {
+        @apply font-titre;
+    }
+
+    .menu-deroulant-gauche > div {
+        @apply left-0 right-auto;
+    }
+
+    .menu-deroulant > summary[data-actif] {
+        @apply bg-entite-clair text-entite-texte;
+    }
+
+    .menu-deroulant .option[aria-current='page'] {
+        @apply bg-entite-clair font-medium;
+    }
+
     .menu-deroulant .option {
         @apply block w-full border-b border-filet px-3 py-2.5 text-left font-titre text-sm last:border-b-0 hover:bg-entite-clair;
     }

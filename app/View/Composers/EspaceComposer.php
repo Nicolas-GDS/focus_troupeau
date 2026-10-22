@@ -49,12 +49,40 @@ class EspaceComposer
     }
 
     /**
-     * Liens de navigation ; « parametres » : paramètres de route éventuels (E24 : table éditée, volets du dossier :
-     * élevage courant) ; « actif » : motif des routes où le lien est marqué comme page courante.
+     * Entrées de la barre de navigation : liens directs, puis menus déroulants des liens portant un « groupe »
+     * (imports, administration), pour que la barre tienne sur l'écran quel que soit le cumul des rôles.
      *
-     * @return list<array{libelle: string, route: string, parametres?: array<string, string>, actif?: string}>
+     * @return list<array{libelle: string, route?: string, parametres?: array<string, string>, actif?: string, liens?: list<array{libelle: string, route: string, parametres?: array<string, string>, actif?: string}>}>
      */
     private function navigation(User $user, ?Elevage $courant): array
+    {
+        $entrees = [];
+        $groupes = [];
+        foreach ($this->liens($user, $courant) as $lien) {
+            if (! isset($lien['groupe'])) {
+                $entrees[] = $lien;
+
+                continue;
+            }
+            $groupe = $lien['groupe'];
+            unset($lien['groupe']);
+            $groupes[$groupe][] = $lien;
+        }
+        foreach ($groupes as $libelle => $liens) {
+            $entrees[] = count($liens) === 1 ? $liens[0] : ['libelle' => $libelle, 'liens' => $liens];
+        }
+
+        return $entrees;
+    }
+
+    /**
+     * Liens de navigation ; « parametres » : paramètres de route éventuels (E24 : table éditée, volets du dossier :
+     * élevage courant) ; « actif » : motif des routes où le lien est marqué comme page courante ; « groupe » : menu
+     * déroulant qui le range.
+     *
+     * @return list<array{libelle: string, route: string, parametres?: array<string, string>, actif?: string, groupe?: string}>
+     */
+    private function liens(User $user, ?Elevage $courant): array
     {
         $liens = [];
         $dossier = $courant === null ? null : ['elevage' => $courant->id];
@@ -97,7 +125,7 @@ class EspaceComposer
         }
 
         if ($user->can('bulletin.importer')) {
-            $liens[] = ['libelle' => 'Import des bulletins', 'route' => 'import.bulletins'];
+            $liens[] = ['libelle' => 'Import des bulletins', 'route' => 'import.bulletins', 'groupe' => 'Imports'];
         }
 
         if ($user->can('pilotage.lire')) {
@@ -105,16 +133,16 @@ class EspaceComposer
         }
 
         if ($user->can('sagema.importer')) {
-            $liens[] = ['libelle' => 'Import SAGEMA', 'route' => 'import.sagema'];
+            $liens[] = ['libelle' => 'Import SAGEMA', 'route' => 'import.sagema', 'groupe' => 'Imports'];
         }
 
         if ($user->hasAnyRole(['admin', Perimetre::ROLE_GLOBAL])) {
-            $liens[] = ['libelle' => 'Utilisateurs', 'route' => 'admin.utilisateurs'];
-            $liens[] = ['libelle' => 'Conventions', 'route' => 'admin.conventions'];
-            $liens[] = ['libelle' => 'GDS', 'route' => 'admin.gds'];
-            $liens[] = ['libelle' => 'Journal', 'route' => 'admin.journal'];
-            $liens[] = ['libelle' => 'Exploitation', 'route' => 'admin.exploitation'];
-            $liens[] = ['libelle' => 'Référentiels', 'route' => 'admin.referentiels', 'parametres' => ['table' => 'seuils']];
+            $liens[] = ['libelle' => 'Utilisateurs', 'route' => 'admin.utilisateurs', 'groupe' => 'Administration'];
+            $liens[] = ['libelle' => 'Conventions', 'route' => 'admin.conventions', 'groupe' => 'Administration'];
+            $liens[] = ['libelle' => 'GDS', 'route' => 'admin.gds', 'groupe' => 'Administration'];
+            $liens[] = ['libelle' => 'Journal', 'route' => 'admin.journal', 'groupe' => 'Administration'];
+            $liens[] = ['libelle' => 'Exploitation', 'route' => 'admin.exploitation', 'groupe' => 'Administration'];
+            $liens[] = ['libelle' => 'Référentiels', 'route' => 'admin.referentiels', 'parametres' => ['table' => 'seuils'], 'actif' => 'admin.referentiels', 'groupe' => 'Administration'];
         }
 
         return $liens;

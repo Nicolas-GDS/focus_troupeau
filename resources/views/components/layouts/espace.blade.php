@@ -27,14 +27,28 @@
 
         <div class="border-t border-slate-200">
             <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-2 sm:flex-row sm:items-center sm:justify-between">
-                <nav aria-label="Navigation principale" class="flex flex-col gap-1 sm:flex-row sm:items-center">
-                    @foreach ($navigation as $lien)
-                        <a href="{{ route($lien['route'], $lien['parametres'] ?? []) }}" class="lien-navigation"
-                           @if (request()->routeIs(...explode('|', $lien['actif'] ?? $lien['route']))) aria-current="page" @endif>{{ $lien['libelle'] }}</a>
+                {{-- Liens directs puis menus déroulants (imports, administration) ; la barre passe à la ligne plutôt que de déborder --}}
+                <nav aria-label="Navigation principale" class="flex min-w-0 flex-col gap-1 sm:flex-1 sm:flex-row sm:flex-wrap sm:items-center">
+                    @foreach ($navigation as $entree)
+                        @isset($entree['liens'])
+                            @php($groupeActif = collect($entree['liens'])->contains(fn ($lien) => request()->routeIs(...explode('|', $lien['actif'] ?? $lien['route']))))
+                            <details class="menu-deroulant menu-deroulant-gauche">
+                                <summary @if ($groupeActif) data-actif @endif>{{ $entree['libelle'] }}</summary>
+                                <div>
+                                    @foreach ($entree['liens'] as $lien)
+                                        <a href="{{ route($lien['route'], $lien['parametres'] ?? []) }}" class="option"
+                                           @if (request()->routeIs(...explode('|', $lien['actif'] ?? $lien['route']))) aria-current="page" @endif>{{ $lien['libelle'] }}</a>
+                                    @endforeach
+                                </div>
+                            </details>
+                        @else
+                            <a href="{{ route($entree['route'], $entree['parametres'] ?? []) }}" class="lien-navigation"
+                               @if (request()->routeIs(...explode('|', $entree['actif'] ?? $entree['route']))) aria-current="page" @endif>{{ $entree['libelle'] }}</a>
+                        @endisset
                     @endforeach
                 </nav>
 
-                <div class="flex flex-col gap-1 sm:flex-row sm:items-center">
+                <div class="flex shrink-0 flex-col gap-1 sm:flex-row sm:items-center">
                     {{-- EF-M0-08 : sélecteur d'élevage en tête d'écran --}}
                     @if ($elevages->count() > 1)
                         <details class="menu-deroulant">
