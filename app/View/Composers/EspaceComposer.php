@@ -49,15 +49,16 @@ class EspaceComposer
     }
 
     /**
-     * Entrées de la barre de navigation : liens directs, puis menus déroulants des liens portant un « groupe »
-     * (imports, administration), pour que la barre tienne sur l'écran quel que soit le cumul des rôles.
+     * Entrées de la barre de navigation : liens directs et menus déroulants des liens portant un « groupe » (élevage
+     * courant pour les agents, imports, administration), pour que la barre tienne sur l'écran quel que soit le cumul des rôles.
      *
      * @return list<array{libelle: string, route?: string, parametres?: array<string, string>, actif?: string, liens?: list<array{libelle: string, route: string, parametres?: array<string, string>, actif?: string}>}>
      */
     private function navigation(User $user, ?Elevage $courant): array
     {
+        // Chaque menu prend la place de son premier lien, ses liens y sont rangés dans l'ordre.
         $entrees = [];
-        $groupes = [];
+        $positions = [];
         foreach ($this->liens($user, $courant) as $lien) {
             if (! isset($lien['groupe'])) {
                 $entrees[] = $lien;
@@ -66,13 +67,14 @@ class EspaceComposer
             }
             $groupe = $lien['groupe'];
             unset($lien['groupe']);
-            $groupes[$groupe][] = $lien;
-        }
-        foreach ($groupes as $libelle => $liens) {
-            $entrees[] = count($liens) === 1 ? $liens[0] : ['libelle' => $libelle, 'liens' => $liens];
+            if (! isset($positions[$groupe])) {
+                $positions[$groupe] = count($entrees);
+                $entrees[] = ['libelle' => $groupe, 'liens' => []];
+            }
+            $entrees[$positions[$groupe]]['liens'][] = $lien;
         }
 
-        return $entrees;
+        return array_map(fn (array $entree) => isset($entree['liens']) && count($entree['liens']) === 1 ? $entree['liens'][0] : $entree, $entrees);
     }
 
     /**
@@ -111,12 +113,14 @@ class EspaceComposer
         }
 
         // E12 à E16 — stocks fourragers, troupeau, autonomie, approvisionnement et paramètres de l'élevage (annexe 10 : éleveur, technicien)
+        // L'éleveur les garde en liens directs ; un agent, dont la barre est plus chargée, les trouve dans le menu « Élevage ».
         if ($dossier !== null && $user->hasAnyRole(['eleveur', 'technicien'])) {
-            $liens[] = ['libelle' => 'Stocks', 'route' => 'stocks', 'parametres' => $dossier, 'actif' => 'stocks*'];
-            $liens[] = ['libelle' => 'Troupeau', 'route' => 'troupeau', 'parametres' => $dossier];
-            $liens[] = ['libelle' => 'Autonomie', 'route' => 'autonomie', 'parametres' => $dossier];
-            $liens[] = ['libelle' => 'Approvisionnement', 'route' => 'approvisionnement', 'parametres' => $dossier, 'actif' => 'approvisionnement|scenarios.*'];
-            $liens[] = ['libelle' => 'Paramètres', 'route' => 'parametres', 'parametres' => $dossier];
+            $groupe = $user->hasRole('eleveur') ? [] : ['groupe' => 'Élevage'];
+            $liens[] = ['libelle' => 'Stocks', 'route' => 'stocks', 'parametres' => $dossier, 'actif' => 'stocks*', ...$groupe];
+            $liens[] = ['libelle' => 'Troupeau', 'route' => 'troupeau', 'parametres' => $dossier, ...$groupe];
+            $liens[] = ['libelle' => 'Autonomie', 'route' => 'autonomie', 'parametres' => $dossier, ...$groupe];
+            $liens[] = ['libelle' => 'Approvisionnement', 'route' => 'approvisionnement', 'parametres' => $dossier, 'actif' => 'approvisionnement|scenarios.*', ...$groupe];
+            $liens[] = ['libelle' => 'Paramètres', 'route' => 'parametres', 'parametres' => $dossier, ...$groupe];
         }
 
         // E23 — élevages (EF-M0-02)
