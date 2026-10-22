@@ -3,6 +3,15 @@
 Format inspiré de [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/) ; versions sémantiques (chapitre 6.5).
 Le numéro de version est affiché dans le pied de page de l'application et dans les PDF (ENF-EXP-03).
 
+## [Non publié]
+
+### Ajouté
+- Import des bulletins (E19, EF-M9-01) : pré-rapprochement des bulletins « à rapprocher ». L'écran propose jusqu'à
+  trois élevages du GDS du dépôt sous convention active, classés d'après l'en-tête du bulletin (nom de l'éleveur ou
+  du tiers, code postal, commune, adresse), avec un score sur 100, un niveau de correspondance et ses motifs. Le
+  technicien retient une proposition en un clic ou choisit un autre élevage ; rien n'est rapproché sans lui. La
+  proposition retenue est tracée au journal (`rapprochement_bulletin`).
+
 ## [1.0.0-rc.1] — lot L8 (recette et mise en production), candidate à la recette des élevages testeurs
 
 ### Ajouté
