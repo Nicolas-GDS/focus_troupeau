@@ -5,6 +5,8 @@ namespace App\Livewire\Elevages;
 use App\Livewire\Admin\Concerns\AdministrateurCourant;
 use App\Models\Fourrage\Elevage;
 use App\Services\Administration\ElevagesService;
+use App\Services\Agds\PreremplissageAgds;
+use App\Services\Dossier\SaisieRefusee;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Url;
@@ -36,6 +38,30 @@ class Liste extends Component
         $this->resetPage();
     }
 
+    /** Message du pré-remplissage depuis AGDS (succès ou avertissement), affiché sous le numéro EDE. */
+    public ?string $messageAgds = null;
+
+    /**
+     * Pré-remplit l'identité depuis AGDS à partir du numéro EDE et du GDS choisi (agds.lire) : seuls les champs connus
+     * d'AGDS sont remplacés, les autres saisies sont gardées.
+     */
+    public function preremplirAgds(PreremplissageAgds $preremplissage): void
+    {
+        abort_unless($this->admin()->can('agds.lire'), 403);
+        $this->messageAgds = null;
+        $this->resetErrorBag('nouveau.num_cheptel_ede');
+
+        try {
+            $proposition = $preremplissage->proposer((string) $this->nouveau['num_cheptel_ede'], (int) $this->nouveau['gds_id'], $this->admin());
+        } catch (SaisieRefusee $e) {
+            $this->addError('nouveau.num_cheptel_ede', $e->getMessage());
+
+            return;
+        }
+        $this->nouveau = [...$this->nouveau, ...$proposition['champs']];
+        $this->messageAgds = $proposition['message'];
+    }
+
     public function creer(ElevagesService $service): void
     {
         $this->validate(['nouveau.gds_id' => ['required', 'integer'], 'nouveau.raison_sociale' => ['required', 'string', 'max:200'], 'nouveau.courriel' => ['nullable', 'email'],
@@ -64,6 +90,7 @@ class Liste extends Component
             'conventions' => DB::table('app.convention')->whereIn('elevage_id', $ids)->orderBy('date_fin')->get(['elevage_id', 'statut', 'date_fin'])->keyBy('elevage_id'),
             'gds' => DB::table('app.gds')->whereIn('id', $service->gdsPossibles($this->admin()))->pluck('nom', 'id'),
             'especes' => ElevagesService::ESPECES,
+            'preremplissageAgds' => config('agds.actif') && $this->admin()->can('agds.lire'),
         ])->layout('components.layouts.espace', ['titre' => 'Élevages']);
     }
 }

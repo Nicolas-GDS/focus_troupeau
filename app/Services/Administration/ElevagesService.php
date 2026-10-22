@@ -34,6 +34,12 @@ class ElevagesService
             ->orderBy('id')->pluck('id')->map(fn ($i) => (int) $i)->all();
     }
 
+    /** Département d'un élevage créé dans un GDS (l'identifiant du GDS est son numéro de département). */
+    public static function departementDuGds(int $gds): string
+    {
+        return str_pad((string) $gds, 2, '0', STR_PAD_LEFT);
+    }
+
     /**
      * @param  array<string, mixed>  $d  identité, gds_id, especes, effectifs, systemes, consentement_donnees
      */
@@ -47,7 +53,7 @@ class ElevagesService
 
         return DB::transaction(function () use ($d, $gds, $auteur) {
             $elevage = Elevage::query()->create([
-                'code_pseudo' => $this->prochainCode(), 'departement' => str_pad((string) $gds, 2, '0', STR_PAD_LEFT), 'gds_id' => $gds,
+                'code_pseudo' => $this->prochainCode(), 'departement' => self::departementDuGds($gds), 'gds_id' => $gds,
                 ...$this->caracteristiques($d),
             ]);
             DB::table('prive.elevage_identite')->insert([...$this->identite($d), 'elevage_id' => $elevage->id]);

@@ -29,7 +29,20 @@
                     <div><label for="ne-gds" class="etiquette">GDS</label><select id="ne-gds" wire:model="nouveau.gds_id" class="champ w-full">@foreach ($gds as $id => $nom) <option value="{{ $id }}">{{ $nom }}</option> @endforeach</select></div>
                 @endif
                 <div><label for="ne-rs" class="etiquette">Raison sociale</label><input id="ne-rs" type="text" wire:model="nouveau.raison_sociale" class="champ w-full">@error('nouveau.raison_sociale') <span class="text-xs text-etat-critique">{{ $message }}</span> @enderror</div>
-                <div><label for="ne-ede" class="etiquette">Numéro EDE</label><input id="ne-ede" type="text" wire:model="nouveau.num_cheptel_ede" class="champ w-full" placeholder="FR12345678"></div>
+                <div>
+                    <label for="ne-ede" class="etiquette">Numéro EDE</label>
+                    <div class="flex gap-2">
+                        <input id="ne-ede" type="text" wire:model="nouveau.num_cheptel_ede" class="champ w-full" placeholder="FR12345678" aria-describedby="ne-ede-aide">
+                        @if ($preremplissageAgds)
+                            <button type="button" wire:click="preremplirAgds" wire:loading.attr="disabled" wire:target="preremplirAgds" class="bouton-secondaire whitespace-nowrap">Pré-remplir depuis AGDS</button>
+                        @endif
+                    </div>
+                    @if ($preremplissageAgds)
+                        <p id="ne-ede-aide" class="mt-1 text-xs text-texte-doux">Saisissez le numéro EDE puis pré-remplissez : raison sociale, code postal, téléphone et e-mail sont repris d'AGDS (cheptel cherché dans le département du GDS choisi).</p>
+                    @endif
+                    @error('nouveau.num_cheptel_ede') <p class="mt-1 text-xs text-etat-critique" role="alert">{{ $message }}</p> @enderror
+                    @if ($messageAgds) <p class="mt-1 text-xs" role="status">{{ $messageAgds }}</p> @endif
+                </div>
                 <div><label for="ne-contact" class="etiquette">Contact</label><input id="ne-contact" type="text" wire:model="nouveau.nom_contact" class="champ w-full"></div>
                 <div class="grid grid-cols-2 gap-2">
                     <div><label for="ne-cp" class="etiquette">Code postal</label><input id="ne-cp" type="text" inputmode="numeric" wire:model="nouveau.code_postal" class="champ w-full">@error('nouveau.code_postal') <span class="text-xs text-etat-critique">{{ $message }}</span> @enderror</div>

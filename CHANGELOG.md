@@ -10,6 +10,9 @@ Le numéro de version est affiché dans le pied de page de l'application et dans
   composition du troupeau bovin présent (sexe, tranche d'âge, race ; liste des bovins par numéro national), lues à
   l'ouverture dans les vues en lecture seule de SAGEMA (connexion `sagema`, `SAGEMA_DB_*`), par le numéro EDE et
   bornées au département de l'élevage. Agents GDS seulement (permission `agds.lire`) ; aucune écriture.
+- Création d'un élevage (E23, EF-M0-02) : bouton « Pré-remplir depuis AGDS » ; à partir du numéro EDE et du GDS
+  choisi, la raison sociale, le code postal, le téléphone et l'e-mail sont repris d'AGDS (cheptel cherché dans le
+  département du GDS, EDE déjà suivi refusé, activité cessée signalée). Le technicien relit puis crée.
 
 ## [1.0.0-rc.1] — lot L8 (recette et mise en production), candidate à la recette des élevages testeurs
 
