@@ -223,8 +223,20 @@ it('range les imports et l\'administration dans des menus déroulants de la barr
         ->toMatch('#<summary\s*>Imports</summary>#')
         ->toMatch('#href="'.preg_quote(route('admin.journal'), '#').'" class="option"\s+aria-current="page"#');
     $page->assertSee(route('admin.utilisateurs'), false)->assertSee(route('import.sagema'), false)
-        ->assertSeeInOrder(['Navigation principale', 'Élevages', 'Imports', 'Administration']);
+        ->assertSeeInOrder(['Navigation principale', 'Dossier', '>Élevage</summary>', 'Stocks', 'Paramètres', 'Élevages', 'Imports', 'Administration'], false);
 
     $this->actingAs($this->jeu->veterinaireConseil24)->get(route('travail'))
         ->assertDontSee('>Imports</summary>', false)->assertDontSee('>Administration</summary>', false);
+});
+
+it('garde les outils de l\'élevage en liens directs pour l\'éleveur et les range dans le menu « Élevage » pour un agent', function () {
+    $eleveur = $this->actingAs($this->jeu->eleveur24a)->get(route('accueil'))->assertDontSee('>Élevage</summary>', false)->getContent();
+    expect($eleveur)->toMatch('#href="'.preg_quote(route('stocks', $this->jeu->elevage24a->id), '#').'" class="lien-navigation"#');
+
+    $this->actingAs($this->jeu->technicien24);
+    $this->post(route('elevage-courant'), ['elevage' => $this->jeu->elevage24a->id]);
+    $html = $this->get(route('stocks', $this->jeu->elevage24a->id))->assertOk()->getContent();
+
+    expect($html)->toMatch('#<summary\s+data-actif\s*>Élevage</summary>#')
+        ->toMatch('#href="'.preg_quote(route('stocks', $this->jeu->elevage24a->id), '#').'" class="option"\s+aria-current="page"#');
 });
