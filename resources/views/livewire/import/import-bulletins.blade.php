@@ -73,6 +73,30 @@
                                 </td>
                                 <td class="px-4 py-3">
                                     @if ($import->statut === 'a_rapprocher')
+                                        {{-- Pré-rapprochement : élevages sous convention active les plus proches de l'en-tête du bulletin --}}
+                                        @php($proposes = $propositions[$import->id] ?? [])
+                                        @php($entete = $import->donnees_extraites['entete'] ?? [])
+                                        <p class="mb-2 text-xs text-texte-doux">
+                                            Lu sur le bulletin : {{ collect([$entete['eleveur'] ?? null, trim(($entete['code_postal'] ?? '').' '.($entete['commune'] ?? ''))])->filter()->join(' — ') ?: 'aucune identité lisible' }}
+                                        </p>
+                                        @if ($proposes === [])
+                                            <p class="mb-2 text-xs text-texte-doux">Aucun élevage sous convention active ne correspond : choisissez l'élevage dans la liste.</p>
+                                        @else
+                                            @php($evidente = \App\Domain\Rapprochement\PreRapprochement::evidente($proposes))
+                                            <ul class="mb-3 space-y-2" aria-label="Élevages proposés">
+                                                @foreach ($proposes as $proposition)
+                                                    @php($pastille = \App\Livewire\Import\ImportBulletins::libelleProposition($proposition->niveau))
+                                                    <li wire:key="proposition-{{ $import->id }}-{{ $proposition->elevage->elevageId }}" class="flex flex-wrap items-center gap-2">
+                                                        <span class="font-medium">{{ $proposition->elevage->libelle() }}</span>
+                                                        <span class="text-xs text-texte-doux">({{ $proposition->elevage->codePseudo }})</span>
+                                                        <x-pastille :etat="$pastille['etat']" :libelle="$pastille['libelle'].' — '.$proposition->score.' / 100'" />
+                                                        <span class="text-xs text-texte-doux">{{ implode(', ', $proposition->motifs) }}</span>
+                                                        <button type="button" wire:click="retenirProposition({{ $import->id }}, '{{ $proposition->elevage->elevageId }}')"
+                                                                class="{{ $proposition === $evidente ? 'bouton-principal' : 'bouton-secondaire' }}">Rapprocher sur cet élevage</button>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @endif
                                         <form wire:submit="rapprocher({{ $import->id }})" class="flex flex-wrap items-end gap-2">
                                             <div>
                                                 <label for="elevage-{{ $import->id }}" class="etiquette">Élevage</label>
