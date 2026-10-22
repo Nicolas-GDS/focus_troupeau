@@ -3,6 +3,7 @@
 namespace App\Services\Cloisonnement;
 
 use App\Models\Fourrage\Elevage;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -16,11 +17,17 @@ class RegleConvention
     {
         $id = $elevage instanceof Elevage ? $elevage->getKey() : $elevage;
 
+        return $this->conventionsActives()->where('elevage_id', $id)->exists();
+    }
+
+    /**
+     * Conventions actives ce jour, selon la même règle que estActive().
+     */
+    public function conventionsActives(): Builder
+    {
         return DB::table('app.convention')
-            ->where('elevage_id', $id)
             ->where('statut', 'active')
             ->whereDate('date_debut', '<=', today())
-            ->whereDate('date_fin', '>=', today())
-            ->exists();
+            ->whereDate('date_fin', '>=', today());
     }
 }

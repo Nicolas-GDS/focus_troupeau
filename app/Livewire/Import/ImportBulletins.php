@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Import;
 
+use App\Domain\Rapprochement\PropositionRapprochement;
 use App\Models\App\Gds;
 use App\Models\App\ImportBulletin;
 use App\Models\App\User;
@@ -9,6 +10,7 @@ use App\Models\Fourrage\Analyse;
 use App\Models\Fourrage\Elevage;
 use App\Services\ElevageCourant;
 use App\Services\Import\ImportBulletinService;
+use App\Services\Import\PreRapprochementService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -18,9 +20,9 @@ use Livewire\WithFileUploads;
 use RuntimeException;
 
 /**
- * E19 — Import des bulletins (EF-M9-01, EF-M2-01, RC-2) : dépôt de PDF, suivi des imports, rapprochement manuel,
- * traitement des anomalies. Chaque action est autorisée côté serveur (ENF-SEC-04) ; les listes passent par les
- * scopes de cloisonnement.
+ * E19 — Import des bulletins (EF-M9-01, EF-M2-01, RC-2) : dépôt de PDF, suivi des imports, rapprochement manuel
+ * (avec propositions d'élevages sous convention active), traitement des anomalies. Chaque action est autorisée côté
+ * serveur (ENF-SEC-04) ; les listes passent par les scopes de cloisonnement.
  */
 class ImportBulletins extends Component
 {
@@ -78,6 +80,33 @@ class ImportBulletins extends Component
         session()->flash('status', 'Bulletin rapproché : '.self::libelleStatut($import->statut)['libelle'].'.');
     }
 
+    /**
+     * Retient une proposition de pré-rapprochement en un clic. La proposition est recalculée côté serveur : seul un
+     * élevage encore proposé pour ce bulletin peut être retenu ainsi.
+     */
+    public function retenirProposition(int $importId, string $elevageId, ImportBulletinService $service, PreRapprochementService $preRapprochement): void
+    {
+        $import = ImportBulletin::query()->findOrFail($importId);
+        $this->authorize('rapprocher', $import);
+
+        $proposition = collect($preRapprochement->propositions([$import])[$import->id] ?? [])
+            ->first(fn (PropositionRapprochement $p) => $p->elevage->elevageId === $elevageId);
+
+        if ($proposition === null) {
+            $this->addError("elevagesChoisis.{$importId}", 'Cet élevage n\'est plus proposé pour ce bulletin : choisissez-le dans la liste.');
+
+            return;
+        }
+
+        $elevage = Elevage::query()->where('gds_id', $import->gds_id)->findOrFail($elevageId);
+        $import = $service->rapprocher($import, $elevage, $this->utilisateur(), [
+            'pre_rapprochement' => ['score' => $proposition->score, 'niveau' => $proposition->niveau, 'motifs' => $proposition->motifs],
+        ]);
+        unset($this->elevagesChoisis[$importId]);
+
+        session()->flash('status', 'Bulletin rapproché : '.self::libelleStatut($import->statut)['libelle'].'.');
+    }
+
     public function leverAnomalie(int $analyseId, ImportBulletinService $service): void
     {
         $analyse = Analyse::query()->findOrFail($analyseId);
@@ -110,6 +139,7 @@ class ImportBulletins extends Component
             'imports' => $imports,
             'gdsDisponibles' => $this->gdsDisponibles(),
             'elevagesParGds' => app(ElevageCourant::class)->accessibles()->groupBy('gds_id'),
+            'propositions' => app(PreRapprochementService::class)->propositions($imports),
         ]);
     }
 
@@ -129,6 +159,20 @@ class ImportBulletins extends Component
             'doublon' => ['libelle' => 'Doublon', 'etat' => 'information'],
             'erreur' => ['libelle' => 'Erreur', 'etat' => 'alerte'],
             default => ['libelle' => $statut, 'etat' => 'information'],
+        };
+    }
+
+    /**
+     * Libellé et état visuel du niveau d'une proposition de pré-rapprochement (EF-GEN-03).
+     *
+     * @return array{libelle: string, etat: string}
+     */
+    public static function libelleProposition(string $niveau): array
+    {
+        return match ($niveau) {
+            PropositionRapprochement::FORTE => ['libelle' => 'Correspondance forte', 'etat' => 'couvert'],
+            PropositionRapprochement::MOYENNE => ['libelle' => 'Correspondance moyenne', 'etat' => 'vigilance'],
+            default => ['libelle' => 'Correspondance faible', 'etat' => 'information'],
         };
     }
 

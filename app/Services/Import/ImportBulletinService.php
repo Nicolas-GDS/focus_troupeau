@@ -158,8 +158,10 @@ class ImportBulletinService
 
     /**
      * Rapprochement manuel par le technicien : l'élevage doit appartenir au GDS du dépôt.
+     *
+     * @param  array<string, mixed>  $detail  trace au journal (proposition de pré-rapprochement retenue, le cas échéant)
      */
-    public function rapprocher(ImportBulletin $import, Elevage $elevage, User $technicien): ImportBulletin
+    public function rapprocher(ImportBulletin $import, Elevage $elevage, User $technicien, array $detail = []): ImportBulletin
     {
         if ($import->statut !== 'a_rapprocher') {
             throw new RuntimeException('Ce bulletin n\'est pas en attente de rapprochement.');
@@ -169,7 +171,7 @@ class ImportBulletinService
             throw new RuntimeException('L\'élevage choisi n\'appartient pas au GDS du dépôt.');
         }
 
-        $this->journal->ecrire('rapprochement_bulletin', $technicien->id, 'app.import_bulletin:'.$import->id, [], $elevage->id);
+        $this->journal->ecrire('rapprochement_bulletin', $technicien->id, 'app.import_bulletin:'.$import->id, $detail, $elevage->id);
 
         return $this->enregistrer($import, $this->creerPrelevement($import, $elevage), null);
     }
