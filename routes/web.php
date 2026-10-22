@@ -16,6 +16,7 @@ use App\Livewire\Autonomie\Parametres as ParametresElevageEcran;
 use App\Livewire\Autonomie\ScenarioEcran;
 use App\Livewire\Dossier\Interpretation\EcranVisite;
 use App\Livewire\Dossier\Lecture\Accueil;
+use App\Livewire\Dossier\Lecture\Agds;
 use App\Livewire\Dossier\Lecture\Aliments;
 use App\Livewire\Dossier\Lecture\Animaux;
 use App\Livewire\Dossier\Lecture\Eau;
@@ -78,6 +79,10 @@ Route::middleware(['auth', 'compte.actif'])->group(function () {
             Route::get('/historique', Historique::class)->name('historique');
             Route::get('/plan-action', PlanAction::class)->name('plan');
         });
+
+        // EF-M9-03, § 6.4 — données AGDS de l'élevage lues dans les vues de SAGEMA (identité, troupeau bovin) : agents GDS
+        // (agds.lire) ; élevage lié à travers les scopes (404 hors périmètre)
+        Route::get('/elevages/{elevage}/agds', Agds::class)->middleware('permission:agds.lire')->name('dossier.agds');
 
         // E17 — Compte et consentements
         Route::middleware('role:eleveur|veterinaire')->group(function () {

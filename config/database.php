@@ -101,6 +101,23 @@ return [
             'sslmode' => env('DB_SSLMODE', 'prefer'),
         ],
 
+        // Vues AGDS en lecture seule exposées par SAGEMA (schéma « focus », § 6.4 « vue SQL (cible) ») : identité de
+        // l'éleveur et bovins présents d'un cheptel. Compte dédié, membre du rôle focus_troupeau_lecture de SAGEMA.
+        'sagema' => [
+            'driver' => 'pgsql',
+            'host' => env('SAGEMA_DB_HOST'),
+            'port' => env('SAGEMA_DB_PORT', '5432'),
+            'database' => env('SAGEMA_DB_DATABASE', 'sagema'),
+            'username' => env('SAGEMA_DB_USERNAME', 'focus_troupeau'),
+            'password' => env('SAGEMA_DB_PASSWORD', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => env('SAGEMA_DB_SCHEMA', 'focus'),
+            'sslmode' => env('SAGEMA_DB_SSLMODE', 'prefer'),
+            'options' => [PDO::ATTR_TIMEOUT => (int) env('SAGEMA_DB_TIMEOUT', 5)],
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),

@@ -28,7 +28,7 @@ it('attribue à chaque rôle les permissions de la matrice du § 2.3', function 
         'profil_sanguin.lire', 'stock.ecrire', 'stock.lire', 'visite.lire',
     ]],
     'technicien' => ['technicien', [
-        'bilan_sanitaire.lire', 'bilan_sanitaire.rediger', 'bulletin.controler', 'bulletin.importer', 'bulletin.lire',
+        'agds.lire', 'bilan_sanitaire.lire', 'bilan_sanitaire.rediger', 'bulletin.controler', 'bulletin.importer', 'bulletin.lire',
         'compte.inviter', 'compte.lire', 'consentement.lire', 'convention.ecrire', 'convention.lire', 'donnees.exporter',
         'eau.lire', 'eau.rediger', 'elevage.ecrire', 'elevage.lire', 'etiquette.lire', 'etiquette.rediger', 'etiquette.valider',
         'interpretation.lire', 'interpretation.rediger', 'mesure_terrain.lire', 'mesure_terrain.rediger',
@@ -37,7 +37,7 @@ it('attribue à chaque rôle les permissions de la matrice du § 2.3', function 
         'stock.ecrire', 'stock.lire', 'visite.lire', 'visite.rediger',
     ]],
     'vétérinaire conseil' => ['veterinaire_gds', [
-        'bilan_sanitaire.lire', 'bulletin.lire', 'convention.lire', 'eau.lire', 'elevage.lire', 'etiquette.lire',
+        'agds.lire', 'bilan_sanitaire.lire', 'bulletin.lire', 'convention.lire', 'eau.lire', 'elevage.lire', 'etiquette.lire',
         'interpretation.lire', 'interpretation.viser', 'mesure_terrain.lire', 'plan.lire', 'plan_action.lire',
         'plan_action.valider_veterinaire', 'profil_sanguin.lire', 'profil_sanguin.rediger', 'referentiel.lire',
         'stock.lire', 'visite.lire',
@@ -48,7 +48,7 @@ it('attribue à chaque rôle les permissions de la matrice du § 2.3', function 
         'profil_sanguin.rediger', 'stock.lire', 'visite.lire',
     ]],
     'administrateur' => ['admin', [
-        'bilan_sanitaire.lire', 'bulletin.lire', 'compte.ecrire', 'compte.inviter', 'compte.lire',
+        'agds.lire', 'bilan_sanitaire.lire', 'bulletin.lire', 'compte.ecrire', 'compte.inviter', 'compte.lire',
         'consentement.ecrire', 'consentement.lire', 'convention.ecrire', 'convention.lire', 'convention.resilier',
         'donnees.exporter', 'eau.lire', 'elevage.anonymiser', 'elevage.ecrire', 'elevage.lire', 'etiquette.lire',
         'gds.ecrire', 'interpretation.lire', 'journal.lire', 'mesure_terrain.lire', 'pilotage.lire', 'plan.lire',

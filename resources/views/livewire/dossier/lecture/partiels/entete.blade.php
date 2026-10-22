@@ -5,6 +5,9 @@
         'dossier.animaux' => 'Animaux', 'dossier.aliments' => 'Minéraux et aliments', 'dossier.sanitaire' => 'Bilan sanitaire',
         'dossier.historique' => 'Historique', 'dossier.plan' => 'Plan d\'action',
     ];
+    if (auth()->user()?->can('agds.lire')) {
+        $volets['dossier.agds'] = 'Données AGDS';
+    }
 @endphp
 <div class="mb-6 space-y-3">
     <p class="text-texte-doux">{{ $libelleElevage }}@if ($libelleElevage !== $elevage->code_pseudo) ({{ $elevage->code_pseudo }})@endif</p>

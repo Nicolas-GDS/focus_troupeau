@@ -53,6 +53,8 @@ use App\Policies\ReferentielPolicy;
 use App\Policies\ScenarioPolicy;
 use App\Policies\StockPolicy;
 use App\Policies\VisitePolicy;
+use App\Services\Agds\SourceAgds;
+use App\Services\Agds\VuesSagemaAgds;
 use App\Services\Autonomie\RecalculBilan;
 use App\Services\Cloisonnement\Perimetre;
 use App\Services\Import\ExtracteurBulletin;
@@ -83,6 +85,7 @@ class AppServiceProvider extends ServiceProvider
         // Extraction des bulletins (EF-M9-01) : script LANO existant ; un export structuré la remplacera.
         $this->app->bind(ExtracteurBulletin::class, ExtracteurLano::class);
         $this->app->bind(RenduPdf::class, RenduBrowsershot::class);
+        $this->app->bind(SourceAgds::class, VuesSagemaAgds::class);
         $this->app->bind(PasserelleSms::class, fn () => config('services.brevo.pilote_sms') === 'brevo' ? new SmsBrevo : new SmsJournal);
         // EF-M6-05 : inventaires à recalculer en fin de transaction, propres à la requête ou au job
         $this->app->scoped(RecalculBilan::class);

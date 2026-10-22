@@ -127,6 +127,8 @@ const REGISTRE_ROUTES = [
     // PDF du bilan et du scénario (EF-M6-06) ; testés dans tests/Feature/Autonomie/PdfAutonomieTest.php
     'GET elevages/{elevage}/autonomie/pdf' => ['acces' => 'objet'],
     'GET elevages/{elevage}/scenarios/{scenario}/pdf' => ['acces' => 'objet'],
+    // EF-M9-03, § 6.4 — données AGDS lues dans SAGEMA (agds.lire : agents GDS) ; écran testé dans tests/Feature/Agds/DonneesAgdsTest.php
+    'GET elevages/{elevage}/agds' => ['acces' => 'dossier', 'roles' => ['technicien', 'veterinaire_gds', 'admin', 'admin_global']],
 ];
 
 /** Rôles des volets du dossier (annexe 10 : éleveur, technicien, vétérinaire ; vétérinaire conseil pour E07, E11, E21). */
